@@ -1,0 +1,12 @@
+# Mengabaikan Virtual Environment
+env/
+triago_env/
+venv/
+
+# Mengabaikan Cache Python
+**/__pycache__/
+*.pyc
+
+# Mengabaikan file log data pasien sementara (jika ada)
+*.csv
+*.log
