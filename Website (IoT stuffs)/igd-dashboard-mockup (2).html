@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>IGD Command Center — Mockup</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>IGD command center</h1>
+    <p>Auto bed management &amp; patient status — RSUD demo</p>
+  </div>
+  <div class="live-clock">
+    <div class="live-dot"></div>
+    <div>
+      <div class="clock-time mono" id="clock">--:--:--</div>
+      <div class="clock-date" id="clockDate">-</div>
+    </div>
+  </div>
+</header>
+
+<div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+  <div class="stat-card stat-red"><div class="n" id="countRed">0</div><div class="l">Resusitasi</div></div>
+  <div class="stat-card stat-yellow"><div class="n" id="countYellow">0</div><div class="l">Darurat</div></div>
+  <div class="stat-card stat-green"><div class="n" id="countGreen">0</div><div class="l">Non-darurat</div></div>
+</div>
+
+<div class="layout">
+  <div class="panel wrapper">
+    <div class="panel-title">
+      <span>Layout bed — realtime</span>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--empty);border:1px solid var(--border-strong)"></div>Kosong</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Merah</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Kuning</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Hijau</div>
+      </div>
+    </div>
+
+    <div class="zone">
+      <div class="zone-label"><span>Zona resusitasi</span><span class="zone-target">Target: segera (0 mnt)</span></div>
+      <div class="bed-grid" id="zoneA"></div>
+    </div>
+    <div class="zone">
+      <div class="zone-label"><span>Zona darurat</span><span class="zone-target">Target: &le;10 mnt</span></div>
+      <div class="bed-grid" id="zoneB"></div>
+    </div>
+    <div class="zone">
+      <div class="zone-label"><span>Zona non-darurat</span><span class="zone-target">Target: &le;60 mnt</span></div>
+      <div class="bed-grid" id="zoneC"></div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h3 id="modalBedId">Bed —</h3>
+        <div class="modal-row"><span>Status</span><span id="modalStatus">—</span></div>
+        <div class="modal-row"><span>Skor XGBoost</span><span id="modalScore">—</span></div>
+        <div class="modal-row"><span>Waktu masuk</span><span id="modalTime">—</span></div>
+        <div class="modal-row"><span>Perawat penanggung jawab</span><span id="modalNurse">—</span></div>
+        <button class="modal-close" onclick="closeModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-title"><span>Ambulans incoming</span><span class="mono" id="ambCount">0 unit</span></div>
+      <div id="ambList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><span>Ringkasan kapasitas</span></div>
+      <div class="modal-row" style="border-color:var(--border)"><span>Bed terisi</span><span class="mono" id="occupied">0 / 0</span></div>
+      <div class="modal-row" style="border-color:var(--border)"><span>Bed tersedia</span><span class="mono" id="available">0</span></div>
+      <div class="modal-row" style="border-color:var(--border); border-bottom:none;"><span>Rerata waktu tunggu</span><span class="mono" id="waitTime">— menit</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cats = ['red','yellow','green'];
+const catLabel = {red:'Resusitasi',yellow:'Darurat',green:'Non-Darurat'};
+const nurses = ['Ns. Ayu','Ns. Bima','Ns. Citra','Ns. Dedi'];
+
+function buildZone(id, count, occupiedRatio, targetMinutes, defaultCat){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  for(let i=1;i<=count;i++){
+    const isEmpty = Math.random() > occupiedRatio;
+    const cat = isEmpty ? null : (Math.random() < 0.6 ? defaultCat : cats[Math.floor(Math.random()*3)]);
+    const bed = document.createElement('div');
+    bed.className = 'bed' + (cat ? ' '+cat : ' empty');
+    bed.dataset.cat = cat || '';
+    bed.dataset.id = id + '-' + i;
+    bed.dataset.target = targetMinutes;
+    if(cat){
+      const elapsedMin = Math.random() * (targetMinutes > 0 ? targetMinutes * 1.6 : 6);
+      bed.dataset.arrival = Date.now() - elapsedMin * 60000;
+    }
+    bed.innerHTML = `<div class="bed-id mono">${id.slice(-1)}${i}</div>` +
+      (cat ? `<div class="bed-cat">${catLabel[cat]}</div><div class="bed-timer mono" data-timer></div>` : '');
+    bed.onclick = () => openModal(bed.dataset.id, cat);
+    el.appendChild(bed);
+  }
+}
+
+function tickCountdowns(){
+  document.querySelectorAll('.bed[data-arrival]').forEach(bed=>{
+    const target = parseFloat(bed.dataset.target);
+    const arrival = parseFloat(bed.dataset.arrival);
+    const elapsedSec = (Date.now() - arrival) / 1000;
+    const remainingSec = target * 60 - elapsedSec;
+    const timerEl = bed.querySelector('[data-timer]');
+    if(!timerEl) return;
+    const sign = remainingSec < 0 ? '-' : '';
+    const abs = Math.abs(Math.round(remainingSec));
+    const mm = String(Math.floor(abs/60)).padStart(2,'0');
+    const ss = String(abs%60).padStart(2,'0');
+    timerEl.textContent = sign + mm + ':' + ss;
+    bed.classList.toggle('overdue', remainingSec < 0);
+  });
+}
+
+function openModal(bedId, cat){
+  const overlay = document.getElementById('modalOverlay');
+  if(!cat){
+    document.getElementById('modalBedId').textContent = 'Bed ' + bedId + ' — kosong';
+    document.getElementById('modalStatus').textContent = 'Tersedia';
+    document.getElementById('modalScore').textContent = '—';
+    document.getElementById('modalTime').textContent = '—';
+    document.getElementById('modalNurse').textContent = '—';
+  } else {
+    document.getElementById('modalBedId').textContent = 'Bed ' + bedId;
+    document.getElementById('modalStatus').textContent = catLabel[cat];
+    document.getElementById('modalScore').textContent = (Math.random()*0.4 + (cat==='red'?0.6:cat==='yellow'?0.35:0.1)).toFixed(2);
+    const mins = Math.floor(Math.random()*90)+2;
+    document.getElementById('modalTime').textContent = mins + ' menit lalu';
+    document.getElementById('modalNurse').textContent = nurses[Math.floor(Math.random()*nurses.length)];
+  }
+  overlay.classList.add('show');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+
+function updateStats(){
+  const beds = document.querySelectorAll('.bed');
+  const counts = {red:0,yellow:0,green:0};
+  let occupied = 0;
+  beds.forEach(b=>{
+    if(b.dataset.cat){ counts[b.dataset.cat]++; occupied++; }
+  });
+  document.getElementById('countRed').textContent = counts.red;
+  document.getElementById('countYellow').textContent = counts.yellow;
+  document.getElementById('countGreen').textContent = counts.green;
+  document.getElementById('occupied').textContent = occupied + ' / ' + beds.length;
+  document.getElementById('available').textContent = beds.length - occupied;
+  document.getElementById('waitTime').textContent = Math.floor(Math.random()*8+6) + ' menit';
+}
+
+function buildAmbulances(){
+  const list = document.getElementById('ambList');
+  list.innerHTML = '';
+  const n = Math.floor(Math.random()*2) + 2;
+  for(let i=1;i<=n;i++){
+    const cat = cats[Math.floor(Math.random()*3)];
+    const progress = Math.floor(Math.random()*70)+15;
+    const card = document.createElement('div');
+    card.className = 'amb-card';
+    const colorVar = cat==='red'?'var(--red)':cat==='yellow'?'var(--yellow)':'var(--green)';
+    card.innerHTML = `
+      <div class="amb-top">
+        <div class="amb-id">Ambulans ${String.fromCharCode(64+i)}-0${i}</div>
+      </div>
+      <div class="amb-status">
+        <div class="amb-cat-dot" style="background:${colorVar}"></div>
+        <div class="amb-cat-label">Prediksi: ${catLabel[cat]}</div>
+      </div>
+      <div class="amb-progress"><div class="amb-progress-fill" style="width:${progress}%; background:${colorVar}"></div></div>
+    `;
+    list.appendChild(card);
+  }
+  document.getElementById('ambCount').textContent = n + ' unit';
+}
+
+function tickClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+  document.getElementById('clockDate').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'});
+}
+
+function init(){
+  buildZone('zoneA', 6, 0.7, 0, 'red');
+  buildZone('zoneB', 12, 0.5, 10, 'yellow');
+  buildZone('zoneC', 6, 0.3, 60, 'green');
+  updateStats();
+  buildAmbulances();
+  tickClock();
+  tickCountdowns();
+}
+init();
+setInterval(tickClock, 1000);
+setInterval(tickCountdowns, 1000);
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{ if(e.target.id==='modalOverlay') closeModal(); });
+</script>
+
+</body>
+</html>
