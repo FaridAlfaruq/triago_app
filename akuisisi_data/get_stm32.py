@@ -1,86 +1,80 @@
 import serial
 import time
 
-# KONFIGURASI DEFAULT
+# UBAH KONFIGURASI DEFAULT SESUAI HASIL SUKSES
 DEFAULT_PORT = 'COM7'
-DEFAULT_BAUDRATE = 115200
+DEFAULT_BAUDRATE = 921600 # Diubah ke 921600 sesuai konfigurasi optimal
 
 def stream_stm32_data(port=DEFAULT_PORT, baudrate=DEFAULT_BAUDRATE):
-    """
-    Generator function untuk membaca, membersihkan, dan memparsing data 
-    dari STM32 secara real-time.
-    Yields:
-        dict: Data sensor terstruktur jika valid, atau None jika terjadi error parsing.
-    """
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
+        # TAMBAH: Alokasikan memori buffer internal Windows sebesar 1MB agar data tidak meluap
+        ser.set_buffer_size(rx_size=1024*1024, tx_size=65536)
+        
         ser.dtr = True
         ser.rts = True
+        
+        # Bersihkan sisa data lama di buffer saat pertama kali konek
+        ser.reset_input_buffer()
+        ser.reset_output_buffer()
         
         # Trigger STM32 untuk mulai mengirim data
         ser.write(b"START\n")
         
+        raw_accumulator = b""
+        
         while True:
-            if ser.in_waiting > 0:
-                # 1. Baca byte mentah & eliminasi byte sampah (\x00)
-                raw_bytes = ser.readline()
-                clean_bytes = raw_bytes.replace(b'\x00', b'')
-                line = clean_bytes.decode('utf-8', errors='ignore').strip()
+            # === TAMBAH: NAPAS KOMPUTASI (5 ms) ===
+            # Memberikan jeda agar CPU laptop tidak overload dan buffer OS terisi penuh
+            time.sleep(0.005) 
+            
+            bytes_to_read = ser.in_waiting
+            if bytes_to_read > 0:
+                # OPTIMASI: Baca seluruh bongkahan data yang sudah mengantre sekaligus
+                raw_accumulator += ser.read(bytes_to_read)
                 
-                if not line:
-                    continue
-                
-                # 2. Parsing pembatas koma
-                data = line.split(',')
-                
-                # 3. Validasi 6 kolom data: [RED, IR, GREEN, ECG, T_AMB, T_OBJ]
-                if len(data) == 6:
-                    try:
-                        vals = list(map(float, data))
+                if b'\n' in raw_accumulator:
+                    lines = raw_accumulator.split(b'\n')
+                    raw_accumulator = lines.pop() # Simpan baris gantung yang belum utuh
+                    
+                    for raw_line in lines:
+                        clean_bytes = raw_line.replace(b'\x00', b'')
+                        line = clean_bytes.decode('utf-8', errors='ignore').strip()
                         
-                        # Pack ke dalam dictionary terstruktur (Keduanya sudah masuk di sini)
-                        yield {
-                            "status": "OK",
-                            "timestamp": time.time(),
-                            "ppg": {
-                                "red": int(vals[0]),
-                                "ir": int(vals[1]),
-                                "green": int(vals[2])
-                            },
-                            "ecg": int(vals[3]),
-                            "temperature": {
-                                "ambient": vals[4],
-                                "object": vals[5]
-                            }
-                        }
-                    except ValueError:
-                        yield {"status": "ERROR", "message": f"Non-numeric data detected: {line}"}
-                else:
-                    # Lewati log heartbeat bawaan STM32 agar tidak mengotori warning
-                    if "HEARTBEAT" not in line:
-                        yield {"status": "WARNING", "message": f"Incomplete columns ({len(data)}/6): {line}"}
+                        if not line or "HEARTBEAT" in line:
+                            continue
                         
+                        # Parsing pembatas koma
+                        data = line.split(',')
+                        
+                        # Validasi 6 kolom data: [RED, IR, GREEN, ECG, T_AMB, T_OBJ]
+                        if len(data) == 6:
+                            try:
+                                vals = list(map(float, data))
+                                
+                                # Pack ke dalam dictionary terstruktur untuk GUI
+                                yield {
+                                    "status": "OK",
+                                    "timestamp": time.time(),
+                                    "ppg": {
+                                        "red": int(vals[0]),
+                                        "ir": int(vals[1]),
+                                        "green": int(vals[2])
+                                    },
+                                    "ecg": int(vals[3]),
+                                    "temperature": {
+                                        "ambient": vals[4],
+                                        "object": vals[5]
+                                    }
+                                }
+                            except ValueError:
+                                yield {"status": "ERROR", "message": f"Non-numeric data detected: {line}"}
+                        else:
+                            yield {"status": "WARNING", "message": f"Incomplete columns ({len(data)}/6): {line}"}
+                                
     except serial.SerialException as e:
         print(f"[FATAL] Gagal mengakses port serial: {e}")
         raise e
     finally:
         if 'ser' in locals() and ser.is_open:
             ser.close()
-
-if __name__ == "__main__":
-    print(f"=== Memulai Konsumsi Data dari STM32 pada {DEFAULT_PORT} ===")
-    
-    try:
-        for packet in stream_stm32_data():
-            if packet["status"] == "OK":
-                # FIX: Sekarang mencetak Ambient Temp DAN Object Temp sekaligus
-                print(f"Time: {packet['timestamp']:.2f} | "
-                      f"PPG: {list(packet['ppg'].values())} | "
-                      f"ECG: {packet['ecg']} | "
-                      f"Amb: {packet['temperature']['ambient']}°C | "
-                      f"Obj: {packet['temperature']['object']}°C")
-            else:
-                print(f"[{packet['status']}] {packet.get('message')}")
-                
-    except KeyboardInterrupt:
-        print("\n[INFO] Proses pembacaan dihentikan oleh pengguna.")
