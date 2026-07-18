@@ -53,7 +53,7 @@ def debug_cdc():
                                 if sample_count % 40 == 0:
                                     elapsed = time.time() - start_time
                                     hz = sample_count / elapsed
-                                    print(f"[{hz:.1f} Hz] Total Samples: {sample_count} | ECG: {int(vals[3])} | Obj: {vals[5]:.2f}°C")
+                                    print(f"[{hz:.1f} Hz] Total Samples: {sample_count} | ECG: {int(vals[3])} | Obj: {vals[5]:.2f}°C | Ambient: {vals[4]:.2f}°C")
                             except ValueError:
                                 pass
                                 
