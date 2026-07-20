@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         # Konfigurasi Parameter Waktu & Sampel (Sesuai Logika Fungsi Baru Anda)
         self.SAMPLE_RATE_HZ = 400
         self.WARMUP_DURATION_SEC = 2.0
-        self.RECORD_DURATION_SEC = 25.0
+        self.RECORD_DURATION_SEC = 15.0
         
         # Total target sampel = (2 detik warmup + 60 detik rekaman) * 400 Hz = 24800 sampel
         self.total_target_samples = int((self.WARMUP_DURATION_SEC + self.RECORD_DURATION_SEC) * self.SAMPLE_RATE_HZ)
