@@ -1,8 +1,19 @@
 import serial
+import serial.tools.list_ports
 import time
 
+def find_stm32_port(fallback='COM7'):
+    for p in serial.tools.list_ports.comports():
+        # VID:PID for STM32 Virtual COM Port (0483:5740)
+        if "0483:5740" in p.hwid:
+            return p.device
+        # Alternative: look for USB Serial Device that is not Bluetooth
+        if "usb" in p.description.lower() and "bluetooth" not in p.description.lower():
+            return p.device
+    return fallback
+
 # UBAH KONFIGURASI DEFAULT SESUAI HASIL SUKSES
-DEFAULT_PORT = 'COM7'
+DEFAULT_PORT = find_stm32_port('COM7')
 DEFAULT_BAUDRATE = 921600 # Diubah ke 921600 sesuai konfigurasi optimal
 
 def stream_stm32_data(port=DEFAULT_PORT, baudrate=DEFAULT_BAUDRATE):

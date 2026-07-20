@@ -1,7 +1,18 @@
 import serial
+import serial.tools.list_ports
 import time
 
-PORT = 'COM16' 
+def find_stm32_port(fallback='COM16'):
+    for p in serial.tools.list_ports.comports():
+        # VID:PID for STM32 Virtual COM Port (0483:5740)
+        if "0483:5740" in p.hwid:
+            return p.device
+        # Alternative: look for USB Serial Device that is not Bluetooth
+        if "usb" in p.description.lower() and "bluetooth" not in p.description.lower():
+            return p.device
+    return fallback
+
+PORT = find_stm32_port('COM16') 
 BAUDRATE = 115200  # Sesuaikan dengan linecoding Virtual COM STM32 Anda
 
 def debug_cdc():
