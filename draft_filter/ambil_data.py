@@ -38,14 +38,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("STM32 Bio-Signal Data Acquisition for Calibration")
-        self.resize(800, 750)
+        self.resize(850, 750)  # Sedikit diperlebar untuk ruang input tambahan
 
-        # Konfigurasi Parameter Waktu & Sampel (Sesuai Logika Fungsi Baru Anda)
+        # Konfigurasi Parameter Waktu & Sampel
         self.SAMPLE_RATE_HZ = 400
         self.WARMUP_DURATION_SEC = 2.0
-        self.RECORD_DURATION_SEC = 15.0
+        self.RECORD_DURATION_SEC = 60.0
         
-        # Total target sampel = (2 detik warmup + 60 detik rekaman) * 400 Hz = 24800 sampel
         self.total_target_samples = int((self.WARMUP_DURATION_SEC + self.RECORD_DURATION_SEC) * self.SAMPLE_RATE_HZ)
 
         # State Control Variables
@@ -83,21 +82,32 @@ class MainWindow(QMainWindow):
         self.lbl_temp_amb = QLabel("Ambient Temp: -- °C")
         self.lbl_temp_amb.setStyleSheet("font-size: 13px; font-weight: bold; color: #555555; margin-left: 15px;")
         
-        lbl_gt = QLabel("SpO2 Ground Truth (%):")
-        lbl_gt.setStyleSheet("font-size: 13px; font-weight: bold; margin-left: 30px;")
+        # Input SpO2 Ground Truth
+        lbl_gt_spo2 = QLabel("SpO2 GT (%):")
+        lbl_gt_spo2.setStyleSheet("font-size: 13px; font-weight: bold; margin-left: 20px;")
         self.input_gt_spo2 = QLineEdit()
         self.input_gt_spo2.setPlaceholderText("e.g. 98")
-        self.input_gt_spo2.setFixedWidth(60)
+        self.input_gt_spo2.setFixedWidth(50)
         self.input_gt_spo2.setEnabled(False) 
+
+        # BARU: Input Heart Rate Ground Truth
+        lbl_gt_hr = QLabel("HR GT (bpm):")
+        lbl_gt_hr.setStyleSheet("font-size: 13px; font-weight: bold; margin-left: 15px;")
+        self.input_gt_hr = QLineEdit()
+        self.input_gt_hr.setPlaceholderText("e.g. 75")
+        self.input_gt_hr.setFixedWidth(50)
+        self.input_gt_hr.setEnabled(False) 
         
         meta_layout.addWidget(self.lbl_temp_obj)
         meta_layout.addWidget(self.lbl_temp_amb)
-        meta_layout.addWidget(lbl_gt)
+        meta_layout.addWidget(lbl_gt_spo2)
         meta_layout.addWidget(self.input_gt_spo2)
+        meta_layout.addWidget(lbl_gt_hr)
+        meta_layout.addWidget(self.input_gt_hr)
         meta_layout.addStretch() 
         main_layout.addLayout(meta_layout)
 
-        # 3. Progress Bar (Baru)
+        # 3. Progress Bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.setTextVisible(True)
@@ -134,27 +144,23 @@ class MainWindow(QMainWindow):
 
     def start_worker_thread(self):
         self.worker = STM32Worker()
-        self.worker.data_received.connect(self.handle_new_packet) # Menggunakan fungsi logika baru Anda
+        self.worker.data_received.connect(self.handle_new_packet)
         self.worker.start()
 
     def update_temperature_ui(self, temp_object, temp_ambient):
-        """ Mengatur teks dan warna kondisional berdasarkan nilai suhu tubuh pasien """
         self.lbl_temp_obj.setText(f"Body Temp: {temp_object:.2f} °C")
         self.lbl_temp_amb.setText(f"Ambient Temp: {temp_ambient:.2f} °C")
         
-        # Contoh visual warna kondisional demam / normal
         if temp_object > 37.5:
-            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #cb2431;") # Merah jika demam
+            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #cb2431;")
         else:
-            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #2ea44f;") # Hijau jika normal
+            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #2ea44f;")
 
     def handle_new_packet(self, packet):
-        """ Implementasi penuh logika pemisahan Warmup dan Riil Rekaman """
         current_time = packet["timestamp"]
         ecg_val = packet["ecg"]
-        ppg_red_val = packet["ppg"]["red"]
+        ppg_red_val = packet["ppg"]["ir"]
         
-        # 1. Update Teks & Warna Kondisional Suhu Tubuh Pasien
         temp_object = packet["temperature"]["object"]
         temp_ambient = packet["temperature"]["ambient"]
         self.update_temperature_ui(temp_object, temp_ambient)
@@ -168,26 +174,22 @@ class MainWindow(QMainWindow):
             warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
             current_samples_count = len(self.recorded_data)
 
-            # FASE A: Masa Stabilisasi / Pemanasan Sensor (0 - 2 Detik Awal)
             if current_samples_count <= warmup_samples:
                 self.progress_bar.setValue(0)
                 self.status_label.setText("STABILIZING SENSOR... Please wait.")
                 self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #d97706;")
                 return
 
-            # FASE B: Masa Perekaman Riil (Setelah detik ke-2 / Sinyal Sudah Stabil)
             if self.lbl_graph_hint.isVisible():
                 self.lbl_graph_hint.hide() 
                 self.status_label.setText("RECORDING ONGOING...")
                 self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #cb2431;")
 
-            # Hitung waktu relatif (Detik ke-2 dikonversi menjadi detik ke-0 pada sumbu-X)
             recorded_duration = (current_samples_count - warmup_samples) / self.SAMPLE_RATE_HZ
             
             progress = (recorded_duration / self.RECORD_DURATION_SEC) * 100
             self.progress_bar.setValue(int(progress))
 
-            # Masukkan data hasil filter yang SUDAH STABIL ke dalam buffer visualisasi
             self.time_buffer.append(recorded_duration)
             self.ecg_buffer.append(clean_ecg)
             self.ppg_red_buffer.append(clean_ppg)
@@ -211,8 +213,13 @@ class MainWindow(QMainWindow):
             self.ecg_buffer.clear()
             self.ppg_red_buffer.clear()
             self.btn_start.setEnabled(False) 
+            
+            # Reset dan kunci input GT SpO2 & HR
             self.input_gt_spo2.clear()
             self.input_gt_spo2.setEnabled(False)
+            self.input_gt_hr.clear()
+            self.input_gt_hr.setEnabled(False)
+            
             self.lbl_graph_hint.show()
             self.progress_bar.setValue(0)
 
@@ -225,29 +232,40 @@ class MainWindow(QMainWindow):
         self.ecg_curve.clear()
         self.ppg_curve.clear()
         self.btn_start.setEnabled(True)
+        
+        # Reset dan kunci input GT SpO2 & HR
         self.input_gt_spo2.clear()
         self.input_gt_spo2.setEnabled(False)
+        self.input_gt_hr.clear()
+        self.input_gt_hr.setEnabled(False)
+        
         self.lbl_graph_hint.show()
         self.progress_bar.setValue(0)
+        
         try:
             self.input_gt_spo2.returnPressed.disconnect(self.save_to_csv)
+            self.input_gt_hr.returnPressed.disconnect(self.save_to_csv)
         except TypeError:
             pass
         self.status_label.setText("Recording reset. Ready to start again.")
         self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #0055ff;")
 
     def stop_and_save_data(self):
-        """ Menangani akhir durasi rekaman dan mengaktifkan kolom input SpO2 Ground Truth """
+        """ Menangani akhir durasi rekaman dan mengaktifkan kolom input Ground Truth """
         self.is_recording = False
-        self.status_label.setText("Recording Finished! Please input SpO2 Ground Truth to Save.")
+        self.status_label.setText("Recording Finished! Please input SpO2 & HR Ground Truth to Save.")
         self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #2ea44f;")
         
+        # Aktifkan kolom input
         self.input_gt_spo2.setEnabled(True)
+        self.input_gt_hr.setEnabled(True)
         self.input_gt_spo2.setFocus()
+        
+        # Menekan Enter di salah satu input akan memicu proses penyimpanan data
         self.input_gt_spo2.returnPressed.connect(self.save_to_csv)
+        self.input_gt_hr.returnPressed.connect(self.save_to_csv)
 
     def generate_next_filename(self):
-        """ Mencari index terakhir di folder untuk format penamaan Data1, Data2, dst. """
         index = 1
         while True:
             filename = f"Data{index}.csv"
@@ -256,24 +274,41 @@ class MainWindow(QMainWindow):
             index += 1
 
     def save_to_csv(self):
-        gt_value = self.input_gt_spo2.text().strip()
-        if not gt_value:
-            QMessageBox.warning(self, "Input Required", "Mohon masukkan nilai SpO2 pembanding terlebih dahulu!")
-            return
+        spo2_val = self.input_gt_spo2.text().strip()
+        hr_val = self.input_gt_hr.text().strip()
         
+        # 1. Validasi Input SpO2
+        if not spo2_val:
+            QMessageBox.warning(self, "Input Required", "Mohon masukkan nilai SpO2 pembanding terlebih dahulu!")
+            self.input_gt_spo2.setFocus()
+            return
         try:
-            float(gt_value)
+            float(spo2_val)
         except ValueError:
             QMessageBox.critical(self, "Invalid Input", "Nilai SpO2 pembanding harus berupa angka!")
+            self.input_gt_spo2.setFocus()
             return
 
-        filename = self.generate_next_filename() # Menghasilkan nama Data1.csv, Data2.csv, dst.
+        # 2. Validasi Input Heart Rate (HR)
+        if not hr_val:
+            QMessageBox.warning(self, "Input Required", "Mohon masukkan nilai Heart Rate pembanding terlebih dahulu!")
+            self.input_gt_hr.setFocus()
+            return
+        try:
+            float(hr_val)
+        except ValueError:
+            QMessageBox.critical(self, "Invalid Input", "Nilai Heart Rate pembanding harus berupa angka!")
+            self.input_gt_hr.setFocus()
+            return
+
+        filename = self.generate_next_filename()
         sampling_interval = 1.0 / self.SAMPLE_RATE_HZ 
 
         try:
             with open(filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(["Time (s)", "PPG_Red", "PPG_IR", "PPG_Green", "ECG", "Temp_Ambient", "Temp_Object", "SpO2_Ground_Truth"])
+                # Menambahkan header kolom HR_Ground_Truth
+                writer.writerow(["Time (s)", "PPG_Red", "PPG_IR", "PPG_Green", "ECG", "Temp_Ambient", "Temp_Object", "SpO2_Ground_Truth", "HR_Ground_Truth"])
                 
                 for index, p in enumerate(self.recorded_data):
                     relative_time_s = index * sampling_interval
@@ -285,7 +320,8 @@ class MainWindow(QMainWindow):
                         p["ecg"],
                         p["temperature"]["ambient"],
                         p["temperature"]["object"],
-                        gt_value
+                        spo2_val,
+                        hr_val  # Menyimpan nilai Ground Truth HR ke baris
                     ])
             
             QMessageBox.information(self, "Success", f"Data berhasil disimpan ke {filename}")
@@ -293,7 +329,10 @@ class MainWindow(QMainWindow):
             
             self.btn_start.setEnabled(True)
             self.input_gt_spo2.setEnabled(False)
+            self.input_gt_hr.setEnabled(False)
+            
             self.input_gt_spo2.returnPressed.disconnect(self.save_to_csv)
+            self.input_gt_hr.returnPressed.disconnect(self.save_to_csv)
 
         except Exception as e:
             QMessageBox.critical(self, "Save Error", f"Gagal menyimpan file CSV: {e}")
