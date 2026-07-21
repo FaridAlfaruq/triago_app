@@ -8,5 +8,4 @@ venv/
 *.pyc
 
 # Mengabaikan file log data pasien sementara
-*.csv
 *.log
