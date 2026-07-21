@@ -18,7 +18,7 @@ def live_ecg_plotter():
     ser.reset_input_buffer()
     ser.reset_output_buffer()
 
-    # Siapkan jendela grafik real-time yang ringan
+    # Siapkan jendela grafik real-time
     plt.ion()
     fig, ax = plt.subplots(figsize=(10, 4))
     window_size = 300  # Jumlah titik sampel yang tampil di layar
@@ -28,7 +28,7 @@ def live_ecg_plotter():
 
     ax.set_ylim(0, 4095)  # Rentang ADC 12-bit STM32
     ax.set_xlim(0, window_size)
-    ax.set_title("Live ECG Signal Monitor (Optimized CDC)")
+    ax.set_title("Live ECG Signal Monitor (Optimized)")
     ax.set_xlabel("Sampel")
     ax.set_ylabel("Amplitudo")
     ax.grid(True)
@@ -36,9 +36,9 @@ def live_ecg_plotter():
     raw_accumulator = b""
     sample_count = 0
     start_time = time.time()
+    last_draw_time = time.time()
 
     while True:
-      # Jeda kecil agar buffer OS terisi penuh dan CPU tidak 100%
       time.sleep(0.005)
 
       bytes_to_read = ser.in_waiting
@@ -49,28 +49,23 @@ def live_ecg_plotter():
           lines = raw_accumulator.split(b"\n")
           raw_accumulator = lines.pop()  # Simpan sisa baris gantung
 
+          new_data_arrived = False
+
           for raw_line in lines:
             clean_bytes = raw_line.replace(b"\x00", b"")
-            line = clean_bytes.decode("utf-8", errors="ignore").strip()
+            line_str = clean_bytes.decode("utf-8", errors="ignore").strip()
 
-            if not line:
+            if not line_str:
               continue
 
             try:
-              # Karena data ECG dari STM32 berupa angka tunggal per baris
-              val = float(line)
+              val = float(line_str)
               sample_count += 1
 
-              # Masukkan data ke array grafik
               ydata.append(val)
               ydata.pop(0)
+              new_data_arrived = True
 
-              # Update tampilan garis grafik
-              line.set_ydata(ydata)
-              fig.canvas.draw()
-              fig.canvas.flush_events()
-
-              # Hitung frekuensi pembacaan berkala di console
               if sample_count % 100 == 0:
                 elapsed = time.time() - start_time
                 hz = sample_count / elapsed
@@ -80,7 +75,14 @@ def live_ecg_plotter():
                 )
 
             except ValueError:
-              pass  # Abaikan jika ada data teks sampah/korup
+              pass
+
+          # Pengaman agar Matplotlib tidak crash saat merender gambar
+          if new_data_arrived and (time.time() - last_draw_time >= 0.03):
+            line.set_ydata(ydata)
+            fig.canvas.draw()
+            fig.canvas.flush_events()
+            last_draw_time = time.time()
 
   except serial.SerialException as e:
     print(f"[FATAL] Gagal membuka port: {e}")
