@@ -58,7 +58,7 @@ class OutputPage(QWidget):
         self.lbl_status_text.setFixedHeight(65)
         self.lbl_status_text.setMinimumWidth(120)
         self.lbl_status_text.setStyleSheet("""
-            font-size: 22px; font-weight: bold; color: #FFFFFF; 
+            font-size: 32px; font-weight: 900; color: #FFFFFF; 
             background-color: #FF8A8A; border-radius: 8px; 
             padding-left: 20px; padding-right: 20px;
         """)
@@ -210,6 +210,6 @@ if __name__ == "__main__":
     test_window = OutputPage()
     test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
     test_window.showMaximized()
-    test_window.update_triage_header("RESUSITASI") 
+    test_window.update_triage_header("DARURAT") 
     
     sys.exit(app.exec())
