@@ -1,7 +1,8 @@
 import sys
 import os
+import pandas as pd
 from PyQt6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt
 
 # System Path Integration
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,39 +15,6 @@ from regist_page import RegistrationPage
 from plot_page import PlotPage
 from loading_page import LoadingPage
 from output_page import OutputPage
-
-# =====================================================================
-# WORKER ASSISTANT: Khusus Proses Ekstraksi Fitur (Durasi 5 Detik)
-# =====================================================================
-class ExtractionWorker(QThread):
-    """Worker tambahan untuk menghandle loading ekstraksi fitur selama 5 detik"""
-    progress_updated = pyqtSignal(str, int)
-    extraction_finished = pyqtSignal(dict)
-
-    def __init__(self, csv_filepath):
-        super().__init__()
-        self.csv_filepath = csv_filepath
-
-    def run(self):
-        total_duration = 5.0  
-        steps = 100
-        interval = total_duration / steps
-
-        for current_step in range(1, steps + 1):
-            self.msleep(int(interval * 1000))
-            self.progress_updated.emit("Mengekstraksi fitur biosinyal ML...", current_step)
-        
-        dummy_ml_results = {
-            "systolic": 120,
-            "diastolic": 80,
-            "heart_rate": 110,
-            "respiration_rate": 14,
-            "temperature": 36.00,
-            "spo2": 98,
-            "triage_status": "RESUSITASI", 
-            "csv_path": self.csv_filepath
-        }
-        self.extraction_finished.emit(dummy_ml_results)
 
 
 # =====================================================================
@@ -72,11 +40,14 @@ class TriaGoApplication(QMainWindow):
         self.page_live_data = PlotPage() 
         self.page_output = OutputPage()
         
+        # Sambungkan reference parent ke LoadingPage
+        self.page_loading.parent_main_win = self
+        
         # 3. Hubungkan Sistem Komunikasi Sinyal (Signals & Slots)
         self.page_home.start_requested.connect(self.go_to_registration)
         self.page_registration.measurement_started.connect(self.handle_start_stabilization_phase)
         
-        # --- SINKRONISASI UTAMA: Hubungkan data warmup PlotPage ke LoadingPage ---
+        # --- SINKRONISASI UTAMA: Warmup PlotPage ke LoadingPage ---
         self.page_live_data.warmup_progress.connect(self.page_loading.update_ui_state)
         self.page_live_data.warmup_finished.connect(self.go_to_live_data_page)
         
@@ -97,15 +68,15 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(1)
 
     def handle_start_stabilization_phase(self, patient_data):
-        """Fase Pertama: Membuka loading screen dan langsung menyalakan data stream STM32"""
+        """Fase Pertama: Membuka loading screen dan menyalakan data stream STM32"""
         self.current_patient_info = patient_data 
         
-        # Pindah ke Halaman Loading terlebih dahulu
+        # Pindah ke Halaman Loading
         self.stacked_widget.setCurrentIndex(2)
         self.page_loading.progress_bar.setValue(0)
         self.page_loading.lbl_status.setText("Menstabilkan sensor....")
         
-        # Jalankan session data STM32. Proses 2 detik awal otomatis men-drive progress bar
+        # Jalankan session data STM32
         self.page_live_data.start_session(patient_data)
 
     def go_to_live_data_page(self):
@@ -114,21 +85,48 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(3)
 
     def handle_extraction_phase(self, csv_filepath):
-        """Fase Kedua Loading: Masuk loading kembali selama 5 detik untuk ekstraksi data"""
+        """Fase Kedua: Membaca CSV hasil perekaman & memproses sinyal riil di LoadingPage"""
         self.saved_csv_path = csv_filepath
         
-        # Kembalikan tampilan ke Halaman Loading (Index 2)
+        # Pindah tampilan ke Halaman Loading (Index 2)
         self.stacked_widget.setCurrentIndex(2)
-        self.page_loading.progress_bar.setValue(0)
         
-        # Inisialisasi thread asinkronus ekstraksi fitur 5 detik
-        self.extraction_worker = ExtractionWorker(csv_filepath)
-        self.extraction_worker.progress_updated.connect(self.page_loading.update_ui_state)
-        self.extraction_worker.extraction_finished.connect(self.handle_output_phase)
-        self.extraction_worker.start()
+        try:
+            # 1. Membaca data CSV yang baru saja direkam dari PlotPage
+            df = pd.read_csv(csv_filepath)
+            
+            # Mapping kolom CSV secara otomatis
+            raw_time = df['time'].values if 'time' in df.columns else df.iloc[:, 0].values
+            raw_ecg = df['ecg'].values if 'ecg' in df.columns else df.iloc[:, 1].values
+            raw_red = df['red'].values if 'red' in df.columns else (df.iloc[:, 2].values if df.shape[1] > 2 else None)
+            raw_ir = df['ir'].values if 'ir' in df.columns else (df.iloc[:, 3].values if df.shape[1] > 3 else None)
+
+            # 2. Jalankan pemrosesan sinyal riil (ECG & PPG) via LoadingPage
+            self.page_loading.start_processing(
+                raw_ecg=raw_ecg,
+                raw_time=raw_time,
+                raw_red=raw_red,
+                raw_ir=raw_ir,
+                fs_orig=400  # Sesuaikan dengan sampling rate hardware STM32
+            )
+
+            # 3. Hubungkan sinyal selesai ke handle_output_phase
+            self.page_loading.worker.processing_finished.connect(self.handle_output_phase)
+
+        except Exception as e:
+            print(f"[ERROR] Gagal membaca CSV / Memproses data: {e}")
 
     def handle_output_phase(self, calculation_results):
-        self.page_output.update_triage_header(calculation_results["triage_status"])
+        print("[LOG SUCCESS] Mengirimkan data sinyal dan parameter ke Output Page...")
+        
+        # Kirim seluruh dictionary (termasuk array sinyal) ke OutputPage
+        if hasattr(self.page_output, "update_results"):
+            self.page_output.update_results(calculation_results)
+            
+        triage_status = calculation_results.get("triage_status", "NON URGENSI")
+        self.page_output.update_triage_header(triage_status)
+        
+        # Pindah ke Halaman Output
         self.stacked_widget.setCurrentIndex(4)
 
     def reset_to_gatekeeper(self):
@@ -152,9 +150,9 @@ class TriaGoApplication(QMainWindow):
     def closeEvent(self, event):
         if hasattr(self.page_live_data, 'worker') and self.page_live_data.worker is not None:
             self.page_live_data.worker.stop()
-        if hasattr(self, 'extraction_worker') and self.extraction_worker.isRunning():
-            self.extraction_worker.quit()
-            self.extraction_worker.wait()
+        if hasattr(self.page_loading, 'worker') and self.page_loading.worker is not None and self.page_loading.worker.isRunning():
+            self.page_loading.worker.quit()
+            self.page_loading.worker.wait()
         event.accept()
 
 if __name__ == "__main__":

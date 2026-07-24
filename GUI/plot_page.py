@@ -331,7 +331,7 @@ class PlotPage(QWidget):
         self.close_threads()
             
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Data_{self.patient_data.get('nama', 'Unknown')}_{timestamp_str}.csv"
+        filename = f"Data_raw_{timestamp_str}.csv"
         sampling_interval = 1.0 / self.SAMPLE_RATE_HZ
 
         warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
