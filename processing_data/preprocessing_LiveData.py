@@ -7,16 +7,13 @@ class LiveSignalFilter:
         
         # 1. RANCANG FILTER PPG (SciPy Butterworth Bandpass 0.5 - 6 Hz)
         # Menurunkan cutoff atas ke 6 Hz untuk membantu meredam noise undakan
-        self.b_ppg, self.a_ppg = butter(N=2, Wn=[0.5, 6.0], btype='bandpass', fs=self.fs)
+        self.b_ppg, self.a_ppg = butter(N=2, Wn=[0.5, 10.0], btype='bandpass', fs=self.fs)
         self.zi_ppg = lfilter_zi(self.b_ppg, self.a_ppg) * 0.0
 
         # 2. RANCANG FILTER ECG (SciPy Butterworth Bandpass 0.5 - 100 Hz)
-        self.b_ecg, self.a_ecg = butter(N=2, Wn=[0.5, 100.0], btype='bandpass', fs=self.fs)
+        self.b_ecg, self.a_ecg = butter(N=2, Wn=[0.5, 25.0], btype='bandpass', fs=self.fs)
         self.zi_ecg = lfilter_zi(self.b_ecg, self.a_ecg) * 0.0
 
-        # 3. KUNCI PERBAIKAN: Jendela Moving Average yang lebih lebar khusus PPG
-        # Pada 400 Hz, jendela 16 sampel (setara 40 ms) sangat efektif menghapus 
-        # efek tangga tanpa membuat puncak gelombang menjadi tumpul.
         self.ppg_window_size = 16
         self.ppg_sma_buffer = []
 

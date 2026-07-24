@@ -2,9 +2,10 @@ import sys
 import os
 import csv
 import time
+from collections import deque
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, 
                              QWidget, QPushButton, QLabel, QLineEdit, QMessageBox, QProgressBar)
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal, QTimer
 import pyqtgraph as pg
 
 # Import custom modules
@@ -12,8 +13,13 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from akuisisi_data.get_stm32 import stream_stm32_data
+from akusisi_data.get_stm32 import stream_stm32_data
 from processing_data.preprocessing_LiveData import LiveSignalFilter
+
+# === OPTIMASI GLOBAL PYQTGRAPH ===
+pg.setConfigOptions(antialias=False)  # Matikan antialiasing untuk rendering super cepat
+pg.setConfigOption('background', 'k')  # Background hitam standar
+
 
 class STM32Worker(QThread):
     data_received = pyqtSignal(dict)
@@ -38,7 +44,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("STM32 Bio-Signal Data Acquisition for Calibration")
-        self.resize(850, 750)  # Sedikit diperlebar untuk ruang input tambahan
+        self.resize(850, 750)
 
         # Konfigurasi Parameter Waktu & Sampel
         self.SAMPLE_RATE_HZ = 400
@@ -53,13 +59,27 @@ class MainWindow(QMainWindow):
         self.max_plot_points = 1300
         self.live_filter = LiveSignalFilter()
 
-        # Buffers untuk Grafik
-        self.time_buffer = []
-        self.ecg_buffer = []
-        self.ppg_red_buffer = []
+        # === OPTIMASI 1: Ring Buffer O(1) menggunakan deque ===
+        self.time_buffer = deque(maxlen=self.max_plot_points)
+        self.ecg_buffer = deque(maxlen=self.max_plot_points)
+        self.ppg_red_buffer = deque(maxlen=self.max_plot_points)
+
+        # Variables penampung state UI sementara (di-update 400Hz, di-render 30Hz)
+        self.latest_temp_obj = 0.0
+        self.latest_temp_amb = 0.0
+        self.current_progress_val = 0
+        self.current_status_text = "Ready for recording..."
+        self.current_status_style = "font-size: 14px; font-weight: bold; color: #0055ff;"
+        self.is_warmup_phase = False
 
         self.init_ui()
         self.start_worker_thread()
+
+        # === OPTIMASI 2: QTimer untuk Refresh Rate GUI (30 FPS / ~33 ms) ===
+        self.render_timer = QTimer()
+        self.render_timer.setInterval(33)  # ~30 FPS
+        self.render_timer.timeout.connect(self.update_ui_render)
+        self.render_timer.start()
 
     def init_ui(self):
         central_widget = QWidget()
@@ -90,7 +110,7 @@ class MainWindow(QMainWindow):
         self.input_gt_spo2.setFixedWidth(50)
         self.input_gt_spo2.setEnabled(False) 
 
-        # BARU: Input Heart Rate Ground Truth
+        # Input Heart Rate Ground Truth
         lbl_gt_hr = QLabel("HR GT (bpm):")
         lbl_gt_hr.setStyleSheet("font-size: 13px; font-weight: bold; margin-left: 15px;")
         self.input_gt_hr = QLineEdit()
@@ -119,13 +139,15 @@ class MainWindow(QMainWindow):
 
         self.p1 = self.win.addPlot(title="ECG Signal")
         self.p1.showGrid(x=True, y=True)
-        self.ecg_curve = self.p1.plot(pen=pg.mkPen('y', width=1.5))
+        self.p1.setClipToView(True)  # Optimasi render hanya elemen terlihat
+        self.ecg_curve = self.p1.plot(pen=pg.mkPen('y', width=1.2))
 
         self.win.nextRow()
 
         self.p2 = self.win.addPlot(title="PPG Signal")
         self.p2.showGrid(x=True, y=True)
-        self.ppg_curve = self.p2.plot(pen=pg.mkPen('r', width=1.5))
+        self.p2.setClipToView(True)
+        self.ppg_curve = self.p2.plot(pen=pg.mkPen('r', width=1.2))
         self.p2.setXLink(self.p1)
 
         # 5. Control Buttons
@@ -147,24 +169,15 @@ class MainWindow(QMainWindow):
         self.worker.data_received.connect(self.handle_new_packet)
         self.worker.start()
 
-    def update_temperature_ui(self, temp_object, temp_ambient):
-        self.lbl_temp_obj.setText(f"Body Temp: {temp_object:.2f} °C")
-        self.lbl_temp_amb.setText(f"Ambient Temp: {temp_ambient:.2f} °C")
-        
-        if temp_object > 37.5:
-            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #cb2431;")
-        else:
-            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #2ea44f;")
-
     def handle_new_packet(self, packet):
-        current_time = packet["timestamp"]
+        """Callback ini berjalan cepat 400 Hz HANYA untuk update buffer data & logika perekaman."""
         ecg_val = packet["ecg"]
-        ppg_red_val = packet["ppg"]["ir"]
+        ppg_red_val = packet["ppg"]["ir"]  # Menggunakan channel IR untuk grafik PPG
         
-        temp_object = packet["temperature"]["object"]
-        temp_ambient = packet["temperature"]["ambient"]
-        self.update_temperature_ui(temp_object, temp_ambient)
+        self.latest_temp_obj = packet["temperature"]["object"]
+        self.latest_temp_amb = packet["temperature"]["ambient"]
 
+        # Filtering Real-Time
         clean_ecg = self.live_filter.filter_ecg(ecg_val)
         clean_ppg = self.live_filter.filter_ppg(ppg_red_val)
 
@@ -175,40 +188,56 @@ class MainWindow(QMainWindow):
             current_samples_count = len(self.recorded_data)
 
             if current_samples_count <= warmup_samples:
-                self.progress_bar.setValue(0)
-                self.status_label.setText("STABILIZING SENSOR... Please wait.")
-                self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #d97706;")
+                self.is_warmup_phase = True
+                self.current_progress_val = 0
+                self.current_status_text = "STABILIZING SENSOR... Please wait."
+                self.current_status_style = "font-size: 14px; font-weight: bold; color: #d97706;"
                 return
 
-            if self.lbl_graph_hint.isVisible():
-                self.lbl_graph_hint.hide() 
-                self.status_label.setText("RECORDING ONGOING...")
-                self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #cb2431;")
+            self.is_warmup_phase = False
+            self.current_status_text = "RECORDING ONGOING..."
+            self.current_status_style = "font-size: 14px; font-weight: bold; color: #cb2431;"
 
             recorded_duration = (current_samples_count - warmup_samples) / self.SAMPLE_RATE_HZ
-            
-            progress = (recorded_duration / self.RECORD_DURATION_SEC) * 100
-            self.progress_bar.setValue(int(progress))
+            self.current_progress_val = int((recorded_duration / self.RECORD_DURATION_SEC) * 100)
 
+            # Fast push ke Ring Buffer deque O(1)
             self.time_buffer.append(recorded_duration)
             self.ecg_buffer.append(clean_ecg)
             self.ppg_red_buffer.append(clean_ppg)
 
-            if len(self.time_buffer) > self.max_plot_points:
-                self.time_buffer.pop(0)
-                self.ecg_buffer.pop(0)
-                self.ppg_red_buffer.pop(0)
-
-            self.ecg_curve.setData(self.time_buffer, self.ecg_buffer)
-            self.ppg_curve.setData(self.time_buffer, self.ppg_red_buffer)
-
             if current_samples_count >= self.total_target_samples:
                 self.stop_and_save_data()
+
+    def update_ui_render(self):
+        """Dijalankan 30 FPS oleh QTimer untuk menggambar ulang grafik dan memperbarui teks GUI."""
+        # 1. Render Suhu
+        self.lbl_temp_obj.setText(f"Body Temp: {self.latest_temp_obj:.2f} °C")
+        self.lbl_temp_amb.setText(f"Ambient Temp: {self.latest_temp_amb:.2f} °C")
+        if self.latest_temp_obj > 37.5:
+            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #cb2431;")
+        else:
+            self.lbl_temp_obj.setStyleSheet("font-size: 13px; font-weight: bold; color: #2ea44f;")
+
+        # 2. Render Status & Progress
+        if self.is_recording:
+            self.progress_bar.setValue(self.current_progress_val)
+            self.status_label.setText(self.current_status_text)
+            self.status_label.setStyleSheet(self.current_status_style)
+            
+            if not self.is_warmup_phase and self.lbl_graph_hint.isVisible():
+                self.lbl_graph_hint.hide()
+
+            # 3. Render Grafik (Konversi deque ke list untuk pyqtgraph)
+            if self.time_buffer:
+                t_list = list(self.time_buffer)
+                self.ecg_curve.setData(t_list, list(self.ecg_buffer))
+                self.ppg_curve.setData(t_list, list(self.ppg_red_buffer))
 
     def start_recording(self):
         if not self.is_recording:
             self.is_recording = True
-            self.recorded_data = [] 
+            self.recorded_data.clear() 
             self.time_buffer.clear()
             self.ecg_buffer.clear()
             self.ppg_red_buffer.clear()
@@ -225,7 +254,7 @@ class MainWindow(QMainWindow):
 
     def reset_recording(self):
         self.is_recording = False
-        self.recorded_data = []
+        self.recorded_data.clear()
         self.time_buffer.clear()
         self.ecg_buffer.clear()
         self.ppg_red_buffer.clear()
@@ -247,6 +276,7 @@ class MainWindow(QMainWindow):
             self.input_gt_hr.returnPressed.disconnect(self.save_to_csv)
         except TypeError:
             pass
+            
         self.status_label.setText("Recording reset. Ready to start again.")
         self.status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #0055ff;")
 
@@ -321,7 +351,7 @@ class MainWindow(QMainWindow):
                         p["temperature"]["ambient"],
                         p["temperature"]["object"],
                         spo2_val,
-                        hr_val  # Menyimpan nilai Ground Truth HR ke baris
+                        hr_val
                     ])
             
             QMessageBox.information(self, "Success", f"Data berhasil disimpan ke {filename}")
@@ -339,6 +369,8 @@ class MainWindow(QMainWindow):
             
     def closeEvent(self, event):
         self.is_recording = False
+        if hasattr(self, 'render_timer'):
+            self.render_timer.stop()
         if hasattr(self, 'worker'):
             self.worker.stop()
         event.accept()

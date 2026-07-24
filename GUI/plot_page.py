@@ -276,7 +276,7 @@ class PlotPage(QWidget):
         # Langkah ini membuat register internal filter konvergen & stabil duluan
         # =====================================================================
         ecg_val = packet["ecg"]
-        ppg_red_val = packet["ppg"]["red"]
+        ppg_red_val = packet["ppg"]["ir"]
 
         clean_ecg = self.live_filter.filter_ecg(ecg_val)
         clean_ppg = self.live_filter.filter_ppg(ppg_red_val)
