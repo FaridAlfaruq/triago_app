@@ -11,10 +11,10 @@ if project_root not in sys.path:
 
 # Import window TriaGO
 from GUI.home_page import HomePage
-from regist_page import RegistrationPage
-from plot_page import PlotPage
-from loading_page import LoadingPage
-from output_page import OutputPage
+from GUI.loading_page import LoadingPage
+from GUI.output_page import OutputPage
+from GUI.plot_page import PlotPage
+from GUI.regist_page import RegistrationPage
 
 
 # =====================================================================
@@ -53,6 +53,7 @@ class TriaGoApplication(QMainWindow):
         
         # Sinyal pasca-perekaman dan tombol kembali
         self.page_live_data.recording_finished.connect(self.handle_extraction_phase)
+        self.page_loading.processing_finished.connect(self.handle_output_phase)
         self.page_output.home_requested.connect(self.reset_to_gatekeeper)
         
         # 4. Daftarkan Halaman ke Stacked Widget
@@ -95,11 +96,17 @@ class TriaGoApplication(QMainWindow):
             # 1. Membaca data CSV yang baru saja direkam dari PlotPage
             df = pd.read_csv(csv_filepath)
             
-            # Mapping kolom CSV secara otomatis
-            raw_time = df['time'].values if 'time' in df.columns else df.iloc[:, 0].values
-            raw_ecg = df['ecg'].values if 'ecg' in df.columns else df.iloc[:, 1].values
-            raw_red = df['red'].values if 'red' in df.columns else (df.iloc[:, 2].values if df.shape[1] > 2 else None)
-            raw_ir = df['ir'].values if 'ir' in df.columns else (df.iloc[:, 3].values if df.shape[1] > 3 else None)
+            required_columns = {"Time (s)", "PPG_Red", "PPG_IR", "ECG"}
+            missing_columns = required_columns.difference(df.columns)
+            if missing_columns:
+                raise ValueError(
+                    "Kolom CSV tidak lengkap: " + ", ".join(sorted(missing_columns))
+                )
+
+            raw_time = df["Time (s)"].to_numpy()
+            raw_ecg = df["ECG"].to_numpy()
+            raw_red = df["PPG_Red"].to_numpy()
+            raw_ir = df["PPG_IR"].to_numpy()
 
             # 2. Jalankan pemrosesan sinyal riil (ECG & PPG) via LoadingPage
             self.page_loading.start_processing(
@@ -109,9 +116,6 @@ class TriaGoApplication(QMainWindow):
                 raw_ir=raw_ir,
                 fs_orig=400  # Sesuaikan dengan sampling rate hardware STM32
             )
-
-            # 3. Hubungkan sinyal selesai ke handle_output_phase
-            self.page_loading.worker.processing_finished.connect(self.handle_output_phase)
 
         except Exception as e:
             print(f"[ERROR] Gagal membaca CSV / Memproses data: {e}")

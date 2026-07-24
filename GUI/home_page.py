@@ -28,7 +28,7 @@ class HomePage(QWidget):
         
         # Path ke file logo Anda (sesuaikan nama filenya jika berbeda)
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        logo_path = os.path.join(current_dir, r"C:\Users\Adyty\Documents\Farid ITS\TriaGo\asset\logo.png") 
+        logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
