@@ -232,7 +232,7 @@ class RegistrationPage(QWidget):
             "gcs": self.selected_gcs
         }
         
-        csv_file = "data_{timestamp}.csv"
+        csv_file = f"data_{measurement_data['bed']}.csv"
         file_exists = os.path.isfile(csv_file)
         
         try:

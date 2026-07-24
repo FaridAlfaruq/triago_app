@@ -134,19 +134,6 @@ class TriaGoApplication(QMainWindow):
     def reset_to_gatekeeper(self):
         self.current_patient_info.clear()
         self.saved_csv_path = ""
-        
-        self.page_registration.input_nama.clear()
-        self.page_registration.input_umur.clear()
-        
-        if self.page_registration.group_gender.checkedButton():
-            self.page_registration.group_gender.setExclusive(False)
-            self.page_registration.group_gender.checkedButton().setChecked(False)
-            self.page_registration.group_gender.setExclusive(True)
-            
-        if self.page_registration.group_kasus.checkedButton():
-            self.page_registration.group_kasus.setExclusive(False)
-            self.page_registration.group_kasus.checkedButton().setChecked(False)
-            self.page_registration.group_kasus.setExclusive(True)
             
         self.page_registration.selected_bed = None
         self.page_registration.selected_gcs = None
