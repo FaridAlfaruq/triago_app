@@ -11,7 +11,7 @@ class LiveSignalFilter:
         self.zi_ppg = lfilter_zi(self.b_ppg, self.a_ppg) * 0.0
 
         # 2. RANCANG FILTER ECG (SciPy Butterworth Bandpass 0.5 - 100 Hz)
-        self.b_ecg, self.a_ecg = butter(N=2, Wn=[0.5, 25.0], btype='bandpass', fs=self.fs)
+        self.b_ecg, self.a_ecg = butter(N=2, Wn=[0.5, 40.0], btype='bandpass', fs=self.fs)
         self.zi_ecg = lfilter_zi(self.b_ecg, self.a_ecg) * 0.0
 
         self.ppg_window_size = 16
