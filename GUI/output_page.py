@@ -10,13 +10,19 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
 
-# Konfigurasi Global Tema PyQtGraph (Background Putih & Teks Gelap)
+# Impor API Client dari folder services
+try:
+    from service.api_client import TriageApiClient
+except ImportError:
+    # Fallback jika struktur direktori berbeda saat run independen
+    TriageApiClient = None
+
+# Konfigurasi Global Tema PyQtGraph
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', '#214889')
 
 
 class OutputPage(QWidget):
-    # Sinyal untuk kembali ke halaman utama / registrasi
     home_requested = pyqtSignal()
 
     def __init__(self):
@@ -24,6 +30,10 @@ class OutputPage(QWidget):
         self.patient_data = {}
         self.calculation_results = {}
         self.iot_json_payload = ""
+        
+        # Inisialisasi API Client
+        self.api_client = TriageApiClient(base_url="http://127.0.0.1:5000") if TriageApiClient else None
+        
         self.setup_ui()
 
     def setup_ui(self):
@@ -35,13 +45,12 @@ class OutputPage(QWidget):
         main_layout.setSpacing(15)
 
         # =========================================================================
-        # 1. HEADER: JUDUL, INDIKATOR TRIASE, & LOGO
+        # 1. HEADER
         # =========================================================================
         header_layout = QHBoxLayout()
         header_layout.setSpacing(20)
         header_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        # Kiri: Judul Halaman
         title_vbox = QVBoxLayout()
         title_vbox.setSpacing(4)
         lbl_title = QLabel("HASIL PENGECEKAN")
@@ -52,7 +61,6 @@ class OutputPage(QWidget):
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
 
-        # Tengah: Indikator Triase
         self.triage_container = QHBoxLayout()
         self.triage_container.setSpacing(10)
         
@@ -74,7 +82,6 @@ class OutputPage(QWidget):
         self.triage_container.addWidget(self.lbl_status_text, stretch=1)
         header_layout.addLayout(self.triage_container, stretch=1)
 
-        # Kanan: Logo TriaGO
         lbl_logo = QLabel()
         lbl_logo.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         lbl_logo.setStyleSheet("background: transparent;")
@@ -92,7 +99,7 @@ class OutputPage(QWidget):
         main_layout.addLayout(header_layout)
 
         # =========================================================================
-        # 2. BODY LAYOUT: 4 BOX UTAMA (SHAP, ECG, PARAMETER, PPG IR)
+        # 2. BODY LAYOUT
         # =========================================================================
         lbl_shap_title = QLabel("SHAP Analysis")
         lbl_shap_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
@@ -106,7 +113,7 @@ class OutputPage(QWidget):
         lbl_ppg_title = QLabel("Sinyal PPG IR (5 Detik)")
         lbl_ppg_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
 
-        # --- A. KOTAK SHAP ---
+        # A. KOTAK SHAP
         self.box_shap = QFrame()
         self.box_shap.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         shap_layout = QVBoxLayout(self.box_shap)
@@ -117,7 +124,7 @@ class OutputPage(QWidget):
         self.plot_shap.setLabel('bottom', 'SHAP Value (Dampak Fitur)', color='#555555')
         shap_layout.addWidget(self.plot_shap)
 
-        # --- B. KOTAK ECG ---
+        # B. KOTAK ECG
         self.box_ecg = QFrame()
         self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ecg_layout = QVBoxLayout(self.box_ecg)
@@ -129,21 +136,20 @@ class OutputPage(QWidget):
         self.plot_ecg.setLabel('left', 'Amplitudo (mV)', color='#555555')
         ecg_layout.addWidget(self.plot_ecg)
 
-        # --- C. KOTAK PARAMETER MEDIS (5 PARAMETER) ---
+        # C. KOTAK PARAMETER MEDIS
         self.box_parameter = QFrame()
         self.box_parameter.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         param_layout = QGridLayout(self.box_parameter)
         param_layout.setContentsMargins(15, 10, 15, 10)
         param_layout.setSpacing(10)
 
-        # 5 Kartu Parameter
         self.lbl_temp_val, self.lbl_temp_sub = self._create_param_card(param_layout, "Suhu Tubuh", "-- °C", 0, 0)
         self.lbl_hr_val, _ = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
         self.lbl_rr_val, _ = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM", 1, 0)
         self.lbl_spo2_val, _ = self._create_param_card(param_layout, "Saturasi Oksigen", "-- %", 1, 1)
         self.lbl_bp_val, _ = self._create_param_card(param_layout, "Tekanan Darah", "--/-- mmHg", 2, 0, colspan=2)
 
-        # --- D. KOTAK PPG IR (TANPA LEGEND) ---
+        # D. KOTAK PPG IR
         self.box_ppg = QFrame()
         self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ppg_layout = QVBoxLayout(self.box_ppg)
@@ -155,7 +161,6 @@ class OutputPage(QWidget):
         self.plot_ppg.setLabel('left', 'Amplitudo (a.u.)', color='#555555')
         ppg_layout.addWidget(self.plot_ppg)
 
-        # --- BARIS 1 (SHAP + ECG) ---
         top_row_layout = QHBoxLayout()
         top_row_layout.setSpacing(20)
         
@@ -173,7 +178,6 @@ class OutputPage(QWidget):
         top_row_layout.addLayout(ecg_cell, stretch=1)
         main_layout.addLayout(top_row_layout, stretch=1)
 
-        # --- BARIS 2 (PARAMETER + PPG) ---
         bottom_row_layout = QHBoxLayout()
         bottom_row_layout.setSpacing(20)
         
@@ -192,7 +196,7 @@ class OutputPage(QWidget):
         main_layout.addLayout(bottom_row_layout, stretch=1)
 
         # =========================================================================
-        # 3. FOOTER: BUTTON KEMBALI
+        # 3. FOOTER
         # =========================================================================
         self.btn_home = QPushButton("KEMBALI")
         self.btn_home.setFixedHeight(50)
@@ -212,7 +216,6 @@ class OutputPage(QWidget):
         main_layout.addWidget(self.btn_home)
 
     def _create_param_card(self, grid_layout, title, default_val, row, col, colspan=1):
-        """Helper untuk membuat tampilan kartu parameter medis."""
         card = QFrame()
         card.setStyleSheet("QFrame { background-color: #F8FAF6; border: 1px solid #D5E5D0; border-radius: 8px; }")
         vbox = QVBoxLayout(card)
@@ -236,13 +239,12 @@ class OutputPage(QWidget):
         return lbl_val, lbl_sub
 
     # =========================================================================
-    # FUNGSI UTAMA: MENERIMA DATA, PLOTTING, & IOT JSON PREPARATION
+    # UPDATE RESULTS & INTEGRASI SINKRONISASI PAYLOAD
     # =========================================================================
     def update_results(self, data):
-        """Dipanggil dari MainGUI untuk mengisi parameter medis, plot sinyal 5s, SHAP, dan payload IoT."""
+        """Memperbarui UI dan mengirim data terbaru ke Flask API Backend."""
         self.calculation_results = data
 
-        # 1. Update Parameter Suhu (Core, Skin, Burton, Ambient)
         temp_core = data.get("temperature", 36.5)
         temp_skin = data.get("temp_skin", 34.5)
         temp_burton = data.get("temp_burton", 35.8)
@@ -254,7 +256,6 @@ class OutputPage(QWidget):
         sys_bp = data.get("systolic", 120)
         dia_bp = data.get("diastolic", 80)
 
-        # Menampilkan Suhu Inti sebagai Angka Utama & Rincian Burton/Kulit di Bawahnya
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
 
@@ -263,7 +264,7 @@ class OutputPage(QWidget):
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 
-        # 2. Potong Sinyal Menjadi 5 Detik Pertama (fs = 125 Hz -> 625 samples)
+        # Slicing Plot Sinyal 5 Detik
         fs = 125
         max_samples = 5 * fs
 
@@ -271,7 +272,6 @@ class OutputPage(QWidget):
         ecg_y = data.get("ecg_smooth", np.array([]))
         ir_y = data.get("ir_clean", np.array([]))
 
-        # Slicing array 5 detik
         time_5s = time_x[:max_samples] if len(time_x) >= max_samples else time_x
         ecg_5s = ecg_y[:max_samples] if len(ecg_y) >= max_samples else ecg_y
         ir_5s = ir_y[:max_samples] if len(ir_y) >= max_samples else ir_y
@@ -279,39 +279,73 @@ class OutputPage(QWidget):
         if len(time_5s) == 0 and len(ecg_5s) > 0:
             time_5s = np.linspace(0, 5, len(ecg_5s))
 
-        # 3. Plot Sinyal ECG (5 Detik)
         self.plot_ecg.clear()
         if len(ecg_5s) > 0:
             self.plot_ecg.plot(time_5s, ecg_5s, pen=pg.mkPen('#214889', width=2))
             self.plot_ecg.setXRange(0, 5)
 
-        # 4. Plot Sinyal PPG IR Saja (5 Detik, Tanpa Legend)
         self.plot_ppg.clear()
         if len(ir_5s) > 0:
             self.plot_ppg.plot(time_5s, ir_5s, pen=pg.mkPen('#2980B9', width=2))
             self.plot_ppg.setXRange(0, 5)
 
-        # 5. Render Grafik SHAP Analysis Nyata
+        # Plot SHAP
         shap_features = data.get("shap_features", ["GCS", "SpO2", "HR", "RR", "Suhu"])
         shap_values = data.get("shap_values", [0.0, 0.0, 0.0, 0.0, 0.0])
         self._render_real_shap(shap_features, shap_values)
 
-        # 6. Persiapkan JSON Payload untuk IoT (6 Parameter Utama)
-        self.iot_json_payload = self.prepare_iot_payload(data)
+        # Update Header Triage UI
+        triage_status_text = data.get("triage_status", "NON-DARURAT")
+        self.update_triage_header(triage_status_text)
+
+        # ---------------------------------------------------------------------
+        # PERBAIKAN: Mengirimkan payload yang sinkron ke Flask via api_client
+        # ---------------------------------------------------------------------
+        if self.api_client:
+            bed_id = data.get("bed", "A1")
+            patient_info = {"nama": data.get("patient_name", "Pasien IGD")}
+            
+            vitals_dict = {
+                "hr": hr,
+                "spo2": spo2,
+                "rr": rr,
+                "temp_skin": temp_skin,
+                "temp_ambient": temp_amb,
+                "sys": sys_bp,
+                "dia": dia_bp
+            }
+            
+            # Map status teks ke kode warna ('red', 'yellow', 'green')
+            triage_cat = self._map_status_to_color(triage_status_text)
+            xgb_score = data.get("xgboost_score", 0.85)
+
+            # Kirim data ke Flask API Server
+            self.api_client.send_triage_result(
+                bed_id=bed_id,
+                patient_info=patient_info,
+                vitals=vitals_dict,
+                classification=triage_cat,
+                score=xgb_score
+            )
+
+    def _map_status_to_color(self, status_text):
+        """Konversi dari string teks UI ke standar warna backend/frontend."""
+        status_upper = str(status_text).upper()
+        if "RESUSITASI" in status_upper or status_upper == "RED":
+            return "red"
+        elif "DARURAT" in status_upper and "NON" not in status_upper or status_upper == "YELLOW":
+            return "yellow"
+        else:
+            return "green"
 
     def _render_real_shap(self, features, shap_values):
-        """Membuat grafik horizontal bar SHAP yang teratur dan rapi."""
         self.plot_shap.clear()
-
-        # Matikan SI Prefix otomatis (x0.001) agar angka sumbu X murni
         self.plot_shap.getAxis('bottom').enableAutoSIPrefix(False)
 
-        # Cek jika data kosong atau bernilai 0 semua
         shap_array = np.array(shap_values)
         if len(features) == 0 or len(shap_array) == 0 or np.all(shap_array == 0):
             return
 
-        # Mapping nama teknis ke nama klinis sederhana
         name_mapping = {
             'temperature_c': 'Suhu',
             'spo2': 'SpO2',
@@ -319,21 +353,9 @@ class OutputPage(QWidget):
             'heart_rate': 'Heart Rate',
             'systolic_bp': 'Sistolik',
             'diastolic_bp': 'Diastolik',
-            'gcs_total': 'Skor GCS',
-            'shock_index': 'Shock Index',
-            'map': 'MAP',
-            'pulse_pressure': 'Pulse Press.',
-            'hypoxia': 'Hipoksia',
-            'tachypnea': 'Takipnea',
-            'abnormal_temp': 'Suhu Abn.',
-            'abnormal_hr': 'HR Abn.',
-            'gcs_squared': 'GCS²',
-            'gcs_map_index': 'GCS-MAP',
-            'gcs_shock_index': 'GCS-SI',
-            'total_abnormal': 'Tot. Abnormal'
+            'gcs_total': 'Skor GCS'
         }
 
-        # Ambil Top 7 Fitur dengan Dampak SHAP Terbesar (Mencegah teks bertumpuk)
         abs_vals = np.abs(shap_array)
         top_indices = np.argsort(abs_vals)[-7:] 
         
@@ -343,7 +365,6 @@ class OutputPage(QWidget):
         labels = [name_mapping.get(f, f) for f in top_features]
         y_pos = np.arange(len(top_features))
 
-        # Render Horizontal Bar (Hijau = Dampak Positif, Merah = Dampak Negatif)
         for y, val in zip(y_pos, top_values):
             color = '#E74C3C' if val < 0 else '#2ECC71'
             x0 = min(0.0, float(val))
@@ -358,7 +379,6 @@ class OutputPage(QWidget):
             )
             self.plot_shap.addItem(bar)
 
-        # Atur Ticks Sumbu Y & Kunci Rentang Tampilan
         axis_y = self.plot_shap.getAxis('left')
         ticks = [list(zip(y_pos, labels))]
         axis_y.setTicks(ticks)
@@ -366,43 +386,17 @@ class OutputPage(QWidget):
         self.plot_shap.setYRange(-0.8, len(top_features) - 0.2)
         self.plot_shap.enableAutoRange(axis='x')
 
-    def prepare_iot_payload(self, data):
-        """Menyiapkan struktur JSON parameter medis utama untuk IoT."""
-        payload = {
-            "device_id": f"TRIAGO_BED_{data.get('bed', '01')}",
-            "timestamp": data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-            "telemetry": {
-                "suhu_inti_c": data.get("temperature", 36.5),
-                "suhu_kulit_c": data.get("temp_skin", 34.5),
-                "suhu_burton_c": data.get("temp_burton", 35.8),
-                "suhu_lingkungan_c": data.get("temp_ambient", 28.0),
-                "saturasi_oksigen_pct": data.get("spo2", 98.0),
-                "laju_pernapasan_rpm": data.get("rr", 16.0),
-                "denyut_jantung_bpm": data.get("hr", 75.0),
-                "gcs_score": data.get("gcs", 15),
-                "tekanan_darah": {
-                    "sistol_mmhg": data.get("systolic", 120),
-                    "diastol_mmhg": data.get("diastolic", 80)
-                }
-            },
-            "triage_status": data.get("triage_status", "NON-DARURAT")
-        }
-        
-        json_str = json.dumps(payload, indent=4)
-        return json_str
-
     def update_triage_header(self, status):
-        """Fungsi dinamis untuk mengubah warna header sesuai hasil klasifikasi."""
         status = status.upper()
-        if status == "RESUSITASI":
+        if "RESUSITASI" in status or status == "RED":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
             self.lbl_status_text.setText("RESUSITASI")
             self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #E74C3C;")
-        elif status == "DARURAT":
+        elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
             self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #F39C12;")
-        elif "NON" in status or status == "HIJAU":
+        else:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
             self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #2ECC71;")
@@ -413,7 +407,7 @@ class OutputPage(QWidget):
 
 
 # =========================================================================
-# BLOK PENGETESAN MANDIRI (LOCAL TESTING BLOCK)
+# UJI MANDIRI LOCAL
 # =========================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -422,17 +416,19 @@ if __name__ == "__main__":
     test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
     test_window.showMaximized()
     
-    # Dummy Data 10 Detik
     fs = 125
     t_dummy = np.linspace(0, 10, 10 * fs)
     ecg_dummy = np.sin(2 * np.pi * 1.5 * t_dummy) + 0.2 * np.random.normal(size=len(t_dummy))
     ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
 
     dummy_results = {
-        "bed": "02",
+        "bed": "A1",
+        "patient_name": "Budi Santoso",
         "gcs": 15,
-        "timestamp": "2026-07-24 17:27:44",
+        "timestamp": "2026-07-25 10:55:00",
         "temperature": 36.5,
+        "temp_skin": 34.2,
+        "temp_ambient": 27.5,
         "hr": 110.5,
         "rr": 16.0,
         "spo2": 98.2,
@@ -441,12 +437,12 @@ if __name__ == "__main__":
         "time_125": t_dummy,
         "ecg_smooth": ecg_dummy,
         "ir_clean": ir_dummy,
-        "triage_status": "DARURAT",
+        "triage_status": "RESUSITASI",
+        "xgboost_score": 0.88,
         "shap_features": ["gcs_total", "systolic_bp", "spo2", "heart_rate", "temperature_c"],
         "shap_values": [0.35, -0.22, 0.18, -0.12, 0.05]
     }
 
     test_window.update_results(dummy_results)
-    test_window.update_triage_header(dummy_results["triage_status"]) 
     
     sys.exit(app.exec())
