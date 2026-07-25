@@ -413,7 +413,7 @@ class LoadingPage(QWidget):
         
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.setContentsMargins(50, 50, 50, 50)
+        main_layout.setContentsMargins(32, 24, 32, 24)
 
         # 1. Logo TriaGO
         self.lbl_logo = QLabel()
@@ -424,7 +424,7 @@ class LoadingPage(QWidget):
         logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
-            self.lbl_logo.setPixmap(pixmap.scaledToWidth(420, Qt.TransformationMode.SmoothTransformation))
+            self.lbl_logo.setPixmap(pixmap.scaledToWidth(340, Qt.TransformationMode.SmoothTransformation))
         else:
             self.lbl_logo.setText("TriaGO")
             self.lbl_logo.setStyleSheet("font-size: 48px; font-weight: 900; color: #214889; background: transparent;")
@@ -438,12 +438,12 @@ class LoadingPage(QWidget):
                 border-radius: 28px; 
             }
         """)
-        card_container.setFixedWidth(600)
-        card_container.setFixedHeight(140)
+        card_container.setFixedWidth(540)
+        card_container.setFixedHeight(128)
 
         card_layout = QVBoxLayout(card_container)
-        card_layout.setContentsMargins(35, 25, 35, 25)
-        card_layout.setSpacing(12)
+        card_layout.setContentsMargins(30, 22, 30, 22)
+        card_layout.setSpacing(10)
 
         # 3. Progress Bar
         self.progress_bar = AnimatedProgressBar()

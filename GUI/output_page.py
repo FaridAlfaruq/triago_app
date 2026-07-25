@@ -41,22 +41,22 @@ class OutputPage(QWidget):
         self.setStyleSheet("background-color: #F6FFEC;")
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(40, 20, 40, 20)
-        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(28, 14, 28, 14)
+        main_layout.setSpacing(10)
 
         # =========================================================================
         # 1. HEADER
         # =========================================================================
         header_layout = QHBoxLayout()
-        header_layout.setSpacing(20)
+        header_layout.setSpacing(16)
         header_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_vbox = QVBoxLayout()
         title_vbox.setSpacing(4)
         lbl_title = QLabel("HASIL PENGECEKAN")
-        lbl_title.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889; background: transparent;")
+        lbl_title.setStyleSheet("font-size: 28px; font-weight: 900; color: #214889; background: transparent;")
         lbl_subtitle = QLabel("Output parameter dan hasil klasifikasi ML")
-        lbl_subtitle.setStyleSheet("font-size: 22px; font-weight: 500; color: #555555; background: transparent;")
+        lbl_subtitle.setStyleSheet("font-size: 17px; font-weight: 500; color: #555555; background: transparent;")
         title_vbox.addWidget(lbl_title)
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
@@ -65,17 +65,17 @@ class OutputPage(QWidget):
         self.triage_container.setSpacing(10)
         
         self.badge_color = QFrame()
-        self.badge_color.setFixedSize(70, 70)
+        self.badge_color.setFixedSize(54, 54)
         self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
         
         self.lbl_status_text = QLabel("RESUSITASI")
         self.lbl_status_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_status_text.setFixedHeight(65)
-        self.lbl_status_text.setMinimumWidth(120)
+        self.lbl_status_text.setFixedHeight(52)
+        self.lbl_status_text.setMinimumWidth(190)
         self.lbl_status_text.setStyleSheet("""
-            font-size: 32px; font-weight: 900; color: #FFFFFF; 
+            font-size: 24px; font-weight: 900; color: #FFFFFF;
             background-color: #FF8A8A; border-radius: 8px; 
-            padding-left: 20px; padding-right: 20px;
+            padding-left: 12px; padding-right: 12px;
         """)
         
         self.triage_container.addWidget(self.badge_color)
@@ -90,7 +90,7 @@ class OutputPage(QWidget):
         logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
-            lbl_logo.setPixmap(pixmap.scaledToWidth(220, Qt.TransformationMode.SmoothTransformation))
+            lbl_logo.setPixmap(pixmap.scaledToWidth(180, Qt.TransformationMode.SmoothTransformation))
         else:
             lbl_logo.setText("TriaGO")
             lbl_logo.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889;")
@@ -102,22 +102,22 @@ class OutputPage(QWidget):
         # 2. BODY LAYOUT
         # =========================================================================
         lbl_shap_title = QLabel("SHAP Analysis")
-        lbl_shap_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_shap_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
         
         lbl_ecg_title = QLabel("Sinyal ECG (5 Detik)")
-        lbl_ecg_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_ecg_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
         
         lbl_param_title = QLabel("HASIL PARAMETER")
-        lbl_param_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_param_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
         
         lbl_ppg_title = QLabel("Sinyal PPG IR (5 Detik)")
-        lbl_ppg_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_ppg_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
 
         # A. KOTAK SHAP
         self.box_shap = QFrame()
         self.box_shap.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         shap_layout = QVBoxLayout(self.box_shap)
-        shap_layout.setContentsMargins(10, 10, 10, 10)
+        shap_layout.setContentsMargins(6, 6, 6, 6)
         
         self.plot_shap = pg.PlotWidget()
         self.plot_shap.showGrid(x=True, y=False, alpha=0.2)
@@ -128,7 +128,7 @@ class OutputPage(QWidget):
         self.box_ecg = QFrame()
         self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ecg_layout = QVBoxLayout(self.box_ecg)
-        ecg_layout.setContentsMargins(10, 10, 10, 10)
+        ecg_layout.setContentsMargins(6, 6, 6, 6)
 
         self.plot_ecg = pg.PlotWidget()
         self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
@@ -140,8 +140,8 @@ class OutputPage(QWidget):
         self.box_parameter = QFrame()
         self.box_parameter.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         param_layout = QGridLayout(self.box_parameter)
-        param_layout.setContentsMargins(15, 10, 15, 10)
-        param_layout.setSpacing(10)
+        param_layout.setContentsMargins(10, 8, 10, 8)
+        param_layout.setSpacing(7)
 
         self.lbl_temp_val, self.lbl_temp_sub = self._create_param_card(param_layout, "Suhu Tubuh", "-- °C", 0, 0)
         self.lbl_hr_val, _ = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
@@ -153,7 +153,7 @@ class OutputPage(QWidget):
         self.box_ppg = QFrame()
         self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ppg_layout = QVBoxLayout(self.box_ppg)
-        ppg_layout.setContentsMargins(10, 10, 10, 10)
+        ppg_layout.setContentsMargins(6, 6, 6, 6)
 
         self.plot_ppg = pg.PlotWidget()
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
@@ -162,7 +162,7 @@ class OutputPage(QWidget):
         ppg_layout.addWidget(self.plot_ppg)
 
         top_row_layout = QHBoxLayout()
-        top_row_layout.setSpacing(20)
+        top_row_layout.setSpacing(14)
         
         shap_cell = QVBoxLayout()
         shap_cell.setSpacing(8)
@@ -179,7 +179,7 @@ class OutputPage(QWidget):
         main_layout.addLayout(top_row_layout, stretch=1)
 
         bottom_row_layout = QHBoxLayout()
-        bottom_row_layout.setSpacing(20)
+        bottom_row_layout.setSpacing(14)
         
         param_cell = QVBoxLayout()
         param_cell.setSpacing(8)
@@ -199,13 +199,13 @@ class OutputPage(QWidget):
         # 3. FOOTER
         # =========================================================================
         self.btn_home = QPushButton("KEMBALI")
-        self.btn_home.setFixedHeight(50)
+        self.btn_home.setFixedHeight(48)
         self.btn_home.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_home.setStyleSheet("""
             QPushButton { 
                 background-color: #214889; 
                 color: white; 
-                font-size: 18px; 
+                font-size: 17px;
                 font-weight: bold; 
                 border-radius: 8px; 
             }
@@ -359,15 +359,15 @@ class OutputPage(QWidget):
         if "RESUSITASI" in status or status == "RED":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
             self.lbl_status_text.setText("RESUSITASI")
-            self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #E74C3C;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
         elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #F39C12;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
         else:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 32px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 20px; padding-right: 20px; color: #2ECC71;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
         print("[LOG] Inputs cleared. Returning to home_page...")

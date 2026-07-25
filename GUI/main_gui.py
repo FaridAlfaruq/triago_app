@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 
 # System Path Integration
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -13,10 +13,10 @@ if project_root not in sys.path:
 
 # Import seluruh halaman TriaGO
 from GUI.home_page import HomePage
-from regist_page import RegistrationPage
-from plot_page import PlotPage
-from loading_page import LoadingPage
-from output_page import OutputPage
+from GUI.loading_page import LoadingPage
+from GUI.output_page import OutputPage
+from GUI.plot_page import PlotPage
+from GUI.regist_page import RegistrationPage
 
 
 # =====================================================================
@@ -26,7 +26,7 @@ class TriaGoApplication(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("TriaGO - Automated Medical Triage Kiosk")
-        self.showMaximized()
+        self.resize(1280, 800)
         
         self.current_patient_info = {}
         
@@ -51,6 +51,7 @@ class TriaGoApplication(QMainWindow):
         # --- SINKRONISASI WARMUP: PlotPage ke LoadingPage ---
         self.page_live_data.warmup_progress.connect(self.page_loading.update_ui_state)
         self.page_live_data.warmup_finished.connect(self.go_to_live_data_page)
+        self.page_live_data.sensor_error.connect(self.handle_sensor_error)
         
         # --- SINKRONISASI PEREKAMAN: Stream data RAM ke LoadingPage ---
         self.page_live_data.recording_finished.connect(self.handle_extraction_phase)
@@ -85,6 +86,15 @@ class TriaGoApplication(QMainWindow):
         """Callback Otomatis: Dipanggil saat detik ke-2 ( warm-up 800 sampel) tercapai"""
         print("[LOG SUCCESS] Detik ke-2 tercapai secara riil. Membuka halaman plot sinyal.")
         self.stacked_widget.setCurrentIndex(3)
+
+    def handle_sensor_error(self, message):
+        """Tampilkan kegagalan koneksi tanpa mengunci pengguna di loading."""
+        print(f"[ERROR SENSOR] {message}")
+        self.page_loading.progress_bar.setValue(0)
+        self.page_loading.lbl_status.setText(
+            "Sensor tidak terhubung. Kembali ke halaman registrasi..."
+        )
+        QTimer.singleShot(2500, self.go_to_registration)
 
     def handle_extraction_phase(self, raw_data_list):
         """Fase 2: Membaca list paket data mentah dari RAM dan mengolahnya di LoadingPage"""
@@ -223,11 +233,26 @@ class TriaGoApplication(QMainWindow):
             self.page_loading.worker.wait()
         event.accept()
 
+    def keyPressEvent(self, event):
+        """Esc keluar dari fullscreen; F11 mengaktifkan/menonaktifkan fullscreen."""
+        if event.key() == Qt.Key.Key_Escape and self.isFullScreen():
+            self.showNormal()
+            self.resize(1280, 800)
+            return
+        if event.key() == Qt.Key.Key_F11:
+            if self.isFullScreen():
+                self.showNormal()
+                self.resize(1280, 800)
+            else:
+                self.showFullScreen()
+            return
+        super().keyPressEvent(event)
+
 # =====================================================================
 # EXECUTION ENTRY POINT
 # =====================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = TriaGoApplication()
-    window.show()
+    window.showFullScreen()
     sys.exit(app.exec())

@@ -28,8 +28,10 @@ def find_stm32_port():
     return "COM7" if sys.platform.startswith("win") else "/dev/ttyACM0"
 
 
-def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE):
+def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):
+    """Alirkan paket STM32 sampai koneksi berhenti atau diminta berhenti."""
     port = port or find_stm32_port()
+    should_stop = should_stop or (lambda: False)
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
         # set_buffer_size tidak tersedia pada seluruh platform/driver serial.
@@ -48,7 +50,7 @@ def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE):
         
         raw_accumulator = b""
         
-        while True:
+        while not should_stop():
             # === TAMBAH: NAPAS KOMPUTASI (5 ms) ===
             # Memberikan jeda agar CPU laptop tidak overload dan buffer OS terisi penuh
             time.sleep(0.005) 

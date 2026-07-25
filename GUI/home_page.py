@@ -20,7 +20,8 @@ class HomePage(QWidget):
         # Layout utama vertikal
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.setSpacing(30) # Jarak antara logo dan tombol
+        main_layout.setSpacing(24)
+        main_layout.setContentsMargins(32, 24, 32, 24)
 
         # 1. Komponen Logo
         self.logo_label = QLabel()
@@ -32,8 +33,7 @@ class HomePage(QWidget):
         
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
-            # Menyesuaikan ukuran logo secara proporsional (lebar diatur kisaran 450px)
-            scaled_pixmap = pixmap.scaledToWidth(450, Qt.TransformationMode.SmoothTransformation)
+            scaled_pixmap = pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
             self.logo_label.setPixmap(scaled_pixmap)
         else:
             self.logo_label.setText("TriaGO Logo Missing")
@@ -42,16 +42,16 @@ class HomePage(QWidget):
         # 2. Komponen Button "MULAI"
         self.btn_start = QPushButton("MULAI")
         self.btn_start.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_start.setFixedSize(200, 50) # Ukuran tombol proporsional
+        self.btn_start.setFixedSize(220, 56)
         
         # Style tombol: background merah (#F65C5C), teks hijau muda (#F6FFEC), dan rounded border
         self.btn_start.setStyleSheet("""
             QPushButton {
                 background-color: #F65C5C;
                 color: #F6FFEC;
-                font-size: 20px;
+                font-size: 21px;
                 font-weight: bold;
-                border-radius: 25px; 
+                border-radius: 28px;
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QPushButton:hover {

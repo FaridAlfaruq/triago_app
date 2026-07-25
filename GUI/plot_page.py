@@ -95,21 +95,31 @@ class AnimatedProgressBar(QWidget):
 # =====================================================================
 class STM32Worker(QThread):
     data_received = pyqtSignal(dict)
+    error_occurred = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self.running = True
 
     def run(self):
-        for packet in stream_stm32_data():
-            if not self.running:
-                break
-            if packet["status"] == "OK":
-                self.data_received.emit(packet)
+        try:
+            for packet in stream_stm32_data(
+                should_stop=lambda: (
+                    not self.running or self.isInterruptionRequested()
+                )
+            ):
+                if not self.running:
+                    break
+                if packet["status"] == "OK":
+                    self.data_received.emit(packet)
+        except Exception as exc:
+            if self.running:
+                self.error_occurred.emit(str(exc))
 
     def stop(self):
         self.running = False
-        self.wait()
+        self.requestInterruption()
+        self.wait(2000)
 
 
 # =====================================================================
@@ -119,6 +129,7 @@ class PlotPage(QWidget):
     recording_finished = pyqtSignal(list) 
     warmup_progress = pyqtSignal(str, int)  # Mengirim teks status & nilai persen (0-100)
     warmup_finished = pyqtSignal()          # Dipanggil tepat saat detik ke-2 selesai
+    sensor_error = pyqtSignal(str)
     
     SAMPLE_RATE_HZ = 400
     WARMUP_DURATION_SEC = 2.0  
@@ -156,23 +167,23 @@ class PlotPage(QWidget):
         self.setStyleSheet("background-color: #F6FFEC;")
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(40, 20, 40, 20)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(28, 16, 28, 16)
+        main_layout.setSpacing(8)
 
         # =====================================================================
         # BAGIAN 1: HEADER LAYOUT (JUDUL KIRI + PILL PROGRESS BAR + LOGO KANAN)
         # =====================================================================
         header_layout = QHBoxLayout()
-        header_layout.setSpacing(25)
+        header_layout.setSpacing(18)
         header_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
         lbl_title = QLabel("Melakukan Perekaman")
-        lbl_title.setStyleSheet("font-size: 28px; font-weight: 800; color: #214889; background: transparent;")
+        lbl_title.setStyleSheet("font-size: 26px; font-weight: 800; color: #214889; background: transparent;")
         header_layout.addWidget(lbl_title)
         
         # Progress Bar Kustom
         self.progress_bar = AnimatedProgressBar()
-        self.progress_bar.setMinimumWidth(320)
+        self.progress_bar.setMinimumWidth(300)
         header_layout.addWidget(self.progress_bar, stretch=1)
         
         lbl_logo = QLabel()
@@ -183,7 +194,7 @@ class PlotPage(QWidget):
         logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
-            lbl_logo.setPixmap(pixmap.scaledToWidth(240, Qt.TransformationMode.SmoothTransformation))
+            lbl_logo.setPixmap(pixmap.scaledToWidth(190, Qt.TransformationMode.SmoothTransformation))
         else:
             lbl_logo.setText("TriaGO")
             lbl_logo.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889;")
@@ -196,13 +207,13 @@ class PlotPage(QWidget):
         # =====================================================================
         # --- PLOT AREA 1: SINYAL ECG ---
         lbl_ecg_tag = QLabel("Sinyal ECG")
-        lbl_ecg_tag.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_ecg_tag.setStyleSheet("font-size: 17px; font-weight: bold; color: #214889; background: transparent;")
         main_layout.addWidget(lbl_ecg_tag)
         
         ecg_frame = QFrame()
         ecg_frame.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ecg_frame_layout = QVBoxLayout(ecg_frame)
-        ecg_frame_layout.setContentsMargins(8, 8, 8, 8) 
+        ecg_frame_layout.setContentsMargins(6, 6, 6, 6)
         
         self.ecg_plot = pg.PlotWidget()
         self.ecg_plot.setBackground('#FFFFFF')
@@ -217,7 +228,7 @@ class PlotPage(QWidget):
         self.ecg_plot.showGrid(x=True, y=True, alpha=0.3)
         
         self.ecg_plot.getViewBox().enableAutoRange(axis='y')
-        self.ecg_plot.plotItem.layout.setContentsMargins(15, 10, 15, 10)
+        self.ecg_plot.plotItem.layout.setContentsMargins(8, 6, 8, 6)
         
         self.ecg_curve = self.ecg_plot.plot(pen=pg.mkPen(color='#214889', width=2))
         ecg_frame_layout.addWidget(self.ecg_plot)
@@ -225,13 +236,13 @@ class PlotPage(QWidget):
 
         # --- PLOT AREA 2: SINYAL PPG ---
         lbl_ppg_tag = QLabel("Sinyal PPG")
-        lbl_ppg_tag.setStyleSheet("font-size: 18px; font-weight: bold; color: #214889; background: transparent;")
+        lbl_ppg_tag.setStyleSheet("font-size: 17px; font-weight: bold; color: #214889; background: transparent;")
         main_layout.addWidget(lbl_ppg_tag)
         
         ppg_frame = QFrame()
         ppg_frame.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ppg_frame_layout = QVBoxLayout(ppg_frame)
-        ppg_frame_layout.setContentsMargins(8, 8, 8, 8)
+        ppg_frame_layout.setContentsMargins(6, 6, 6, 6)
         
         self.ppg_plot = pg.PlotWidget()
         self.ppg_plot.setBackground('#FFFFFF')
@@ -246,7 +257,7 @@ class PlotPage(QWidget):
         self.ppg_plot.showGrid(x=True, y=True, alpha=0.3)
         
         self.ppg_plot.getViewBox().enableAutoRange(axis='y')
-        self.ppg_plot.plotItem.layout.setContentsMargins(15, 10, 15, 10)
+        self.ppg_plot.plotItem.layout.setContentsMargins(8, 6, 8, 6)
         
         self.ppg_curve = self.ppg_plot.plot(pen=pg.mkPen(color='#214889', width=2))
         self.ppg_plot.setXLink(self.ecg_plot) 
@@ -270,7 +281,12 @@ class PlotPage(QWidget):
         
         self.worker = STM32Worker()
         self.worker.data_received.connect(self.handle_new_packet)
+        self.worker.error_occurred.connect(self._handle_sensor_error)
         self.worker.start()
+
+    def _handle_sensor_error(self, message):
+        self.is_recording = False
+        self.sensor_error.emit(message)
 
     def handle_new_packet(self, packet):
         if not self.is_recording:
