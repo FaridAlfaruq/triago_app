@@ -491,7 +491,7 @@ class LoadingPage(QWidget):
         # Alirkan hasil ke Window Utama
         if hasattr(self, "parent_main_win"):
             self.parent_main_win.processed_results = results
-            self.parent_main_win.go_to_live_data_page()
+            self.parent_main_win.handle_output_phase(results)
         else:
             self.lbl_status.setText(
                 f"Selesai!!!"
