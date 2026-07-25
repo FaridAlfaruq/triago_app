@@ -232,9 +232,6 @@ class RegistrationPage(QWidget):
             "gcs": self.selected_gcs
         }
         
-        csv_file = f"data_{measurement_data['bed']}.csv"
-        file_exists = os.path.isfile(csv_file)
-        
         try:
             with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
                 writer = csv.DictWriter(f, fieldnames=measurement_data.keys())

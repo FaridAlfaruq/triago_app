@@ -1,6 +1,8 @@
 import sys
 import os
+import numpy as np
 import pandas as pd
+from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PyQt6.QtCore import Qt
 
@@ -9,7 +11,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# Import window TriaGO
+# Import seluruh halaman TriaGO
 from GUI.home_page import HomePage
 from regist_page import RegistrationPage
 from plot_page import PlotPage
@@ -27,7 +29,6 @@ class TriaGoApplication(QMainWindow):
         self.showMaximized()
         
         self.current_patient_info = {}
-        self.saved_csv_path = ""
         
         # 1. Kontainer Utama Stacked Widget
         self.stacked_widget = QStackedWidget()
@@ -40,18 +41,18 @@ class TriaGoApplication(QMainWindow):
         self.page_live_data = PlotPage() 
         self.page_output = OutputPage()
         
-        # Sambungkan reference parent ke LoadingPage
+        # Connect reference parent ke LoadingPage
         self.page_loading.parent_main_win = self
         
         # 3. Hubungkan Sistem Komunikasi Sinyal (Signals & Slots)
         self.page_home.start_requested.connect(self.go_to_registration)
         self.page_registration.measurement_started.connect(self.handle_start_stabilization_phase)
         
-        # --- SINKRONISASI UTAMA: Warmup PlotPage ke LoadingPage ---
+        # --- SINKRONISASI WARMUP: PlotPage ke LoadingPage ---
         self.page_live_data.warmup_progress.connect(self.page_loading.update_ui_state)
         self.page_live_data.warmup_finished.connect(self.go_to_live_data_page)
         
-        # Sinyal pasca-perekaman dan tombol kembali
+        # --- SINKRONISASI PEREKAMAN: Stream data RAM ke LoadingPage ---
         self.page_live_data.recording_finished.connect(self.handle_extraction_phase)
         self.page_output.home_requested.connect(self.reset_to_gatekeeper)
         
@@ -65,10 +66,11 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(0)
 
     def go_to_registration(self):
+        """Pindah ke Halaman Registrasi (Kasur & GCS)"""
         self.stacked_widget.setCurrentIndex(1)
 
     def handle_start_stabilization_phase(self, patient_data):
-        """Fase Pertama: Membuka loading screen dan menyalakan data stream STM32"""
+        """Fase 1: Membuka loading screen dan menyalakan data stream STM32 (Warmup 2 detik)"""
         self.current_patient_info = patient_data 
         
         # Pindah ke Halaman Loading
@@ -76,78 +78,141 @@ class TriaGoApplication(QMainWindow):
         self.page_loading.progress_bar.setValue(0)
         self.page_loading.lbl_status.setText("Menstabilkan sensor....")
         
-        # Jalankan session data STM32
+        # Jalankan session data STM32 pada PlotPage
         self.page_live_data.start_session(patient_data)
 
     def go_to_live_data_page(self):
-        """Callback Otomatis: Dipanggil saat data warmup ke-800 dari PlotPage selesai diterima"""
+        """Callback Otomatis: Dipanggil saat detik ke-2 ( warm-up 800 sampel) tercapai"""
         print("[LOG SUCCESS] Detik ke-2 tercapai secara riil. Membuka halaman plot sinyal.")
         self.stacked_widget.setCurrentIndex(3)
 
-    def handle_extraction_phase(self, csv_filepath):
-        """Fase Kedua: Membaca CSV hasil perekaman & memproses sinyal riil di LoadingPage"""
-        self.saved_csv_path = csv_filepath
-        
-        # Pindah tampilan ke Halaman Loading (Index 2)
+    def handle_extraction_phase(self, raw_data_list):
+        """Fase 2: Membaca list paket data mentah dari RAM dan mengolahnya di LoadingPage"""
+        # Pindah tampilan kembali ke Halaman Loading (Index 2)
         self.stacked_widget.setCurrentIndex(2)
         
         try:
-            # 1. Membaca data CSV yang baru saja direkam dari PlotPage
-            df = pd.read_csv(csv_filepath)
+            # 1. Konversi list paket dict dari PlotPage ke NumPy Array di RAM
+            sampling_rate = 400.0
+            sampling_interval = 1.0 / sampling_rate
+            n_samples = len(raw_data_list)
             
-            # Mapping kolom CSV secara otomatis
-            raw_time = df['time'].values if 'time' in df.columns else df.iloc[:, 0].values
-            raw_ecg = df['ecg'].values if 'ecg' in df.columns else df.iloc[:, 1].values
-            raw_red = df['red'].values if 'red' in df.columns else (df.iloc[:, 2].values if df.shape[1] > 2 else None)
-            raw_ir = df['ir'].values if 'ir' in df.columns else (df.iloc[:, 3].values if df.shape[1] > 3 else None)
+            raw_time = np.array([i * sampling_interval for i in range(n_samples)])
+            raw_ecg = np.array([p["ecg"] for p in raw_data_list])
+            raw_red = np.array([p["ppg"]["red"] for p in raw_data_list])
+            raw_ir = np.array([p["ppg"]["ir"] for p in raw_data_list])
 
-            # 2. Jalankan pemrosesan sinyal riil (ECG & PPG) via LoadingPage
+            # 2. Oper data ke LoadingPage untuk pemrosesan sinyal & ML XGBoost
             self.page_loading.start_processing(
                 raw_ecg=raw_ecg,
                 raw_time=raw_time,
                 raw_red=raw_red,
                 raw_ir=raw_ir,
-                fs_orig=400  # Sesuaikan dengan sampling rate hardware STM32
+                patient_info=self.current_patient_info,
+                fs_orig=400
             )
 
-            # 3. Hubungkan sinyal selesai ke handle_output_phase
-            self.page_loading.worker.processing_finished.connect(self.handle_output_phase)
-
         except Exception as e:
-            print(f"[ERROR] Gagal membaca CSV / Memproses data: {e}")
+            print(f"[ERROR] Gagal mengolah data RAM di LoadingPage: {e}")
 
     def handle_output_phase(self, calculation_results):
-        print("[LOG SUCCESS] Mengirimkan data sinyal dan parameter ke Output Page...")
+        """Fase 3: Menyimpan 1 File CSV Konsolidasi Tunggal & Buka Halaman Output"""
+        print("[LOG SUCCESS] Memproses fase output akhir...")
         
-        # Kirim seluruh dictionary (termasuk array sinyal) ke OutputPage
+        # 1. SIMPAN 1 FILE CSV KONSOLIDASI MASTER
+        self.save_consolidated_csv(calculation_results)
+        
+        # 2. Update Halaman Output (Grafik 5s, Parameter, SHAP, & JSON IoT)
         if hasattr(self.page_output, "update_results"):
             self.page_output.update_results(calculation_results)
             
-        triage_status = calculation_results.get("triage_status", "NON URGENSI")
+        triage_status = calculation_results.get("triage_status", "NON-DARURAT")
         self.page_output.update_triage_header(triage_status)
         
-        # Pindah ke Halaman Output
+        # 3. Pindah ke Halaman Output (Index 4)
         self.stacked_widget.setCurrentIndex(4)
 
+    def save_consolidated_csv(self, results):
+        """Menyimpan seluruh data registrasi, sinyal bersih, dan fitur ekstraksi ke 1 CSV master."""
+        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        bed_id = results.get("bed", "00")
+        
+        # FORMAT NAMA FILE MASTER (Bisa disesuaikan jika ingin lokasi folder tertentu)
+        filename = f"TriaGO_FullData_Bed{bed_id}_{timestamp_str}.csv"
+        
+        try:
+            time_arr = results.get("time_125", [])
+            ecg_clean = results.get("ecg_smooth", [])
+            ir_clean = results.get("ir_clean", [])
+            
+            # Gabungkan Sinyal Time-Series + Metadata & Hasil Ekstraksi
+            df = pd.DataFrame({
+                "Time_s": time_arr,
+                "ECG_Clean": ecg_clean,
+                "PPG_IR_Clean": ir_clean,
+                
+                # Metadata & Input Registrasi
+                "Bed_Location": results.get("bed", "00"),
+                "GCS_Score": results.get("gcs", 15),
+                "Timestamp": results.get("timestamp", ""),
+                
+                # Parameter Hasil Ekstraksi & ML
+                "Suhu_C": results.get("temperature", 36.5),
+                "SpO2_Pct": results.get("spo2", 0.0),
+                "RR_RPM": results.get("rr", 0.0),
+                "HR_BPM": results.get("hr", 0.0),
+                "BP_Systolic": results.get("systolic", 120),
+                "BP_Diastolic": results.get("diastolic", 80),
+                "PI_Red_Pct": results.get("pi_red", 0.0),
+                "PI_IR_Pct": results.get("pi_ir", 0.0),
+                "Triage_Status": results.get("triage_status", "")
+            })
+            
+            df.to_csv(filename, index=False)
+            print(f"[LOG SUCCESS] File CSV Konsolidasi Berhasil Disimpan: {filename}")
+        except Exception as e:
+            print(f"[ERROR] Gagal menyimpan CSV konsolidasi: {e}")
+
     def reset_to_gatekeeper(self):
+        """Reset seluruh input data pasien dan kembalikan tampilan ke Halaman Registrasi"""
         self.current_patient_info.clear()
-        self.saved_csv_path = ""
             
         self.page_registration.selected_bed = None
         self.page_registration.selected_gcs = None
         
         for btn in self.page_registration.bed_buttons.values():
             btn.setChecked(False)
-            btn.setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1.5px solid #214889; border-radius: 8px; font-size: 32px; font-weight: bold; color: #214889; } QPushButton:hover { background-color: #F0F4FF; }")
+            btn.setStyleSheet("""
+                QPushButton { 
+                    background-color: #FFFFFF; 
+                    border: 2px solid #214889; 
+                    border-radius: 12px; 
+                    font-size: 48px; 
+                    font-weight: bold; 
+                    color: #214889; 
+                } 
+                QPushButton:hover { background-color: #F0F4FF; }
+            """)
             
         for btn in self.page_registration.gcs_buttons.values():
             btn.setChecked(False)
-            btn.setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid #C2D5BB; border-radius: 8px; font-size: 18px; font-weight: bold; color: #A0B09C; } QPushButton:hover { border-color: #214889; color: #214889; }")
+            btn.setStyleSheet("""
+                QPushButton { 
+                    background-color: #FFFFFF; 
+                    border: 2px solid #C2D5BB; 
+                    border-radius: 12px; 
+                    font-size: 28px; 
+                    font-weight: bold; 
+                    color: #A0B09C; 
+                } 
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
             
         self.page_registration.validate_form()
         self.stacked_widget.setCurrentIndex(1)
 
     def closeEvent(self, event):
+        """Pastikan seluruh background thread ditutup dengan aman saat aplikasi keluar."""
         if hasattr(self.page_live_data, 'worker') and self.page_live_data.worker is not None:
             self.page_live_data.worker.stop()
         if hasattr(self.page_loading, 'worker') and self.page_loading.worker is not None and self.page_loading.worker.isRunning():
@@ -155,6 +220,9 @@ class TriaGoApplication(QMainWindow):
             self.page_loading.worker.wait()
         event.accept()
 
+# =====================================================================
+# EXECUTION ENTRY POINT
+# =====================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = TriaGoApplication()

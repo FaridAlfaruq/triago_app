@@ -117,7 +117,7 @@ class STM32Worker(QThread):
 # HALAMAN UTAMA: PlotPage
 # =====================================================================
 class PlotPage(QWidget):
-    recording_finished = pyqtSignal(str) 
+    recording_finished = pyqtSignal(list) 
     warmup_progress = pyqtSignal(str, int)  # Mengirim teks status & nilai persen (0-100)
     warmup_finished = pyqtSignal()          # Dipanggil tepat saat detik ke-2 selesai
     
@@ -330,33 +330,15 @@ class PlotPage(QWidget):
         self.is_recording = False
         self.close_threads()
             
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Data_raw_{timestamp_str}.csv"
-        sampling_interval = 1.0 / self.SAMPLE_RATE_HZ
-
         warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
         clean_data_subset = self.recorded_data[warmup_samples:]
 
-        try:
-            with open(filename, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(["Time (s)", "PPG_Red", "PPG_IR", "PPG_Green", "ECG", "Temp_Ambient", "Temp_Object"])
-                
-                for index, p in enumerate(clean_data_subset):
-                    relative_time_s = index * sampling_interval
-                    writer.writerow([
-                        f"{relative_time_s:.4f}",
-                        p["ppg"]["red"], p["ppg"]["ir"], p["ppg"]["green"],
-                        p["ecg"], p["temperature"]["ambient"], p["temperature"]["object"]
-                    ])
-            print(f"[LOG SUCCESS] Data riil berhasil disimpan ke: {filename}")
-            
-            # Memastikan visual menyentuh 100% penuh di akhir rekaman
-            self.progress_bar.animate_to(100)
-            
-            self.recording_finished.emit(filename)
-        except Exception as e:
-            print(f"[ERROR WRITE CSV FAILURE]: {e}")
+        # MENGHAPUS SIMPAN CSV INDEPENDEN
+        self.progress_bar.animate_to(100)
+        
+        # Langsung emit list data di RAM ke Main GUI
+        print(f"[LOG SUCCESS] {len(clean_data_subset)} paket data dioper ke RAM.")
+        self.recording_finished.emit(clean_data_subset)
 
     def close_threads(self):
         self.is_recording = False

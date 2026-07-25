@@ -1,7 +1,9 @@
 import sys
 import os
+import json
 import numpy as np
 import pyqtgraph as pg
+from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication
 )
@@ -14,13 +16,14 @@ pg.setConfigOption('foreground', '#214889')
 
 
 class OutputPage(QWidget):
-    # Sinyal untuk kembali ke halaman utama
+    # Sinyal untuk kembali ke halaman utama / registrasi
     home_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.patient_data = {}
         self.calculation_results = {}
+        self.iot_json_payload = ""
         self.setup_ui()
 
     def setup_ui(self):
@@ -43,8 +46,8 @@ class OutputPage(QWidget):
         title_vbox.setSpacing(4)
         lbl_title = QLabel("HASIL PENGECEKAN")
         lbl_title.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889; background: transparent;")
-        lbl_subtitle = QLabel("Output parameter dan hasil klasifikasi")
-        lbl_subtitle.setStyleSheet("font-size: 22px; font-weight: 500; color: #214889; background: transparent;")
+        lbl_subtitle = QLabel("Output parameter dan hasil klasifikasi ML")
+        lbl_subtitle.setStyleSheet("font-size: 22px; font-weight: 500; color: #555555; background: transparent;")
         title_vbox.addWidget(lbl_title)
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
@@ -133,7 +136,7 @@ class OutputPage(QWidget):
         param_layout.setContentsMargins(15, 10, 15, 10)
         param_layout.setSpacing(10)
 
-        # Membuat 5 Kartu Parameter
+        # 5 Kartu Parameter
         self.lbl_temp_val = self._create_param_card(param_layout, "Suhu", "-- °C", 0, 0)
         self.lbl_hr_val = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
         self.lbl_rr_val = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM", 1, 0)
@@ -150,7 +153,6 @@ class OutputPage(QWidget):
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
         self.plot_ppg.setLabel('bottom', 'Waktu (detik)', color='#555555')
         self.plot_ppg.setLabel('left', 'Amplitudo (a.u.)', color='#555555')
-        # Legend sengaja dihilangkan
         ppg_layout.addWidget(self.plot_ppg)
 
         # --- BARIS 1 (SHAP + ECG) ---
@@ -229,33 +231,33 @@ class OutputPage(QWidget):
         return lbl_val
 
     # =========================================================================
-    # FUNGSI UTAMA: MENERIMA DATA & PLOTTING
+    # FUNGSI UTAMA: MENERIMA DATA, PLOTTING, & IOT JSON PREPARATION
     # =========================================================================
     def update_results(self, data):
-        """Dipanggil dari MainGUI untuk mengisi 5 parameter medis dan plot sinyal (5 Detik)."""
+        """Dipanggil dari MainGUI untuk mengisi parameter medis, plot sinyal 5s, SHAP, dan payload IoT."""
         self.calculation_results = data
 
         # 1. Update 5 Parameter Medis
-        temp = data.get("temperature", data.get("suhu", 36.5))
-        hr = data.get("hr", data.get("heart_rate", 0.0))
-        rr = data.get("rr", data.get("respiration_rate", 0.0))
+        temp = data.get("temperature", 36.5)
+        hr = data.get("hr", 0.0)
+        rr = data.get("rr", 0.0)
         spo2 = data.get("spo2", 0.0)
-        sys_bp = data.get("systolic", data.get("sys", 120))
-        dia_bp = data.get("diastolic", data.get("dia", 80))
+        sys_bp = data.get("systolic", 120)
+        dia_bp = data.get("diastolic", 80)
 
         self.lbl_temp_val.setText(f"{temp} °C")
         self.lbl_hr_val.setText(f"{hr} BPM")
         self.lbl_rr_val.setText(f"{rr} RPM")
         self.lbl_spo2_val.setText(f"{spo2} %")
-        self.lbl_bp_val.setText(f"{sys_bp}/{dia_bp} mmHg")
+        self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 
         # 2. Potong Sinyal Menjadi 5 Detik Pertama (fs = 125 Hz -> 625 samples)
         fs = 125
         max_samples = 5 * fs
 
         time_x = data.get("time_125", np.array([]))
-        ecg_y = data.get("ecg_smooth", data.get("ecg_125", np.array([])))
-        ir_y = data.get("ir_clean", data.get("ir_smooth", np.array([])))
+        ecg_y = data.get("ecg_smooth", np.array([]))
+        ir_y = data.get("ir_clean", np.array([]))
 
         # Slicing array 5 detik
         time_5s = time_x[:max_samples] if len(time_x) >= max_samples else time_x
@@ -277,25 +279,103 @@ class OutputPage(QWidget):
             self.plot_ppg.plot(time_5s, ir_5s, pen=pg.mkPen('#2980B9', width=2))
             self.plot_ppg.setXRange(0, 5)
 
-        # 5. Render Dummy Grafik SHAP Analysis
-        self._render_dummy_shap()
+        # 5. Render Grafik SHAP Analysis Nyata
+        shap_features = data.get("shap_features", ["GCS", "SpO2", "HR", "RR", "Suhu"])
+        shap_values = data.get("shap_values", [0.0, 0.0, 0.0, 0.0, 0.0])
+        self._render_real_shap(shap_features, shap_values)
 
-    def _render_dummy_shap(self):
-        """Membuat grafik horizontal bar dummy untuk SHAP Analysis."""
+        # 6. Persiapkan JSON Payload untuk IoT (6 Parameter Utama)
+        self.iot_json_payload = self.prepare_iot_payload(data)
+
+    def _render_real_shap(self, features, shap_values):
+        """Membuat grafik horizontal bar SHAP yang teratur dan rapi."""
         self.plot_shap.clear()
-        
-        features = ["GCS", "Tekanan Darah", "SpO2", "HR", "Suhu"]
-        shap_values = [0.42, -0.35, 0.28, -0.18, 0.08]
-        y_pos = np.arange(len(features))
 
-        for y, val in zip(y_pos, shap_values):
+        # Matikan SI Prefix otomatis (x0.001) agar angka sumbu X murni
+        self.plot_shap.getAxis('bottom').enableAutoSIPrefix(False)
+
+        # Cek jika data kosong atau bernilai 0 semua
+        shap_array = np.array(shap_values)
+        if len(features) == 0 or len(shap_array) == 0 or np.all(shap_array == 0):
+            return
+
+        # Mapping nama teknis ke nama klinis sederhana
+        name_mapping = {
+            'temperature_c': 'Suhu',
+            'spo2': 'SpO2',
+            'respiratory_rate': 'Laju Nafas',
+            'heart_rate': 'Heart Rate',
+            'systolic_bp': 'Sistolik',
+            'diastolic_bp': 'Diastolik',
+            'gcs_total': 'Skor GCS',
+            'shock_index': 'Shock Index',
+            'map': 'MAP',
+            'pulse_pressure': 'Pulse Press.',
+            'hypoxia': 'Hipoksia',
+            'tachypnea': 'Takipnea',
+            'abnormal_temp': 'Suhu Abn.',
+            'abnormal_hr': 'HR Abn.',
+            'gcs_squared': 'GCS²',
+            'gcs_map_index': 'GCS-MAP',
+            'gcs_shock_index': 'GCS-SI',
+            'total_abnormal': 'Tot. Abnormal'
+        }
+
+        # Ambil Top 7 Fitur dengan Dampak SHAP Terbesar (Mencegah teks bertumpuk)
+        abs_vals = np.abs(shap_array)
+        top_indices = np.argsort(abs_vals)[-7:] 
+        
+        top_features = [features[i] for i in top_indices]
+        top_values = [shap_array[i] for i in top_indices]
+
+        labels = [name_mapping.get(f, f) for f in top_features]
+        y_pos = np.arange(len(top_features))
+
+        # Render Horizontal Bar (Hijau = Dampak Positif, Merah = Dampak Negatif)
+        for y, val in zip(y_pos, top_values):
             color = '#E74C3C' if val < 0 else '#2ECC71'
-            bar = pg.BarGraphItem(x0=0, y=y, height=0.45, width=val, brush=color, pen=color)
+            x0 = min(0.0, float(val))
+            x1 = max(0.0, float(val))
+            
+            bar = pg.BarGraphItem(
+                x0=x0, x1=x1,
+                y=float(y),
+                height=0.45,
+                brush=pg.mkBrush(color),
+                pen=pg.mkPen(color)
+            )
             self.plot_shap.addItem(bar)
 
+        # Atur Ticks Sumbu Y & Kunci Rentang Tampilan
         axis_y = self.plot_shap.getAxis('left')
-        ticks = [list(zip(y_pos, features))]
+        ticks = [list(zip(y_pos, labels))]
         axis_y.setTicks(ticks)
+        
+        self.plot_shap.setYRange(-0.8, len(top_features) - 0.2)
+        self.plot_shap.enableAutoRange(axis='x')
+
+    def prepare_iot_payload(self, data):
+        """Menyiapkan struktur JSON 6 parameter medis utama untuk IoT."""
+        payload = {
+            "device_id": f"TRIAGO_BED_{data.get('bed', '01')}",
+            "timestamp": data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            "telemetry": {
+                "suhu_tubuh_c": data.get("temperature", 36.5),
+                "saturasi_oksigen_pct": data.get("spo2", 98.0),
+                "laju_pernapasan_rpm": data.get("rr", 16.0),
+                "denyut_jantung_bpm": data.get("hr", 75.0),
+                "gcs_score": data.get("gcs", 15),
+                "tekanan_darah": {
+                    "sistol_mmhg": data.get("systolic", 120),
+                    "diastol_mmhg": data.get("diastolic", 80)
+                }
+            },
+            "triage_status": data.get("triage_status", "NON-DARURAT")
+        }
+        
+        json_str = json.dumps(payload, indent=4)
+        print("[LOG IoT PREPARATION] JSON Payload Siap Dikirim ke IoT:\n", json_str)
+        return json_str
 
     def update_triage_header(self, status):
         """Fungsi dinamis untuk mengubah warna header sesuai hasil klasifikasi."""
@@ -328,13 +408,16 @@ if __name__ == "__main__":
     test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
     test_window.showMaximized()
     
-    # Generate Dummy Data 10 Detik
+    # Dummy Data 10 Detik
     fs = 125
     t_dummy = np.linspace(0, 10, 10 * fs)
     ecg_dummy = np.sin(2 * np.pi * 1.5 * t_dummy) + 0.2 * np.random.normal(size=len(t_dummy))
     ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
 
     dummy_results = {
+        "bed": "02",
+        "gcs": 15,
+        "timestamp": "2026-07-24 17:27:44",
         "temperature": 36.5,
         "hr": 110.5,
         "rr": 16.0,
@@ -344,7 +427,9 @@ if __name__ == "__main__":
         "time_125": t_dummy,
         "ecg_smooth": ecg_dummy,
         "ir_clean": ir_dummy,
-        "triage_status": "DARURAT"
+        "triage_status": "DARURAT",
+        "shap_features": ["gcs_total", "systolic_bp", "spo2", "heart_rate", "temperature_c"],
+        "shap_values": [0.35, -0.22, 0.18, -0.12, 0.05]
     }
 
     test_window.update_results(dummy_results)
