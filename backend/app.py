@@ -1,18 +1,34 @@
 import os
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from bed_manager import BedManager
+from flask_socketio import SocketIO
+
+try:
+    from .bed_manager import BedManager
+except ImportError:
+    # Tetap mendukung eksekusi langsung: python backend/app.py
+    from bed_manager import BedManager
 
 # Inisialisasi Flask App & Arahkan static folder ke folder 'website'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEBSITE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "website"))
+SERVER_HOST = os.environ.get("TRIAGO_HOST", "0.0.0.0")
+SERVER_PORT = int(os.environ.get("TRIAGO_PORT", "5000"))
+DEBUG_MODE = os.environ.get("TRIAGO_DEBUG", "0").lower() in {"1", "true", "yes"}
+CORS_ORIGINS = os.environ.get("TRIAGO_CORS_ORIGINS", "*")
 
 app = Flask(__name__, static_folder=WEBSITE_DIR, static_url_path="")
-CORS(app)  # Izinkan CORS agar Live Server atau PyQt6 bisa terhubung tanpa hambatan
+CORS(
+    app,
+    resources={r"/api/*": {"origins": CORS_ORIGINS}},
+)
 
 # Inisialisasi SocketIO untuk komunikasi dua arah (Real-time)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(
+    app,
+    cors_allowed_origins=CORS_ORIGINS,
+    async_mode="threading",
+)
 
 # Inisialisasi BedManager untuk mengelola status bed IGD
 bed_manager = BedManager()
@@ -27,6 +43,16 @@ def index():
     return send_from_directory(WEBSITE_DIR, "index.html")
 
 
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    """Health-check sederhana untuk pengujian koneksi dari laptop."""
+    return jsonify({
+        "status": "ok",
+        "service": "triago-backend",
+        "port": SERVER_PORT,
+    })
+
+
 # =========================================================================
 # 2. ENDPOINT API UNTUK PENGIRIMAN DATA DARI GUI / HARDWARE
 # =========================================================================
@@ -36,7 +62,7 @@ def update_triage():
     Endpoint yang dipanggil oleh TriageApiClient di output_page.py.
     Menerima JSON payload 6 parameter vital sign & hasil klasifikasi.
     """
-    data = request.json
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
 
@@ -91,8 +117,20 @@ def handle_disconnect():
 # MAIN EXECUTION
 # =========================================================================
 if __name__ == "__main__":
-    print(f"=== Menjalankan Server IGD Command Center ===")
+    print("=== Menjalankan Server IGD Command Center ===")
     print(f"Static directory: {WEBSITE_DIR}")
-    print(f"Server berjalan di http://127.0.0.1:5000\n")
+    print(f"Listen address : http://{SERVER_HOST}:{SERVER_PORT}")
+    print(
+        "Akses laptop  : http://<IP-RASPBERRY-PI>:"
+        f"{SERVER_PORT}"
+    )
+    print("Cari IP Raspi  : hostname -I\n")
     
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    socketio.run(
+        app,
+        host=SERVER_HOST,
+        port=SERVER_PORT,
+        debug=DEBUG_MODE,
+        use_reloader=False,
+        allow_unsafe_werkzeug=True,
+    )

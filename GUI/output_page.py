@@ -32,7 +32,7 @@ class OutputPage(QWidget):
         self.iot_json_payload = ""
         
         # Inisialisasi API Client
-        self.api_client = TriageApiClient(base_url="http://127.0.0.1:5000") if TriageApiClient else None
+        self.api_client = TriageApiClient() if TriageApiClient else None
         
         self.setup_ui()
 

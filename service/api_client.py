@@ -1,8 +1,15 @@
+import os
+
 import requests
 
+
 class TriageApiClient:
-    def __init__(self, base_url="http://127.0.0.1:5000"):
-        self.base_url = base_url
+    def __init__(self, base_url=None):
+        self.base_url = (
+            base_url
+            or os.environ.get("TRIAGO_API_URL")
+            or "http://127.0.0.1:5000"
+        ).rstrip("/")
         self.endpoint_update = f"{self.base_url}/api/triage/update"
         self.timeout = 3.0
 

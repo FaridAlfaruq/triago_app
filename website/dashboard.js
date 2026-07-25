@@ -1,4 +1,4 @@
-const socket = io();
+const socket = typeof io === 'function' ? io() : null;
 
 const catLabel = {
   red: 'Resusitasi',
@@ -132,11 +132,16 @@ function savePatientData() {
   closeFormModal();
 }
 
-socket.on('bed_updated', (updatedBed) => {
-  bedsData[updatedBed.bed_id] = updatedBed;
-  renderAllZones();
-  tickCountdowns();
-});
+if (socket) {
+  socket.on('bed_updated', (updatedBed) => {
+    bedsData[updatedBed.bed_id] = updatedBed;
+    renderAllZones();
+    tickCountdowns();
+  });
+} else {
+  console.warn('[SOCKET] Socket.IO tidak tersedia; menggunakan polling API.');
+  setInterval(fetchInitialBeds, 3000);
+}
 
 function tickCountdowns() {
   document.querySelectorAll('.bed[data-arrival]').forEach(bed => {
