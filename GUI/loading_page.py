@@ -120,177 +120,209 @@ class ProcessingWorker(QThread):
         print("="*50 + "\n")
 
     def run(self):
-        # -----------------------------------------------------------------
-        # TAHAP 1: Preprocessing & Filtering Sinyal ECG (0% - 25%)
-        # -----------------------------------------------------------------
-        self.status_updated.emit("Downsampling & Filtering Sinyal ECG...", 15)
-        self.msleep(100)
+            # -----------------------------------------------------------------
+            # TAHAP 1: Preprocessing & Filtering Sinyal ECG (0% - 25%)
+            # -----------------------------------------------------------------
+            self.status_updated.emit("Downsampling & Filtering Sinyal ECG...", 15)
+            self.msleep(100)
 
-        ecg_125, time_125 = self.ecg_processor.downsample(
-            self.raw_ecg, self.raw_time, fs=self.fs_orig, fs_target=125
-        )
-
-        sig_notch = self.ecg_processor.notch(ecg_125, freq=50.0, fs=125)
-        sig_detrend = self.ecg_processor.detrending(sig_notch, fs=125)
-        sig_lpf = self.ecg_processor.lowpass(sig_detrend, lowcut=35.0, fs=125)
-        ecg_smooth = self.ecg_processor.savgol(sig_lpf, window_size=11, poly_order=2)
-
-        # -----------------------------------------------------------------
-        # TAHAP 2: Ekstraksi Fitur ECG (R-Peak, HR, & RR) (25% - 50%)
-        # -----------------------------------------------------------------
-        self.status_updated.emit("Mendeteksi R-Peak, HR & Respiratory Rate...", 40)
-        self.msleep(100)
-
-        r_peaks, noise_peaks = self.ecg_processor.detect_r_peaks(ecg_125, fs=125)
-        hr_ecg = self.ecg_processor.calculate_heart_rate(r_peaks, fs=125)
-        resp_rate, resp_signal, resp_peaks = (
-            self.ecg_processor.calculate_respiration_rate(ecg_125, r_peaks, fs=125)
-        )
-
-        # -----------------------------------------------------------------
-        # TAHAP 3: Pemrosesan Sinyal PPG 7 Tahap (50% - 75%)
-        # -----------------------------------------------------------------
-        self.status_updated.emit("Menjalankan Pemrosesan Sinyal PPG (SpO2 & PI)...", 65)
-        self.msleep(100)
-
-        if self.raw_red is not None and self.raw_ir is not None and len(self.raw_red) > 0:
-            ppg_results = self.ppg_processor.process_ppg(
-                raw_time=self.raw_time,
-                raw_red=self.raw_red,
-                raw_ir=self.raw_ir,
-                fs_orig=self.fs_orig
+            ecg_125, time_125 = self.ecg_processor.downsample(
+                self.raw_ecg, self.raw_time, fs=self.fs_orig, fs_target=125
             )
 
-            spo2 = ppg_results['spo2']
-            pi_red = ppg_results['pi_red']
-            pi_ir = ppg_results['pi_ir']
-            red_clean = ppg_results['red_clean']
-            ir_clean = ppg_results['ir_clean']
-            ppg_hr = ppg_results['ppg_hr']
-        else:
-            spo2 = 98.0
-            pi_red, pi_ir, ppg_hr = 0.0, 0.0, 0.0
-            red_clean, ir_clean = np.array([]), np.array([])
+            sig_notch = self.ecg_processor.notch(ecg_125, freq=50.0, fs=125)
+            sig_detrend = self.ecg_processor.detrending(sig_notch, fs=125)
+            sig_lpf = self.ecg_processor.lowpass(sig_detrend, lowcut=35.0, fs=125)
+            ecg_smooth = self.ecg_processor.savgol(sig_lpf, window_size=11, poly_order=2)
 
-        # -----------------------------------------------------------------
-        # TAHAP 4: Machine Learning Triage & SHAP Analysis (75% - 95%)
-        # -----------------------------------------------------------------
-        self.status_updated.emit("Menjalankan Feature Engineering & ML Triage...", 85)
-        self.msleep(100)
+            # -----------------------------------------------------------------
+            # TAHAP 2: Ekstraksi Fitur ECG (R-Peak, HR, & RR) (25% - 50%)
+            # -----------------------------------------------------------------
+            self.status_updated.emit("Mendeteksi R-Peak, HR & Respiratory Rate...", 40)
+            self.msleep(100)
 
-        patient = self.patient_info or {}
-        
-        temp_val = float(patient.get('temperature', 36.5))
-        spo2_val = float(spo2 if spo2 > 0 else 98.0)
-        rr_val = float(resp_rate if resp_rate > 0 else 16.0)
-        hr_val = float(hr_ecg if hr_ecg > 0 else 75.0)
-        sys_val = float(patient.get('systolic', 120))
-        dia_val = float(patient.get('diastolic', 80))
-        gcs_val = float(patient.get('gcs', 15))
+            r_peaks, noise_peaks = self.ecg_processor.detect_r_peaks(ecg_125, fs=125)
+            hr_ecg = self.ecg_processor.calculate_heart_rate(r_peaks, fs=125)
+            resp_rate, resp_signal, resp_peaks = (
+                self.ecg_processor.calculate_respiration_rate(ecg_125, r_peaks, fs=125)
+            )
 
-        # 1. Susun 7 Fitur Mentah
-        raw_data = {
-            'temperature_c': [temp_val],
-            'spo2': [spo2_val],
-            'respiratory_rate': [rr_val],
-            'heart_rate': [hr_val],
-            'systolic_bp': [sys_val],
-            'diastolic_bp': [dia_val],
-            'gcs_total': [gcs_val]
-        }
+            # -----------------------------------------------------------------
+            # TAHAP 3: Pemrosesan Sinyal PPG 7 Tahap (50% - 75%)
+            # -----------------------------------------------------------------
+            self.status_updated.emit("Menjalankan Pemrosesan Sinyal PPG (SpO2 & PI)...", 65)
+            self.msleep(100)
 
-        # 2. Jalankan Feature Engineering (18 Fitur)
-        df_base = pd.DataFrame(raw_data)
-        df_engineered = apply_feature_engineering(df_base)
+            if self.raw_red is not None and self.raw_ir is not None and len(self.raw_red) > 0:
+                ppg_results = self.ppg_processor.process_ppg(
+                    raw_time=self.raw_time,
+                    raw_red=self.raw_red,
+                    raw_ir=self.raw_ir,
+                    fs_orig=self.fs_orig
+                )
 
-        EXPECTED_FEATURES = [
-            'temperature_c', 'spo2', 'respiratory_rate', 'heart_rate', 
-            'systolic_bp', 'diastolic_bp', 'gcs_total', 'shock_index', 
-            'map', 'pulse_pressure', 'hypoxia', 'tachypnea', 
-            'abnormal_temp', 'abnormal_hr', 'gcs_squared', 
-            'gcs_map_index', 'gcs_shock_index', 'total_abnormal'
-        ]
-        df_input = df_engineered[EXPECTED_FEATURES]
+                spo2 = ppg_results['spo2']
+                pi_red = ppg_results['pi_red']
+                pi_ir = ppg_results['pi_ir']
+                red_clean = ppg_results['red_clean']
+                ir_clean = ppg_results['ir_clean']
+                ppg_hr = ppg_results['ppg_hr']
+            else:
+                spo2 = 98.0
+                pi_red, pi_ir, ppg_hr = 0.0, 0.0, 0.0
+                red_clean, ir_clean = np.array([]), np.array([])
 
-        triage_label = "NON-DARURAT"
-        shap_features = EXPECTED_FEATURES
-        shap_vals_sample = np.zeros(len(EXPECTED_FEATURES))
+            # -----------------------------------------------------------------
+            # TAHAP 4: Machine Learning Triage & SHAP Analysis (75% - 95%)
+            # -----------------------------------------------------------------
+            self.status_updated.emit("Menjalankan Feature Engineering & ML Triage...", 85)
+            self.msleep(100)
 
-        # 3. Prediksi & SHAP Analysis via XGBoost
-        if os.path.exists(self.model_path):
-            try:
-                pipeline = joblib.load(self.model_path)
+            patient = self.patient_info or {}
 
-                # Prediksi Kelas Triase
-                pred_class = pipeline.predict(df_input)[0]
-                class_mapping = {0: "RESUSITASI", 1: "DARURAT", 2: "NON-DARURAT"}
-                triage_label = class_mapping.get(pred_class, "NON-DARURAT")
+            # -----------------------------------------------------------------
+            # ESTIMASI SUHU TUBUH INTI (T_core) & BURTON (T_b)
+            # -----------------------------------------------------------------
+            WEIGHT_CORE = 0.64
+            WEIGHT_SKIN = 0.36
 
-                # SHAP Value Calculation
-                scaler = pipeline.named_steps['scaler']
-                model = pipeline.named_steps['model']
-                
-                X_scaled = scaler.transform(df_input)
-                explainer = shap.TreeExplainer(model)
-                shap_values = explainer.shap_values(X_scaled)
+            # Ambil nilai mentah dari patient_info
+            raw_temp_skin = patient.get('temp_skin')
+            raw_temp_amb = patient.get('temp_ambient')
 
-                # Penanganan Universal Array SHAP Multi-Class
-                if isinstance(shap_values, list):
-                    # Format list: [class_0_array, class_1_array, class_2_array]
-                    shap_vals_sample = shap_values[pred_class][0]
-                elif isinstance(shap_values, np.ndarray):
-                    if shap_values.ndim == 3:
-                        # Format 3D Array: (n_samples, n_features, n_classes) atau (n_classes, n_samples, n_features)
-                        if shap_values.shape[0] == 3:  # Shape (3, 1, 18)
-                            shap_vals_sample = shap_values[pred_class][0]
-                        else:  # Shape (1, 18, 3)
-                            shap_vals_sample = shap_values[0, :, pred_class]
-                    elif shap_values.ndim == 2:
-                        shap_vals_sample = shap_values[0]
+            # Logging warning jika salah satu/kedua suhu bernilai None
+            if raw_temp_skin is None or raw_temp_amb is None:
+                print(f"[WARN WORKER TEMP] ⚠️ Parameter 'temp_skin' ({raw_temp_skin}) atau 'temp_ambient' ({raw_temp_amb}) tidak ditemukan pada patient_info! Memakai nilai default (Kulit: 34.5°C, Amb: 28.0°C).")
 
-            except Exception as e:
-                print(f"[ERROR ML INFERENCE] Gagal memprediksi/menghitung SHAP: {e}")
+            temp_skin_val = float(raw_temp_skin if raw_temp_skin is not None else 34.5)
+            temp_amb_val = float(raw_temp_amb if raw_temp_amb is not None else 28.0)
 
-        # -----------------------------------------------------------------
-        # TAHAP 5: Konsolidasi Seluruh Data ke Dictionary RAM (100%)
-        # -----------------------------------------------------------------
-        self.status_updated.emit("Pemrosesan Data Selesai!", 100)
-        self.msleep(150)
+            # 1. Hitung Estimasi Suhu Inti (T_core)
+            k_env = WEIGHT_SKIN / WEIGHT_CORE  # 0.36 / 0.64 = 0.5625
+            t_core_calc = temp_skin_val + k_env * (temp_skin_val - temp_amb_val)
 
-        results = {
-            # Metadata & Registrasi
-            "bed": patient.get("bed", "00"),
-            "gcs": gcs_val,
-            "timestamp": patient.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            # 2. Hitung Suhu Rata-rata Tubuh Burton (T_b)
+            t_burton_calc = (WEIGHT_CORE * t_core_calc) + (WEIGHT_SKIN * temp_skin_val)
 
-            # Parameter Medis
-            "temperature": temp_val,
-            "hr": hr_val,
-            "rr": rr_val,
-            "spo2": spo2_val,
-            "systolic": sys_val,
-            "diastolic": dia_val,
-            "pi_red": pi_red,
-            "pi_ir": pi_ir,
-            "ppg_hr": ppg_hr,
+            # Gunakan T_core hasil kalkulasi sebagai temp_val (dikunci pada batas biologis aman)
+            temp_val = float(np.clip(t_core_calc, 30.0, 43.0))
 
-            # Output ML & SHAP
-            "triage_status": triage_label,
-            "shap_features": shap_features,
-            "shap_values": shap_vals_sample,
+            print(f"[LOG BURTON FORMULA] T_skin={temp_skin_val:.2f}°C, T_amb={temp_amb_val:.2f}°C => T_core={temp_val:.2f}°C, T_burton={t_burton_calc:.2f}°C")
 
-            # Sinyal Raw & Filtered
-            "raw_time": self.raw_time,
-            "raw_ecg": self.raw_ecg,
-            "raw_red": self.raw_red,
-            "raw_ir": self.raw_ir,
-            "time_125": time_125,
-            "ecg_smooth": ecg_smooth,
-            "red_clean": red_clean,
-            "ir_clean": ir_clean
-        }
+            # Parameter vital sign lainnya
+            spo2_val = float(spo2 if spo2 > 0 else 98.0)
+            rr_val = float(resp_rate if resp_rate > 0 else 16.0)
+            hr_val = float(hr_ecg if hr_ecg > 0 else 75.0)
+            sys_val = float(patient.get('systolic', 120))
+            dia_val = float(patient.get('diastolic', 80))
+            gcs_val = float(patient.get('gcs', 15))
 
-        self.processing_finished.emit(results)
+            # 1. Susun 7 Fitur Mentah untuk Input Machine Learning
+            raw_data = {
+                'temperature_c': [temp_val],  # Memakai T_core hasil kalkulasi
+                'spo2': [spo2_val],
+                'respiratory_rate': [rr_val],
+                'heart_rate': [hr_val],
+                'systolic_bp': [sys_val],
+                'diastolic_bp': [dia_val],
+                'gcs_total': [gcs_val]
+            }
+
+            # 2. Jalankan Feature Engineering (18 Fitur)
+            df_base = pd.DataFrame(raw_data)
+            df_engineered = apply_feature_engineering(df_base)
+
+            EXPECTED_FEATURES = [
+                'temperature_c', 'spo2', 'respiratory_rate', 'heart_rate', 
+                'systolic_bp', 'diastolic_bp', 'gcs_total', 'shock_index', 
+                'map', 'pulse_pressure', 'hypoxia', 'tachypnea', 
+                'abnormal_temp', 'abnormal_hr', 'gcs_squared', 
+                'gcs_map_index', 'gcs_shock_index', 'total_abnormal'
+            ]
+            df_input = df_engineered[EXPECTED_FEATURES]
+
+            triage_label = "NON-DARURAT"
+            shap_features = EXPECTED_FEATURES
+            shap_vals_sample = np.zeros(len(EXPECTED_FEATURES))
+
+            # 3. Prediksi & SHAP Analysis via XGBoost
+            if os.path.exists(self.model_path):
+                try:
+                    pipeline = joblib.load(self.model_path)
+
+                    # Prediksi Kelas Triase
+                    pred_class = pipeline.predict(df_input)[0]
+                    class_mapping = {0: "RESUSITASI", 1: "DARURAT", 2: "NON-DARURAT"}
+                    triage_label = class_mapping.get(pred_class, "NON-DARURAT")
+
+                    # SHAP Value Calculation
+                    scaler = pipeline.named_steps['scaler']
+                    model = pipeline.named_steps['model']
+                    
+                    X_scaled = scaler.transform(df_input)
+                    explainer = shap.TreeExplainer(model)
+                    shap_values = explainer.shap_values(X_scaled)
+
+                    # Penanganan Universal Array SHAP Multi-Class
+                    if isinstance(shap_values, list):
+                        shap_vals_sample = shap_values[pred_class][0]
+                    elif isinstance(shap_values, np.ndarray):
+                        if shap_values.ndim == 3:
+                            if shap_values.shape[0] == 3:
+                                shap_vals_sample = shap_values[pred_class][0]
+                            else:
+                                shap_vals_sample = shap_values[0, :, pred_class]
+                        elif shap_values.ndim == 2:
+                            shap_vals_sample = shap_values[0]
+
+                except Exception as e:
+                    print(f"[ERROR ML INFERENCE] Gagal memprediksi/menghitung SHAP: {e}")
+
+            # -----------------------------------------------------------------
+            # TAHAP 5: Konsolidasi Seluruh Data ke Dictionary RAM (100%)
+            # -----------------------------------------------------------------
+            self.status_updated.emit("Pemrosesan Data Selesai!", 100)
+            self.msleep(150)
+
+            results = {
+                # Metadata & Registrasi
+                "bed": patient.get("bed", "00"),
+                "gcs": gcs_val,
+                "timestamp": patient.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+
+                # Parameter Medis Suhu (Direct, Core Estimate, & Burton)
+                "temperature": temp_val,                  # T_core (digunakan oleh ML Model & Display Utama)
+                "temp_skin": round(temp_skin_val, 1),     # Suhu kulit/object dari sensor
+                "temp_ambient": round(temp_amb_val, 1),   # Suhu lingkungan dari sensor
+                "temp_burton": round(t_burton_calc, 1),   # Suhu Rata-rata Burton (Tb)
+
+                # Parameter Medis Lainnya
+                "hr": hr_val,
+                "rr": rr_val,
+                "spo2": spo2_val,
+                "systolic": sys_val,
+                "diastolic": dia_val,
+                "pi_red": pi_red,
+                "pi_ir": pi_ir,
+                "ppg_hr": ppg_hr,
+
+                # Output ML & SHAP
+                "triage_status": triage_label,
+                "shap_features": shap_features,
+                "shap_values": shap_vals_sample,
+
+                # Sinyal Raw & Filtered
+                "raw_time": self.raw_time,
+                "raw_ecg": self.raw_ecg,
+                "raw_red": self.raw_red,
+                "raw_ir": self.raw_ir,
+                "time_125": time_125,
+                "ecg_smooth": ecg_smooth,
+                "red_clean": red_clean,
+                "ir_clean": ir_clean
+            }
+
+            self.processing_finished.emit(results)
 
 
 # =====================================================================

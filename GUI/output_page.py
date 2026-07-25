@@ -137,11 +137,11 @@ class OutputPage(QWidget):
         param_layout.setSpacing(10)
 
         # 5 Kartu Parameter
-        self.lbl_temp_val = self._create_param_card(param_layout, "Suhu", "-- °C", 0, 0)
-        self.lbl_hr_val = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
-        self.lbl_rr_val = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM", 1, 0)
-        self.lbl_spo2_val = self._create_param_card(param_layout, "Saturasi Oksigen", "-- %", 1, 1)
-        self.lbl_bp_val = self._create_param_card(param_layout, "Tekanan Darah", "--/-- mmHg", 2, 0, colspan=2)
+        self.lbl_temp_val, self.lbl_temp_sub = self._create_param_card(param_layout, "Suhu Tubuh", "-- °C", 0, 0)
+        self.lbl_hr_val, _ = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
+        self.lbl_rr_val, _ = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM", 1, 0)
+        self.lbl_spo2_val, _ = self._create_param_card(param_layout, "Saturasi Oksigen", "-- %", 1, 1)
+        self.lbl_bp_val, _ = self._create_param_card(param_layout, "Tekanan Darah", "--/-- mmHg", 2, 0, colspan=2)
 
         # --- D. KOTAK PPG IR (TANPA LEGEND) ---
         self.box_ppg = QFrame()
@@ -217,7 +217,7 @@ class OutputPage(QWidget):
         card.setStyleSheet("QFrame { background-color: #F8FAF6; border: 1px solid #D5E5D0; border-radius: 8px; }")
         vbox = QVBoxLayout(card)
         vbox.setContentsMargins(10, 6, 10, 6)
-        vbox.setSpacing(2)
+        vbox.setSpacing(1)
 
         lbl_title = QLabel(title)
         lbl_title.setStyleSheet("font-size: 13px; font-weight: bold; color: #555555; border: none; background: transparent;")
@@ -225,10 +225,15 @@ class OutputPage(QWidget):
         lbl_val = QLabel(default_val)
         lbl_val.setStyleSheet("font-size: 20px; font-weight: 900; color: #214889; border: none; background: transparent;")
         
+        lbl_sub = QLabel("")
+        lbl_sub.setStyleSheet("font-size: 11px; font-weight: 600; color: #778899; border: none; background: transparent;")
+        
         vbox.addWidget(lbl_title)
         vbox.addWidget(lbl_val)
+        vbox.addWidget(lbl_sub)
+        
         grid_layout.addWidget(card, row, col, 1, colspan)
-        return lbl_val
+        return lbl_val, lbl_sub
 
     # =========================================================================
     # FUNGSI UTAMA: MENERIMA DATA, PLOTTING, & IOT JSON PREPARATION
@@ -237,18 +242,25 @@ class OutputPage(QWidget):
         """Dipanggil dari MainGUI untuk mengisi parameter medis, plot sinyal 5s, SHAP, dan payload IoT."""
         self.calculation_results = data
 
-        # 1. Update 5 Parameter Medis
-        temp = data.get("temperature", 36.5)
+        # 1. Update Parameter Suhu (Core, Skin, Burton, Ambient)
+        temp_core = data.get("temperature", 36.5)
+        temp_skin = data.get("temp_skin", 34.5)
+        temp_burton = data.get("temp_burton", 35.8)
+        temp_amb = data.get("temp_ambient", 28.0)
+
         hr = data.get("hr", 0.0)
         rr = data.get("rr", 0.0)
         spo2 = data.get("spo2", 0.0)
         sys_bp = data.get("systolic", 120)
         dia_bp = data.get("diastolic", 80)
 
-        self.lbl_temp_val.setText(f"{temp} °C")
-        self.lbl_hr_val.setText(f"{hr} BPM")
-        self.lbl_rr_val.setText(f"{rr} RPM")
-        self.lbl_spo2_val.setText(f"{spo2} %")
+        # Menampilkan Suhu Inti sebagai Angka Utama & Rincian Burton/Kulit di Bawahnya
+        self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
+        self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
+
+        self.lbl_hr_val.setText(f"{hr:.1f} BPM")
+        self.lbl_rr_val.setText(f"{rr:.1f} RPM")
+        self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 
         # 2. Potong Sinyal Menjadi 5 Detik Pertama (fs = 125 Hz -> 625 samples)
@@ -355,12 +367,15 @@ class OutputPage(QWidget):
         self.plot_shap.enableAutoRange(axis='x')
 
     def prepare_iot_payload(self, data):
-        """Menyiapkan struktur JSON 6 parameter medis utama untuk IoT."""
+        """Menyiapkan struktur JSON parameter medis utama untuk IoT."""
         payload = {
             "device_id": f"TRIAGO_BED_{data.get('bed', '01')}",
             "timestamp": data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             "telemetry": {
-                "suhu_tubuh_c": data.get("temperature", 36.5),
+                "suhu_inti_c": data.get("temperature", 36.5),
+                "suhu_kulit_c": data.get("temp_skin", 34.5),
+                "suhu_burton_c": data.get("temp_burton", 35.8),
+                "suhu_lingkungan_c": data.get("temp_ambient", 28.0),
                 "saturasi_oksigen_pct": data.get("spo2", 98.0),
                 "laju_pernapasan_rpm": data.get("rr", 16.0),
                 "denyut_jantung_bpm": data.get("hr", 75.0),
@@ -374,7 +389,6 @@ class OutputPage(QWidget):
         }
         
         json_str = json.dumps(payload, indent=4)
-        print("[LOG IoT PREPARATION] JSON Payload Siap Dikirim ke IoT:\n", json_str)
         return json_str
 
     def update_triage_header(self, status):

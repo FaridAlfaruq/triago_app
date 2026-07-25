@@ -88,11 +88,9 @@ class TriaGoApplication(QMainWindow):
 
     def handle_extraction_phase(self, raw_data_list):
         """Fase 2: Membaca list paket data mentah dari RAM dan mengolahnya di LoadingPage"""
-        # Pindah tampilan kembali ke Halaman Loading (Index 2)
         self.stacked_widget.setCurrentIndex(2)
         
         try:
-            # 1. Konversi list paket dict dari PlotPage ke NumPy Array di RAM
             sampling_rate = 400.0
             sampling_interval = 1.0 / sampling_rate
             n_samples = len(raw_data_list)
@@ -102,7 +100,12 @@ class TriaGoApplication(QMainWindow):
             raw_red = np.array([p["ppg"]["red"] for p in raw_data_list])
             raw_ir = np.array([p["ppg"]["ir"] for p in raw_data_list])
 
-            # 2. Oper data ke LoadingPage untuk pemrosesan sinyal & ML XGBoost
+            # Debug log verifikasi data suhu yang dihitung oleh plot_page.py
+            skin_temp = self.current_patient_info.get("temp_skin")
+            amb_temp = self.current_patient_info.get("temp_ambient")
+            print(f"[LOG MAIN_GUI] Data Suhu Pasien Siap -> Kulit: {skin_temp}°C | Lingkungan: {amb_temp}°C")
+
+            # Oper data ke LoadingPage
             self.page_loading.start_processing(
                 raw_ecg=raw_ecg,
                 raw_time=raw_time,
