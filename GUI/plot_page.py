@@ -15,6 +15,7 @@ if project_root not in sys.path:
 
 from akuisisi_data.get_stm32 import stream_stm32_data
 from processing_data.preprocessing_LiveData import LiveSignalFilter
+from service.api_client import TriageApiClient
 
 
 # =====================================================================

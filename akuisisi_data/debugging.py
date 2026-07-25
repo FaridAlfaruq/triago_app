@@ -3,7 +3,7 @@ import numpy as np
 import serial
 import time
 
-PORT = "COM16"  # Sesuaikan dengan port COM STM32 kamu
+PORT = "COM7"  # Sesuaikan dengan port COM STM32 kamu
 BAUDRATE = 115200
 
 
