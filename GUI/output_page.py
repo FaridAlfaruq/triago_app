@@ -255,74 +255,42 @@ class OutputPage(QWidget):
         spo2 = data.get("spo2", 0.0)
         sys_bp = data.get("systolic", 120)
         dia_bp = data.get("diastolic", 80)
+        gcs = data.get("gcs", 15)  # Ambil skor GCS
 
+        # (Logika update tampilan PyQt6 tetap sama...)
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
-
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
         self.lbl_rr_val.setText(f"{rr:.1f} RPM")
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
-
-        # Slicing Plot Sinyal 5 Detik
-        fs = 125
-        max_samples = 5 * fs
-
-        time_x = data.get("time_125", np.array([]))
-        ecg_y = data.get("ecg_smooth", np.array([]))
-        ir_y = data.get("ir_clean", np.array([]))
-
-        time_5s = time_x[:max_samples] if len(time_x) >= max_samples else time_x
-        ecg_5s = ecg_y[:max_samples] if len(ecg_y) >= max_samples else ecg_y
-        ir_5s = ir_y[:max_samples] if len(ir_y) >= max_samples else ir_y
-
-        if len(time_5s) == 0 and len(ecg_5s) > 0:
-            time_5s = np.linspace(0, 5, len(ecg_5s))
-
-        self.plot_ecg.clear()
-        if len(ecg_5s) > 0:
-            self.plot_ecg.plot(time_5s, ecg_5s, pen=pg.mkPen('#214889', width=2))
-            self.plot_ecg.setXRange(0, 5)
-
-        self.plot_ppg.clear()
-        if len(ir_5s) > 0:
-            self.plot_ppg.plot(time_5s, ir_5s, pen=pg.mkPen('#2980B9', width=2))
-            self.plot_ppg.setXRange(0, 5)
-
-        # Plot SHAP
-        shap_features = data.get("shap_features", ["GCS", "SpO2", "HR", "RR", "Suhu"])
-        shap_values = data.get("shap_values", [0.0, 0.0, 0.0, 0.0, 0.0])
-        self._render_real_shap(shap_features, shap_values)
 
         # Update Header Triage UI
         triage_status_text = data.get("triage_status", "NON-DARURAT")
         self.update_triage_header(triage_status_text)
 
         # ---------------------------------------------------------------------
-        # PERBAIKAN: Mengirimkan payload yang sinkron ke Flask via api_client
+        # PENGIRIMAN PAYLOAD: SUHU INTI & SKOR GCS
         # ---------------------------------------------------------------------
         if self.api_client:
             bed_id = data.get("bed", "A1")
-            patient_info = {"nama": data.get("patient_name", "Pasien IGD")}
             
             vitals_dict = {
                 "hr": hr,
                 "spo2": spo2,
                 "rr": rr,
-                "temp_skin": temp_skin,
-                "temp_ambient": temp_amb,
+                "temp_core": temp_core,  # Gunakan Suhu Inti hasil estimasi
                 "sys": sys_bp,
                 "dia": dia_bp
             }
             
-            # Map status teks ke kode warna ('red', 'yellow', 'green')
             triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.85)
 
             # Kirim data ke Flask API Server
             self.api_client.send_triage_result(
                 bed_id=bed_id,
-                patient_info=patient_info,
+                gcs_score=gcs,          # Kirim Skor GCS
                 vitals=vitals_dict,
                 classification=triage_cat,
                 score=xgb_score
