@@ -13,10 +13,10 @@ if project_root not in sys.path:
 
 # Import seluruh halaman TriaGO
 from GUI.home_page import HomePage
-from regist_page import RegistrationPage
-from plot_page import PlotPage
-from loading_page import LoadingPage
-from output_page import OutputPage
+from GUI.loading_page import LoadingPage
+from GUI.output_page import OutputPage
+from GUI.plot_page import PlotPage
+from GUI.regist_page import RegistrationPage
 
 
 # =====================================================================
@@ -54,6 +54,7 @@ class TriaGoApplication(QMainWindow):
         
         # --- SINKRONISASI PEREKAMAN: Stream data RAM ke LoadingPage ---
         self.page_live_data.recording_finished.connect(self.handle_extraction_phase)
+        self.page_loading.processing_finished.connect(self.handle_output_phase)
         self.page_output.home_requested.connect(self.reset_to_gatekeeper)
         
         # 4. Daftarkan Halaman ke Stacked Widget
@@ -92,15 +93,14 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(2)
         
         try:
-            # 1. Konversi list paket dict dari PlotPage ke NumPy Array di RAM
-            sampling_rate = 400.0
-            sampling_interval = 1.0 / sampling_rate
-            n_samples = len(raw_data_list)
+            # 1. Membaca data CSV yang baru saja direkam dari PlotPage
+            df = pd.read_csv(csv_filepath)
             
-            raw_time = np.array([i * sampling_interval for i in range(n_samples)])
-            raw_ecg = np.array([p["ecg"] for p in raw_data_list])
-            raw_red = np.array([p["ppg"]["red"] for p in raw_data_list])
-            raw_ir = np.array([p["ppg"]["ir"] for p in raw_data_list])
+            # Mapping kolom CSV secara otomatis
+            raw_time = df['time'].values if 'time' in df.columns else df.iloc[:, 0].values
+            raw_ecg = df['ecg'].values if 'ecg' in df.columns else df.iloc[:, 1].values
+            raw_red = df['red'].values if 'red' in df.columns else (df.iloc[:, 2].values if df.shape[1] > 2 else None)
+            raw_ir = df['ir'].values if 'ir' in df.columns else (df.iloc[:, 3].values if df.shape[1] > 3 else None)
 
             # 2. Oper data ke LoadingPage untuk pemrosesan sinyal & ML XGBoost
             self.page_loading.start_processing(

@@ -365,6 +365,8 @@ class AnimatedProgressBar(QWidget):
 # HALAMAN UTAMA: LoadingPage
 # =====================================================================
 class LoadingPage(QWidget):
+    processing_finished = pyqtSignal(dict)
+
     def __init__(self):
         super().__init__()
         self._status_effect = None
@@ -387,7 +389,7 @@ class LoadingPage(QWidget):
         self.lbl_logo.setStyleSheet("background: transparent; margin-bottom: 10px;")
         
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        logo_path = os.path.join(current_dir, r"C:\Users\Adyty\Documents\Farid ITS\TriaGo\asset\logo.png") 
+        logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
             self.lbl_logo.setPixmap(pixmap.scaledToWidth(420, Qt.TransformationMode.SmoothTransformation))
@@ -466,10 +468,34 @@ class LoadingPage(QWidget):
         print("[LOG] Pemrosesan data selesai!")
         self.lbl_status.setText("Pemrosesan Data Selesai!")
 
-        # MENGHAPUS SIMPAN FILE LOKAL CSV
-        # Langsung mengalirkan hasil ke Controller Utama (main_gui.py)
+        # 1. Generate string timestamp saat ini (Format: TahunBulanTanggal_JamMenitDetik)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # 2. Buat nama file dinamis menggunakan f-string
+        filename = f"ekstraksi_data_{timestamp}.csv"
+
+        # 3. Menyusun data parameter vital sign
+        summary_data = {
+            "HR_ECG_BPM": [results['hr']],
+            "RR_RPM": [results['rr']],
+            "SpO2_Percent": [results['spo2']],
+            "PI_Red_Percent": [results['pi_red']],
+            "PI_IR_Percent": [results['pi_ir']],
+            "HR_PPG_BPM": [results['ppg_hr']]
+        }
+        df_summary = pd.DataFrame(summary_data)
+        # Menyimpan file ke folder project
+        df_summary.to_csv(filename, index=False)
+        print(f"[LOG] Data berhasil disimpan ke: {filename}")
+
+        # Alirkan hasil ke Window Utama
         if hasattr(self, "parent_main_win"):
-            self.parent_main_win.handle_output_phase(results)
+            self.parent_main_win.processed_results = results
+            self.parent_main_win.go_to_live_data_page()
+        else:
+            self.lbl_status.setText(
+                f"Selesai!!!"
+            )
 
     def update_ui_state(self, text, progress_value):
         """Sinkronisasi progress bar dan transisi teks status."""
@@ -501,7 +527,7 @@ class LoadingPage(QWidget):
 
     def close_threads(self):
         """Memastikan thread mati jika aplikasi ditutup paksa."""
-        if hasattr(self, 'worker') and self.worker.isRunning():
+        if self.worker is not None and self.worker.isRunning():
             self.worker.quit()
             self.worker.wait()
 
