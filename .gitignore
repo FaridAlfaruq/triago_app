@@ -10,3 +10,6 @@ venv/
 
 # Mengabaikan file log data pasien sementara
 *.log
+
+# Temporary Superdesign component files
+.superdesign/tmp/
