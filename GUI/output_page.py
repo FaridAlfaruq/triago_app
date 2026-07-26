@@ -5,7 +5,7 @@ import numpy as np
 import pyqtgraph as pg
 from datetime import datetime
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication, QSizePolicy
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
@@ -41,8 +41,8 @@ class OutputPage(QWidget):
         self.setStyleSheet("background-color: #F6FFEC;")
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(28, 14, 28, 14)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(24, 12, 24, 12)
+        main_layout.setSpacing(8)
 
         # =========================================================================
         # 1. HEADER
@@ -52,11 +52,11 @@ class OutputPage(QWidget):
         header_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_vbox = QVBoxLayout()
-        title_vbox.setSpacing(4)
+        title_vbox.setSpacing(2)
         lbl_title = QLabel("HASIL PENGECEKAN")
-        lbl_title.setStyleSheet("font-size: 28px; font-weight: 900; color: #214889; background: transparent;")
+        lbl_title.setStyleSheet("font-size: 26px; font-weight: 900; color: #214889; background: transparent;")
         lbl_subtitle = QLabel("Output parameter dan hasil klasifikasi ML")
-        lbl_subtitle.setStyleSheet("font-size: 17px; font-weight: 500; color: #555555; background: transparent;")
+        lbl_subtitle.setStyleSheet("font-size: 15px; font-weight: 500; color: #555555; background: transparent;")
         title_vbox.addWidget(lbl_title)
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
@@ -65,15 +65,15 @@ class OutputPage(QWidget):
         self.triage_container.setSpacing(10)
         
         self.badge_color = QFrame()
-        self.badge_color.setFixedSize(54, 54)
+        self.badge_color.setFixedSize(48, 48)
         self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
         
         self.lbl_status_text = QLabel("RESUSITASI")
         self.lbl_status_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_status_text.setFixedHeight(52)
-        self.lbl_status_text.setMinimumWidth(190)
+        self.lbl_status_text.setFixedHeight(48)
+        self.lbl_status_text.setMinimumWidth(180)
         self.lbl_status_text.setStyleSheet("""
-            font-size: 24px; font-weight: 900; color: #FFFFFF;
+            font-size: 22px; font-weight: 900; color: #FFFFFF;
             background-color: #FF8A8A; border-radius: 8px; 
             padding-left: 12px; padding-right: 12px;
         """)
@@ -90,45 +90,50 @@ class OutputPage(QWidget):
         logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
-            lbl_logo.setPixmap(pixmap.scaledToWidth(180, Qt.TransformationMode.SmoothTransformation))
+            lbl_logo.setPixmap(pixmap.scaledToWidth(160, Qt.TransformationMode.SmoothTransformation))
         else:
             lbl_logo.setText("TriaGO")
-            lbl_logo.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889;")
+            lbl_logo.setStyleSheet("font-size: 28px; font-weight: 900; color: #214889;")
         header_layout.addWidget(lbl_logo)
 
         main_layout.addLayout(header_layout)
 
         # =========================================================================
-        # 2. BODY LAYOUT
+        # 2. BODY LAYOUT (GRID 2x2 PROPORSI SEIMBANG & RESPONSUS)
         # =========================================================================
-        lbl_shap_title = QLabel("SHAP Analysis")
-        lbl_shap_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
-        
-        lbl_ecg_title = QLabel("Sinyal ECG (5 Detik)")
-        lbl_ecg_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
-        
-        lbl_param_title = QLabel("HASIL PARAMETER")
-        lbl_param_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
-        
-        lbl_ppg_title = QLabel("Sinyal PPG IR (5 Detik)")
-        lbl_ppg_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #214889; background: transparent;")
+        content_grid = QGridLayout()
+        content_grid.setSpacing(12)
 
-        # A. KOTAK SHAP
+        # A. KOTAK SHAP ANALYSIS (Baris 0, Kolom 0)
+        lbl_shap_title = QLabel("SHAP Analysis")
+        lbl_shap_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+        
         self.box_shap = QFrame()
+        self.box_shap.setMinimumHeight(160)  # Kunci tinggi minimum agar tidak tertekan gepeng
         self.box_shap.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         shap_layout = QVBoxLayout(self.box_shap)
-        shap_layout.setContentsMargins(6, 6, 6, 6)
+        shap_layout.setContentsMargins(4, 4, 4, 4)
         
         self.plot_shap = pg.PlotWidget()
         self.plot_shap.showGrid(x=True, y=False, alpha=0.2)
         self.plot_shap.setLabel('bottom', 'SHAP Value (Dampak Fitur)', color='#555555')
         shap_layout.addWidget(self.plot_shap)
 
-        # B. KOTAK ECG
+        shap_cell = QVBoxLayout()
+        shap_cell.setSpacing(4)
+        shap_cell.addWidget(lbl_shap_title)
+        shap_cell.addWidget(self.box_shap, stretch=1)
+        content_grid.addLayout(shap_cell, 0, 0)
+
+        # B. KOTAK SINYAL ECG (Baris 0, Kolom 1)
+        lbl_ecg_title = QLabel("Sinyal ECG (5 Detik)")
+        lbl_ecg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+
         self.box_ecg = QFrame()
+        self.box_ecg.setMinimumHeight(160)  # Kunci tinggi minimum
         self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ecg_layout = QVBoxLayout(self.box_ecg)
-        ecg_layout.setContentsMargins(6, 6, 6, 6)
+        ecg_layout.setContentsMargins(4, 4, 4, 4)
 
         self.plot_ecg = pg.PlotWidget()
         self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
@@ -136,12 +141,22 @@ class OutputPage(QWidget):
         self.plot_ecg.setLabel('left', 'Amplitudo (mV)', color='#555555')
         ecg_layout.addWidget(self.plot_ecg)
 
-        # C. KOTAK PARAMETER MEDIS
+        ecg_cell = QVBoxLayout()
+        ecg_cell.setSpacing(4)
+        ecg_cell.addWidget(lbl_ecg_title)
+        ecg_cell.addWidget(self.box_ecg, stretch=1)
+        content_grid.addLayout(ecg_cell, 0, 1)
+
+        # C. KOTAK PARAMETER MEDIS (Baris 1, Kolom 0)
+        lbl_param_title = QLabel("HASIL PARAMETER")
+        lbl_param_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+
         self.box_parameter = QFrame()
+        self.box_parameter.setMinimumHeight(160)
         self.box_parameter.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         param_layout = QGridLayout(self.box_parameter)
-        param_layout.setContentsMargins(10, 8, 10, 8)
-        param_layout.setSpacing(7)
+        param_layout.setContentsMargins(6, 6, 6, 6)
+        param_layout.setSpacing(5)
 
         self.lbl_temp_val, self.lbl_temp_sub = self._create_param_card(param_layout, "Suhu Tubuh", "-- °C", 0, 0)
         self.lbl_hr_val, _ = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
@@ -149,11 +164,21 @@ class OutputPage(QWidget):
         self.lbl_spo2_val, _ = self._create_param_card(param_layout, "Saturasi Oksigen", "-- %", 1, 1)
         self.lbl_bp_val, _ = self._create_param_card(param_layout, "Tekanan Darah", "--/-- mmHg", 2, 0, colspan=2)
 
-        # D. KOTAK PPG IR
+        param_cell = QVBoxLayout()
+        param_cell.setSpacing(4)
+        param_cell.addWidget(lbl_param_title)
+        param_cell.addWidget(self.box_parameter, stretch=1)
+        content_grid.addLayout(param_cell, 1, 0)
+
+        # D. KOTAK SINYAL PPG IR (Baris 1, Kolom 1)
+        lbl_ppg_title = QLabel("Sinyal PPG IR (5 Detik)")
+        lbl_ppg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+
         self.box_ppg = QFrame()
+        self.box_ppg.setMinimumHeight(160)  # Kunci tinggi minimum
         self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         ppg_layout = QVBoxLayout(self.box_ppg)
-        ppg_layout.setContentsMargins(6, 6, 6, 6)
+        ppg_layout.setContentsMargins(4, 4, 4, 4)
 
         self.plot_ppg = pg.PlotWidget()
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
@@ -161,51 +186,31 @@ class OutputPage(QWidget):
         self.plot_ppg.setLabel('left', 'Amplitudo (a.u.)', color='#555555')
         ppg_layout.addWidget(self.plot_ppg)
 
-        top_row_layout = QHBoxLayout()
-        top_row_layout.setSpacing(14)
-        
-        shap_cell = QVBoxLayout()
-        shap_cell.setSpacing(8)
-        shap_cell.addWidget(lbl_shap_title)
-        shap_cell.addWidget(self.box_shap, stretch=1)
-        
-        ecg_cell = QVBoxLayout()
-        ecg_cell.setSpacing(8)
-        ecg_cell.addWidget(lbl_ecg_title)
-        ecg_cell.addWidget(self.box_ecg, stretch=1)
-        
-        top_row_layout.addLayout(shap_cell, stretch=1)
-        top_row_layout.addLayout(ecg_cell, stretch=1)
-        main_layout.addLayout(top_row_layout, stretch=1)
-
-        bottom_row_layout = QHBoxLayout()
-        bottom_row_layout.setSpacing(14)
-        
-        param_cell = QVBoxLayout()
-        param_cell.setSpacing(8)
-        param_cell.addWidget(lbl_param_title)
-        param_cell.addWidget(self.box_parameter, stretch=1)
-        
         ppg_cell = QVBoxLayout()
-        ppg_cell.setSpacing(8)
+        ppg_cell.setSpacing(4)
         ppg_cell.addWidget(lbl_ppg_title)
         ppg_cell.addWidget(self.box_ppg, stretch=1)
-        
-        bottom_row_layout.addLayout(param_cell, stretch=1)
-        bottom_row_layout.addLayout(ppg_cell, stretch=1)
-        main_layout.addLayout(bottom_row_layout, stretch=1)
+        content_grid.addLayout(ppg_cell, 1, 1)
+
+        # Mengatur rasio pembagian tinggi dan lebar persis 50% : 50%
+        content_grid.setRowStretch(0, 1)
+        content_grid.setRowStretch(1, 1)
+        content_grid.setColumnStretch(0, 1)
+        content_grid.setColumnStretch(1, 1)
+
+        main_layout.addLayout(content_grid, stretch=1)
 
         # =========================================================================
         # 3. FOOTER
         # =========================================================================
         self.btn_home = QPushButton("KEMBALI")
-        self.btn_home.setFixedHeight(48)
+        self.btn_home.setFixedHeight(42)
         self.btn_home.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_home.setStyleSheet("""
             QPushButton { 
                 background-color: #214889; 
                 color: white; 
-                font-size: 17px;
+                font-size: 16px;
                 font-weight: bold; 
                 border-radius: 8px; 
             }
@@ -216,20 +221,21 @@ class OutputPage(QWidget):
         main_layout.addWidget(self.btn_home)
 
     def _create_param_card(self, grid_layout, title, default_val, row, col, colspan=1):
+        """Membuat kartu parameter yang ringkas dan responsif."""
         card = QFrame()
-        card.setStyleSheet("QFrame { background-color: #F8FAF6; border: 1px solid #D5E5D0; border-radius: 8px; }")
+        card.setStyleSheet("QFrame { background-color: #F8FAF6; border: 1px solid #D5E5D0; border-radius: 6px; }")
         vbox = QVBoxLayout(card)
-        vbox.setContentsMargins(10, 6, 10, 6)
-        vbox.setSpacing(1)
+        vbox.setContentsMargins(8, 4, 8, 4)  # Margin ringkas agar tidak boros ruang vertikal
+        vbox.setSpacing(0)
 
         lbl_title = QLabel(title)
-        lbl_title.setStyleSheet("font-size: 13px; font-weight: bold; color: #555555; border: none; background: transparent;")
+        lbl_title.setStyleSheet("font-size: 11px; font-weight: bold; color: #555555; border: none; background: transparent;")
         
         lbl_val = QLabel(default_val)
-        lbl_val.setStyleSheet("font-size: 20px; font-weight: 900; color: #214889; border: none; background: transparent;")
+        lbl_val.setStyleSheet("font-size: 18px; font-weight: 900; color: #214889; border: none; background: transparent;")
         
         lbl_sub = QLabel("")
-        lbl_sub.setStyleSheet("font-size: 11px; font-weight: 600; color: #778899; border: none; background: transparent;")
+        lbl_sub.setStyleSheet("font-size: 10px; font-weight: 600; color: #778899; border: none; background: transparent;")
         
         vbox.addWidget(lbl_title)
         vbox.addWidget(lbl_val)
@@ -239,10 +245,10 @@ class OutputPage(QWidget):
         return lbl_val, lbl_sub
 
     # =========================================================================
-    # UPDATE RESULTS & INTEGRASI SINKRONISASI PAYLOAD
+    # UPDATE RESULTS: MENAMPILKAN PARAMETER & RENDERING SELURUH GRAFIK
     # =========================================================================
     def update_results(self, data):
-        """Memperbarui UI dan mengirim data terbaru ke Flask API Backend."""
+        """Memperbarui UI parameter medis, merender grafik SHAP/ECG/PPG, dan kirim API Backend."""
         self.calculation_results = data
 
         temp_core = data.get("temperature", 36.5)
@@ -255,9 +261,9 @@ class OutputPage(QWidget):
         spo2 = data.get("spo2", 0.0)
         sys_bp = data.get("systolic", 120)
         dia_bp = data.get("diastolic", 80)
-        gcs = data.get("gcs", 15)  # Ambil skor GCS
+        gcs = data.get("gcs", 15)
 
-        # (Logika update tampilan PyQt6 tetap sama...)
+        # 1. Update Teks Kartu Parameter Medis
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
@@ -265,32 +271,60 @@ class OutputPage(QWidget):
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 
-        # Update Header Triage UI
+        # 2. Update Header Triase UI
         triage_status_text = data.get("triage_status", "NON-DARURAT")
         self.update_triage_header(triage_status_text)
 
-        # ---------------------------------------------------------------------
-        # PENGIRIMAN PAYLOAD: SUHU INTI & SKOR GCS
-        # ---------------------------------------------------------------------
+        # 3. Render Grafik SHAP Analysis
+        shap_features = data.get("shap_features", [])
+        shap_values = data.get("shap_values", [])
+        if len(shap_features) > 0 and len(shap_values) > 0:
+            self._render_real_shap(shap_features, shap_values)
+
+        # 4. Render Grafik Sinyal ECG 5 Detik
+        time_arr = np.array(data.get("time_125", []))
+        ecg_arr = np.array(data.get("ecg_smooth", []))
+        if len(time_arr) > 0 and len(ecg_arr) > 0:
+            sample_count = min(len(time_arr), 125 * 5)
+            t_slice = time_arr[-sample_count:]
+            ecg_slice = ecg_arr[-sample_count:]
+            t_rel = t_slice - t_slice[0]
+            
+            self.plot_ecg.clear()
+            self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
+            self.plot_ecg.setXRange(0, 5, padding=0)
+            self.plot_ecg.enableAutoRange(axis='y')
+
+        # 5. Render Grafik Sinyal PPG IR 5 Detik
+        ppg_arr = np.array(data.get("ir_clean", []))
+        if len(time_arr) > 0 and len(ppg_arr) > 0:
+            sample_count = min(len(time_arr), 125 * 5)
+            t_slice = time_arr[-sample_count:]
+            ppg_slice = ppg_arr[-sample_count:]
+            t_rel = t_slice - t_slice[0]
+            
+            self.plot_ppg.clear()
+            self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
+            self.plot_ppg.setXRange(0, 5, padding=0)
+            self.plot_ppg.enableAutoRange(axis='y')
+
+        # 6. Pengiriman Payload ke Flask API Backend
         if self.api_client:
             bed_id = data.get("bed", "A1")
-            
             vitals_dict = {
                 "hr": hr,
                 "spo2": spo2,
                 "rr": rr,
-                "temp_core": temp_core,  # Gunakan Suhu Inti hasil estimasi
+                "temp_core": temp_core,
                 "sys": sys_bp,
                 "dia": dia_bp
             }
-            
             triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.85)
 
-            # Kirim data ke Flask API Server
             self.api_client.send_triage_result(
                 bed_id=bed_id,
-                gcs_score=gcs,          # Kirim Skor GCS
+                gcs_score=gcs,
                 vitals=vitals_dict,
                 classification=triage_cat,
                 score=xgb_score
@@ -307,6 +341,7 @@ class OutputPage(QWidget):
             return "green"
 
     def _render_real_shap(self, features, shap_values):
+        """Menggambar Bar Chart SHAP secara Horizontal."""
         self.plot_shap.clear()
         self.plot_shap.getAxis('bottom').enableAutoSIPrefix(False)
 
@@ -321,16 +356,21 @@ class OutputPage(QWidget):
             'heart_rate': 'Heart Rate',
             'systolic_bp': 'Sistolik',
             'diastolic_bp': 'Diastolik',
-            'gcs_total': 'Skor GCS'
+            'gcs_total': 'Skor GCS',
+            'shock_index': 'Shock Index',
+            'map': 'MAP',
+            'pulse_pressure': 'Pulse Press',
+            'total_abnormal': 'Tot Abnormal'
         }
 
         abs_vals = np.abs(shap_array)
-        top_indices = np.argsort(abs_vals)[-7:] 
+        top_k = min(7, len(features))
+        top_indices = np.argsort(abs_vals)[-top_k:] 
         
         top_features = [features[i] for i in top_indices]
         top_values = [shap_array[i] for i in top_indices]
 
-        labels = [name_mapping.get(f, f) for f in top_features]
+        labels = [name_mapping.get(f, str(f)) for f in top_features]
         y_pos = np.arange(len(top_features))
 
         for y, val in zip(y_pos, top_values):
@@ -359,15 +399,15 @@ class OutputPage(QWidget):
         if "RESUSITASI" in status or status == "RED":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
             self.lbl_status_text.setText("RESUSITASI")
-            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
         elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
         else:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
         print("[LOG] Inputs cleared. Returning to home_page...")
