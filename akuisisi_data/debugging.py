@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import serial
+import serial.tools.list_ports
 import time
 
 PORT = "COM7"  # Sesuaikan dengan port COM STM32 kamu
