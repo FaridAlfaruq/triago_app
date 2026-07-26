@@ -1,26 +1,42 @@
-import serial
-import serial.tools.list_ports
+import os
+import sys
 import time
 
-def find_stm32_port(fallback='COM7'):
-    for p in serial.tools.list_ports.comports():
-        # VID:PID for STM32 Virtual COM Port (0483:5740)
-        if "0483:5740" in p.hwid:
-            return p.device
-        # Alternative: look for USB Serial Device that is not Bluetooth
-        if "usb" in p.description.lower() and "bluetooth" not in p.description.lower():
-            return p.device
-    return fallback
+import serial
+from serial.tools import list_ports
 
-# UBAH KONFIGURASI DEFAULT SESUAI HASIL SUKSES
-DEFAULT_PORT = find_stm32_port('COM7')
-DEFAULT_BAUDRATE = 921600 # Diubah ke 921600 sesuai konfigurasi optimal
 
-def stream_stm32_data(port=DEFAULT_PORT, baudrate=DEFAULT_BAUDRATE):
+DEFAULT_BAUDRATE = 921600
+
+
+def find_stm32_port():
+    """Cari port STM32, dengan override melalui environment TRIAGO_SERIAL_PORT."""
+    configured_port = os.environ.get("TRIAGO_SERIAL_PORT")
+    if configured_port:
+        return configured_port
+
+    ports = list(list_ports.comports())
+    preferred_markers = ("stm32", "stlink", "virtual com", "ttyacm", "ttyusb")
+    for port in ports:
+        description = f"{port.device} {port.description} {port.manufacturer or ''}".lower()
+        if any(marker in description for marker in preferred_markers):
+            return port.device
+
+    if len(ports) == 1:
+        return ports[0].device
+
+    return "COM7" if sys.platform.startswith("win") else "/dev/ttyACM0"
+
+
+def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):
+    """Alirkan paket STM32 sampai koneksi berhenti atau diminta berhenti."""
+    port = port or find_stm32_port()
+    should_stop = should_stop or (lambda: False)
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
-        # TAMBAH: Alokasikan memori buffer internal Windows sebesar 1MB agar data tidak meluap
-        ser.set_buffer_size(rx_size=1024*1024, tx_size=65536)
+        # set_buffer_size tidak tersedia pada seluruh platform/driver serial.
+        if hasattr(ser, "set_buffer_size"):
+            ser.set_buffer_size(rx_size=1024 * 1024, tx_size=65536)
         
         ser.dtr = True
         ser.rts = True
@@ -34,7 +50,7 @@ def stream_stm32_data(port=DEFAULT_PORT, baudrate=DEFAULT_BAUDRATE):
         
         raw_accumulator = b""
         
-        while True:
+        while not should_stop():
             # === TAMBAH: NAPAS KOMPUTASI (5 ms) ===
             # Memberikan jeda agar CPU laptop tidak overload dan buffer OS terisi penuh
             time.sleep(0.005) 

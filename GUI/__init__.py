@@ -1,0 +1,1 @@
+"""Komponen antarmuka pengguna TriaGO."""
