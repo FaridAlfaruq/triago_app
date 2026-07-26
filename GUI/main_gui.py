@@ -146,23 +146,42 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(4)
 
     def save_consolidated_csv(self, results):
-        """Menyimpan seluruh data registrasi, sinyal bersih, dan fitur ekstraksi ke 1 CSV master."""
+        """Menyimpan data registrasi, sinyal mentah (400 Hz), sinyal bersih (125 Hz), dan fitur ke folder data_pengukuran."""
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         bed_id = results.get("bed", "00")
         
-        # FORMAT NAMA FILE MASTER (Bisa disesuaikan jika ingin lokasi folder tertentu)
-        filename = f"TriaGO_FullData_Bed{bed_id}_{timestamp_str}.csv"
+        # 1. Tentukan folder penyimpanan tetap
+        folder_path = os.path.join(project_root, "data_pengukuran")
+        os.makedirs(folder_path, exist_ok=True)  # Otomatis buat folder jika belum ada
+        
+        # 2. Path file lengkap di dalam folder data_pengukuran
+        filename = os.path.join(folder_path, f"TriaGO_FullData_Bed{bed_id}_{timestamp_str}.csv")
         
         try:
-            time_arr = results.get("time_125", [])
+            # Ambil Sinyal Mentah (400 Hz)
+            raw_time = results.get("raw_time", [])
+            raw_ecg = results.get("raw_ecg", [])
+            raw_red = results.get("raw_red", [])
+            raw_ir = results.get("raw_ir", [])
+            
+            # Ambil Sinyal Clean & Downsampled (125 Hz)
+            time_125 = results.get("time_125", [])
             ecg_clean = results.get("ecg_smooth", [])
             ir_clean = results.get("ir_clean", [])
             
-            # Gabungkan Sinyal Time-Series + Metadata & Hasil Ekstraksi
+            # Menggunakan pd.Series agar ukuran array yang berbeda (400 Hz vs 125 Hz) 
+            # dapat digabungkan tanpa menyebabkan error beda panjang array
             df = pd.DataFrame({
-                "Time_s": time_arr,
-                "ECG_Clean": ecg_clean,
-                "PPG_IR_Clean": ir_clean,
+                # Sinyal Mentah (Sampling Rate 400 Hz)
+                "Raw_Time_s": pd.Series(raw_time),
+                "Raw_ECG": pd.Series(raw_ecg),
+                "Raw_PPG_Red": pd.Series(raw_red),
+                "Raw_PPG_IR": pd.Series(raw_ir),
+                
+                # Sinyal Filtered & Downsampled (Sampling Rate 125 Hz)
+                "Clean_Time_s": pd.Series(time_125),
+                "ECG_Clean": pd.Series(ecg_clean),
+                "PPG_IR_Clean": pd.Series(ir_clean),
                 
                 # Metadata & Input Registrasi
                 "Bed_Location": results.get("bed", "00"),
@@ -182,7 +201,7 @@ class TriaGoApplication(QMainWindow):
             })
             
             df.to_csv(filename, index=False)
-            print(f"[LOG SUCCESS] File CSV Konsolidasi Berhasil Disimpan: {filename}")
+            print(f"[LOG SUCCESS] File CSV Konsolidasi Berhasil Disimpan di: {filename}")
         except Exception as e:
             print(f"[ERROR] Gagal menyimpan CSV konsolidasi: {e}")
 

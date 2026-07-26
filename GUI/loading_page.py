@@ -503,10 +503,15 @@ class LoadingPage(QWidget):
         # 1. Generate string timestamp saat ini (Format: TahunBulanTanggal_JamMenitDetik)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # 2. Buat nama file dinamis menggunakan f-string
-        filename = f"ekstraksi_data_{timestamp}.csv"
+        # 2. Tentukan folder penyimpanan tetap 'data_pengukuran'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        folder_path = os.path.abspath(os.path.join(current_dir, "..", "data_pengukuran"))
+        os.makedirs(folder_path, exist_ok=True)  # Membuat folder otomatis jika belum ada
 
-        # 3. Menyusun data parameter vital sign
+        # 3. Buat path nama file lengkap di dalam folder data_pengukuran
+        filename = os.path.join(folder_path, f"ekstraksi_data_{timestamp}.csv")
+
+        # 4. Menyusun data parameter vital sign
         summary_data = {
             "HR_ECG_BPM": [results['hr']],
             "RR_RPM": [results['rr']],
@@ -516,18 +521,17 @@ class LoadingPage(QWidget):
             "HR_PPG_BPM": [results['ppg_hr']]
         }
         df_summary = pd.DataFrame(summary_data)
-        # Menyimpan file ke folder project
+        
+        # 5. Menyimpan file ke folder data_pengukuran
         df_summary.to_csv(filename, index=False)
-        print(f"[LOG] Data berhasil disimpan ke: {filename}")
+        print(f"[LOG] Data ringkasan berhasil disimpan ke: {filename}")
 
-        # Alirkan hasil ke Window Utama
+        # 6. Alirkan hasil ke Window Utama
         if hasattr(self, "parent_main_win"):
             self.parent_main_win.processed_results = results
             self.parent_main_win.handle_output_phase(results)
         else:
-            self.lbl_status.setText(
-                f"Selesai!!!"
-            )
+            self.lbl_status.setText("Selesai!!!")
 
     def update_ui_state(self, text, progress_value):
         """Sinkronisasi progress bar dan transisi teks status."""
