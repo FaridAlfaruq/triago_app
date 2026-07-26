@@ -236,7 +236,13 @@ class RegistrationPage(QWidget):
             "gcs": self.selected_gcs
         }
 
-        csv_file = "data_pendaftaran_pasien.csv"
+        # 1. Tentukan folder penyimpanan 'data_pengukuran'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        folder_path = os.path.abspath(os.path.join(current_dir, "..", "data_pengukuran"))
+        os.makedirs(folder_path, exist_ok=True)  # Buat folder otomatis jika belum ada
+
+        # 2. Lokasi lengkap file CSV di dalam folder data_pengukuran
+        csv_file = os.path.join(folder_path, "data_pendaftaran_pasien.csv")
         file_exists = os.path.isfile(csv_file)
         
         try:
