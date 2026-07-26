@@ -1,175 +1,266 @@
+import os
+import sys
+import csv
+from datetime import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QLineEdit, QPushButton, QGridLayout, QFrame, 
-                             QRadioButton, QSizePolicy, QButtonGroup)
+                             QPushButton, QGridLayout, QFrame, QApplication,
+                             QSizePolicy)
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 
 class RegistrationPage(QWidget):
-    # Buat custom signal untuk mengirim data ke main_gui saat tombol start diklik
+    # Signal untuk mengirim data (hanya bed dan gcs) saat tombol start diklik
     measurement_started = pyqtSignal(dict)
 
     def __init__(self):
         super().__init__()
+        self.selected_bed = None
         self.selected_gcs = None
+        self.bed_buttons = {}
+        self.gcs_buttons = {}
         self.setup_ui()
 
     def setup_ui(self):
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setStyleSheet("""
+            QWidget { 
+                background-color: #F6FFEC; 
+                color: #214889; 
+                font-family: 'Segoe UI', Arial, sans-serif; 
+            }
+            QLabel { 
+                font-weight: bold; 
+                color: #214889; 
+            }
+        """)
+        
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(30, 20, 30, 20)
-        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(32, 16, 32, 16)
+        main_layout.setSpacing(14)
         
-        # --- HEADER ---
-        header_label = QLabel("TriaGO — PENDAFTARAN & TRIASE AWAL")
-        header_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #2ECC71; letter-spacing: 1px;")
-        main_layout.addWidget(header_label, alignment=Qt.AlignmentFlag.AlignHCenter)
+        # =====================================================================
+        # HEADER (Judul & Logo)
+        # =====================================================================
+        header_layout = QHBoxLayout()
         
-        body_layout = QHBoxLayout()
-        body_layout.setSpacing(30)
+        title_vbox = QVBoxLayout()
+        lbl_title = QLabel("LOKASI KASUR & GCS")
+        # Ukuran font judul diperbesar menjadi 40px
+        lbl_title.setStyleSheet("font-size: 34px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;")
         
-        # --- KOLOM KIRI: FORM IDENTITAS ---
-        form_container = QFrame()
-        form_container.setStyleSheet("background-color: #1E1E1E; border-radius: 8px; padding: 20px;")
-        form_layout = QVBoxLayout(form_container)
-        form_layout.setSpacing(15)
+        lbl_subtitle = QLabel("Manajemen tata letak kasur dan input Glasgow Coma Score")
+        # Ukuran font subtitle diperbesar menjadi 20px
+        lbl_subtitle.setStyleSheet("font-size: 18px; font-weight: normal; color: #556B85;")
         
-        form_layout.addWidget(QLabel("<font size='4' color='#BDC3C7'><b>Identitas Pasien</b></font>"))
+        title_vbox.addWidget(lbl_title)
+        title_vbox.addWidget(lbl_subtitle)
         
-        form_layout.addWidget(QLabel("Nama Lengkap Pasien:"))
-        self.input_nama = QLineEdit(placeholderText="Masukkan nama...")
-        self.input_nama.setStyleSheet("background-color: #2C2C2C; border: 1px solid #444; padding: 10px; border-radius: 4px; color: white; font-size: 14px;")
-        form_layout.addWidget(self.input_nama)
-        
-        form_layout.addWidget(QLabel("Umur Pasien (Tahun):"))
-        self.input_umur = QLineEdit(placeholderText="Masukkan umur...")
-        self.input_umur.setStyleSheet("background-color: #2C2C2C; border: 1px solid #444; padding: 10px; border-radius: 4px; color: white; font-size: 14px;")
-        form_layout.addWidget(self.input_umur)
-        
-        radio_style = """
-        QRadioButton { color: white; font-size: 14px; padding-left: 8px; min-height: 30px; }
-        QRadioButton::indicator { width: 18px; height: 18px; border: 2px solid #555555; border-radius: 10px; background-color: #2C2C2C; }
-        QRadioButton::indicator:hover { border-color: #7F8C8D; }
-        QRadioButton::indicator:checked { border-color: #3498DB; background-color: #2980B9; image: url(none); }
-        """
-        
-        form_layout.addWidget(QLabel("Jenis Kelamin:"))
-        layout_gender = QHBoxLayout()
-        layout_gender.setSpacing(20)
-        self.radio_laki = QRadioButton("Laki-laki")
-        self.radio_perempuan = QRadioButton("Perempuan")
-        self.radio_laki.setStyleSheet(radio_style)
-        self.radio_perempuan.setStyleSheet(radio_style)
-        
-        self.group_gender = QButtonGroup(self)
-        self.group_gender.addButton(self.radio_laki)
-        self.group_gender.addButton(self.radio_perempuan)
-        
-        layout_gender.addWidget(self.radio_laki)
-        layout_gender.addWidget(self.radio_perempuan)
-        layout_gender.addStretch()
-        form_layout.addLayout(layout_gender)
-        
-        form_layout.addWidget(QLabel("Kategori Kasus Pasien:"))
-        layout_kasus = QHBoxLayout()
-        layout_kasus.setSpacing(20)
-        self.radio_nontrauma = QRadioButton("Non-Trauma")
-        self.radio_trauma = QRadioButton("Trauma")
-        self.radio_nontrauma.setStyleSheet(radio_style)
-        self.radio_trauma.setStyleSheet(radio_style)
-        
-        self.group_kasus = QButtonGroup(self)
-        self.group_kasus.addButton(self.radio_nontrauma)
-        self.group_kasus.addButton(self.radio_trauma)
-        
-        layout_kasus.addWidget(self.radio_nontrauma)
-        layout_kasus.addWidget(self.radio_trauma)
-        layout_kasus.addStretch()
-        form_layout.addLayout(layout_kasus)
-        
-        form_layout.addStretch()
-        body_layout.addWidget(form_container, stretch=4)
-        
-        # --- KOLOM KANAN: GCS GRID ---
-        gcs_container = QFrame()
-        gcs_container.setStyleSheet("background-color: #1E1E1E; border-radius: 8px; padding: 20px;")
-        gcs_layout = QVBoxLayout(gcs_container)
-        
-        gcs_layout.addWidget(QLabel("<font size='4' color='#BDC3C7'><b>Glasgow Coma Scale (GCS)</b></font>"))
-        gcs_layout.addWidget(QLabel("<font size='2' color='#7F8C8D'>Pilih skor kesadaran fisik pasien:</font>"))
-        gcs_layout.addSpacing(15)
-        
-        grid_gcs = QGridLayout()
-        grid_gcs.setSpacing(10)
-        self.gcs_buttons = {}
-        
-        for index, score in enumerate(range(3, 16)):
-            row = index // 4
-            col = index % 4
-            btn = QPushButton(str(score))
-            btn.setCheckable(True)
-            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-            btn.setMinimumSize(70, 50)
-            btn.setStyleSheet(
-                "QPushButton { background-color: #2C2C2C; border: 2px solid #3A3A3A; border-radius: 6px; font-size: 16px; font-weight: bold; color: #E0E0E0; }"
-                "QPushButton:hover { background-color: #3D3D3D; border-color: #7F8C8D; }"
-            )
-            btn.clicked.connect(lambda checked, s=score: self.handle_gcs_selection(s))
-            grid_gcs.addWidget(btn, row, col)
-            self.gcs_buttons[score] = btn
+        lbl_logo = QLabel()
+        lbl_logo.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path)
+            lbl_logo.setPixmap(pixmap.scaledToWidth(230, Qt.TransformationMode.SmoothTransformation))
+        else:
+            lbl_logo.setText("TriaGO")
+            lbl_logo.setStyleSheet("font-size: 42px; font-weight: 900; color: #214889;")
             
-        for r in range(4): grid_gcs.setRowStretch(r, 1)
-        for c in range(4): grid_gcs.setColumnStretch(c, 1)
-            
-        gcs_layout.addLayout(grid_gcs)
-        body_layout.addWidget(gcs_container, stretch=5)
-        main_layout.addLayout(body_layout)
+        header_layout.addLayout(title_vbox)
+        header_layout.addStretch()
+        header_layout.addWidget(lbl_logo)
         
-        # --- ACTION BUTTON ---
-        self.btn_start = QPushButton("MULAI PENGUKURAN")
+        main_layout.addLayout(header_layout)
+        
+        # =====================================================================
+        # KONTEN TENGAH (Kasur, GCS, Tombol Start)
+        # =====================================================================
+        center_layout = QVBoxLayout()
+        center_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        
+        # --- Tata Letak Kasur ---
+        bed_frame = QFrame()
+        bed_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        bed_frame.setStyleSheet("QFrame { border: 2px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
+        
+        bed_layout = QVBoxLayout(bed_frame)
+        bed_layout.setContentsMargins(24, 16, 24, 20)
+        bed_layout.setSpacing(10)
+        
+        lbl_bed_title = QLabel("Tata Letak Kasur")
+        lbl_bed_title.setStyleSheet("QLabel { font-size: 18px; font-weight: 600; color: #556B85; border: none; background: transparent; }")
+        bed_layout.addWidget(lbl_bed_title)
+        
+        grid_bed = QGridLayout()
+        grid_bed.setContentsMargins(0, 0, 0, 0)
+        grid_bed.setVerticalSpacing(12)
+        grid_bed.setHorizontalSpacing(14)
+        for column in range(6):
+            grid_bed.setColumnStretch(column, 1)
+        
+        for i in range(1, 13):
+            row = 0 if i <= 6 else 1
+            col = (i - 1) % 6
+            bed_str = f"{i:02d}"
+            
+            btn_bed = QPushButton(bed_str)
+            btn_bed.setCheckable(True)
+            btn_bed.setMinimumHeight(66)
+            btn_bed.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            btn_bed.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn_bed.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
+                QPushButton:hover { background-color: #F0F4FF; }
+            """)
+            btn_bed.clicked.connect(lambda checked, b=bed_str: self.handle_bed_selection(b))
+            grid_bed.addWidget(btn_bed, row, col)
+            self.bed_buttons[bed_str] = btn_bed
+            
+        bed_layout.addLayout(grid_bed)
+        center_layout.addWidget(bed_frame)
+        
+        center_layout.addSpacing(5) # Ruang antara Kasur dan GCS
+        
+        # --- Input GCS ---
+        gcs_vbox = QVBoxLayout()
+        gcs_vbox.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        
+        lbl_gcs_title = QLabel("Input Glasgow Coma Score")
+        lbl_gcs_title.setStyleSheet("font-size: 23px; font-weight: bold; color: #214889;")
+        gcs_vbox.addWidget(lbl_gcs_title, alignment=Qt.AlignmentFlag.AlignLeft)
+        
+        hbox_gcs = QHBoxLayout()
+        hbox_gcs.setSpacing(10)
+        hbox_gcs.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        for score in range(3, 16):
+            btn_gcs = QPushButton(str(score))
+            btn_gcs.setCheckable(True)
+            # Dimensi tombol GCS
+            btn_gcs.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn_gcs.setMinimumSize(54, 54)
+            btn_gcs.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            btn_gcs.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #C2D5BB; border-radius: 10px; font-size: 19px; font-weight: bold; color: #A0B09C; }
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
+            btn_gcs.clicked.connect(lambda checked, s=score: self.handle_gcs_selection(s))
+            hbox_gcs.addWidget(btn_gcs)
+            self.gcs_buttons[score] = btn_gcs
+            
+        gcs_vbox.addLayout(hbox_gcs)
+        center_layout.addLayout(gcs_vbox)
+        
+        center_layout.addSpacing(10)
+        
+        # --- Tombol Start Measurement ---
+        self.btn_start = QPushButton("Mulai")
+        self.btn_start.setFixedSize(380, 56)
         self.btn_start.setEnabled(False)
-        self.btn_start.setStyleSheet("QPushButton { background-color: #7F8C8D; color: #333333; font-size: 18px; font-weight: bold; padding: 15px; border-radius: 6px; }")
-        self.btn_start.clicked.connect(self.emit_start_signal)
-        main_layout.addWidget(self.btn_start)
+        self.btn_start.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_start.setStyleSheet("""
+            QPushButton { background-color: #A0B09C; color: #FFFFFF; font-size: 21px; font-weight: bold; border-radius: 10px; border: none; letter-spacing: 1.5px;}
+        """)
+        self.btn_start.clicked.connect(self.save_and_emit_data)
+        center_layout.addWidget(self.btn_start, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        # SIGNALS CONNECT
-        self.input_nama.textChanged.connect(self.validate_form)
-        self.input_umur.textChanged.connect(self.validate_form)
-        self.radio_laki.toggled.connect(self.validate_form)
-        self.radio_perempuan.toggled.connect(self.validate_form)
-        self.radio_nontrauma.toggled.connect(self.validate_form)
-        self.radio_trauma.toggled.connect(self.validate_form)
+        main_layout.addLayout(center_layout)
+        main_layout.addStretch()
 
-    def handle_gcs_selection(self, selected_score):
-        self.selected_gcs = selected_score
-        for score, btn in self.gcs_buttons.items():
-            btn.setStyleSheet("QPushButton { background-color: #2C2C2C; border: 2px solid #3A3A3A; border-radius: 6px; font-size: 16px; font-weight: bold; color: #E0E0E0; } QPushButton:hover { background-color: #3D3D3D; border-color: #7F8C8D; }")
-        
-        if 13 <= selected_score <= 15: active_color, border_color = "#2ECC71", "#27AE60"
-        elif 9 <= selected_score <= 12: active_color, border_color = "#F39C12", "#D35400"
-        else: active_color, border_color = "#E74C3C", "#C0392B"
+    def handle_bed_selection(self, bed_id):
+        self.selected_bed = bed_id
+        for bid, btn in self.bed_buttons.items():
+            # Update style mereset ke ukuran dan font baru
+            btn.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
+                QPushButton:hover { background-color: #CEF9B6; }
+            """)
             
-        self.gcs_buttons[selected_score].setStyleSheet(f"QPushButton {{ background-color: {active_color}; border: 2px solid {border_color}; border-radius: 6px; font-size: 16px; font-weight: bold; color: #FFFFFF; padding: 5px; }}")
+        self.bed_buttons[bed_id].setStyleSheet("""
+            QPushButton { background-color: #CEF9B6; border: 3px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
+        """)
+        self.validate_form()
+
+    def handle_gcs_selection(self, score):
+        self.selected_gcs = score
+        for s, btn in self.gcs_buttons.items():
+            btn.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #C2D5BB; border-radius: 10px; font-size: 19px; font-weight: bold; color: #A0B09C; }
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
+            
+        if 13 <= score <= 15:
+            gcs_color = "#34D980"  # Normal: Hijau
+        elif 9 <= score <= 12:
+            gcs_color = "#F09C00"  # Sedang: Jingga
+        else:
+            gcs_color = "#F12A2A"  # Parah: Merah
+            
+        self.gcs_buttons[score].setStyleSheet(f"""
+            QPushButton {{
+                background-color: {gcs_color};
+                border: none;
+                border-radius: 10px;
+                font-size: 20px;
+                font-weight: bold;
+                color: #FFFFFF;
+            }}
+        """)
         self.validate_form()
 
     def validate_form(self):
-        gender_checked = self.radio_laki.isChecked() or self.radio_perempuan.isChecked()
-        kasus_checked = self.radio_nontrauma.isChecked() or self.radio_trauma.isChecked()
-        
-        if self.input_nama.text().strip() and self.input_umur.text().strip() and self.selected_gcs is not None and gender_checked and kasus_checked:
+        if self.selected_bed and self.selected_gcs:
             self.btn_start.setEnabled(True)
-            self.btn_start.setStyleSheet("QPushButton { background-color: #2ECC71; color: white; font-size: 18px; font-weight: bold; padding: 15px; border-radius: 6px; } QPushButton:hover { background-color: #27AE60; }")
+            self.btn_start.setStyleSheet("""
+                QPushButton { 
+                    background-color: #214889; 
+                    color: #FFFFFF; 
+                    font-size: 21px;
+                    font-weight: bold; 
+                    border-radius: 10px;
+                    border: none;
+                    letter-spacing: 1.5px;
+                }
+                QPushButton:hover { background-color: #163264; }
+            """)
         else:
             self.btn_start.setEnabled(False)
-            self.btn_start.setStyleSheet("QPushButton { background-color: #7F8C8D; color: #333333; font-size: 18px; font-weight: bold; padding: 15px; border-radius: 6px; }")
+            self.btn_start.setStyleSheet("""
+                QPushButton { background-color: #A0B09C; color: #FFFFFF; font-size: 21px; font-weight: bold; border-radius: 10px; border: none; letter-spacing: 1.5px;}
+            """)
 
-    def emit_start_signal(self):
-        gender = "Laki-laki" if self.radio_laki.isChecked() else "Perempuan"
-        kasus = "Non-Trauma" if self.radio_nontrauma.isChecked() else "Trauma"
-        
-        patient_data = {
-            "nama": self.input_nama.text(),
-            "umur": self.input_umur.text(),
-            "gender": gender,
-            "kasus": kasus,
+    def save_and_emit_data(self):
+        measurement_data = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "bed": self.selected_bed,
             "gcs": self.selected_gcs
         }
-        # Lepaskan sinyal data pasien ke main_gui
-        self.measurement_started.emit(patient_data)
+
+        # 1. Tentukan folder penyimpanan 'data_pengukuran'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        folder_path = os.path.abspath(os.path.join(current_dir, "..", "data_pengukuran"))
+        os.makedirs(folder_path, exist_ok=True)  # Buat folder otomatis jika belum ada
+
+        # 2. Lokasi lengkap file CSV di dalam folder data_pengukuran
+        csv_file = os.path.join(folder_path, "data_pendaftaran_pasien.csv")
+        file_exists = os.path.isfile(csv_file)
+        
+        try:
+            with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=measurement_data.keys())
+                if not file_exists:
+                    writer.writeheader()
+                writer.writerow(measurement_data)
+            print(f"[LOG] Data Kasur {measurement_data['bed']} berhasil disimpan ke {csv_file}")
+        except Exception as e:
+            print(f"[ERROR] Gagal menyimpan ke CSV: {e}")
+            
+        self.measurement_started.emit(measurement_data)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    test_window = RegistrationPage()
+    test_window.resize(1920, 1080)  
+    test_window.setWindowTitle("Test Run - Halaman Setup TriaGO")
+    test_window.show()
+    sys.exit(app.exec())

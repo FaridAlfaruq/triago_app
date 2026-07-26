@@ -1,0 +1,1 @@
+"""Akuisisi data sensor TriaGO."""

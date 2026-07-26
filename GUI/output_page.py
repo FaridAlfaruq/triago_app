@@ -1,444 +1,456 @@
 import sys
 import os
-import csv
+import json
+import numpy as np
 import pyqtgraph as pg
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                             QPushButton, QFrame, QGridLayout, QScrollArea,
-                             QSizePolicy, QApplication)
+from datetime import datetime
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication, QSizePolicy
+)
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QPdfWriter, QPainter, QTextDocument, QPageSize
+from PyQt6.QtGui import QPixmap
 
+# Impor API Client dari folder services
+try:
+    from service.api_client import TriageApiClient
+except ImportError:
+    # Fallback jika struktur direktori berbeda saat run independen
+    TriageApiClient = None
 
-class LockedViewBox(pg.ViewBox):
-    """
-    ViewBox kustom yang mengunci fitur drag/pan (geser dengan mouse),
-    namun tetap membiarkan zoom in/out lewat scroll wheel berfungsi normal.
-    """
-
-    def mouseDragEvent(self, ev, axis=None):
-        ev.ignore()
-
-    def mouseClickEvent(self, ev):
-        ev.ignore()
-
-    def wheelEvent(self, ev, axis=None):
-        super().wheelEvent(ev, axis=axis)
+# Konfigurasi Global Tema PyQtGraph
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', '#214889')
 
 
 class OutputPage(QWidget):
-    # Sinyal untuk meriset sistem dan kembali ke halaman pendaftaran awal
     home_requested = pyqtSignal()
-
-    DISPLAY_DURATION_SEC = 5
-    SAMPLE_RATE_HZ = 400
 
     def __init__(self):
         super().__init__()
         self.patient_data = {}
         self.calculation_results = {}
+        self.iot_json_payload = ""
+        
+        # Inisialisasi API Client
+        self.api_client = TriageApiClient() if TriageApiClient else None
+        
         self.setup_ui()
 
     def setup_ui(self):
-        outer_layout = QVBoxLayout(self)
-        outer_layout.setContentsMargins(25, 20, 25, 20)
-        outer_layout.setSpacing(15)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setStyleSheet("background-color: #F6FFEC;")
+        
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(24, 12, 24, 12)
+        main_layout.setSpacing(8)
 
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-        scroll_area.setStyleSheet("""
-            QScrollArea { background: transparent; border: none; }
-            QScrollBar:vertical {
-                background: #1E1E1E; width: 10px; border-radius: 5px;
-            }
-            QScrollBar::handle:vertical {
-                background: #3A3A3A; border-radius: 5px; min-height: 30px;
-            }
-            QScrollBar::handle:vertical:hover { background: #4A4A4A; }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+        # =========================================================================
+        # 1. HEADER
+        # =========================================================================
+        header_layout = QHBoxLayout()
+        header_layout.setSpacing(16)
+        header_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+
+        title_vbox = QVBoxLayout()
+        title_vbox.setSpacing(2)
+        lbl_title = QLabel("HASIL PENGECEKAN")
+        lbl_title.setStyleSheet("font-size: 26px; font-weight: 900; color: #214889; background: transparent;")
+        lbl_subtitle = QLabel("Output parameter dan hasil klasifikasi ML")
+        lbl_subtitle.setStyleSheet("font-size: 15px; font-weight: 500; color: #555555; background: transparent;")
+        title_vbox.addWidget(lbl_title)
+        title_vbox.addWidget(lbl_subtitle)
+        header_layout.addLayout(title_vbox)
+
+        self.triage_container = QHBoxLayout()
+        self.triage_container.setSpacing(10)
+        
+        self.badge_color = QFrame()
+        self.badge_color.setFixedSize(48, 48)
+        self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
+        
+        self.lbl_status_text = QLabel("RESUSITASI")
+        self.lbl_status_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_status_text.setFixedHeight(48)
+        self.lbl_status_text.setMinimumWidth(180)
+        self.lbl_status_text.setStyleSheet("""
+            font-size: 22px; font-weight: 900; color: #FFFFFF;
+            background-color: #FF8A8A; border-radius: 8px; 
+            padding-left: 12px; padding-right: 12px;
         """)
+        
+        self.triage_container.addWidget(self.badge_color)
+        self.triage_container.addWidget(self.lbl_status_text, stretch=1)
+        header_layout.addLayout(self.triage_container, stretch=1)
 
-        scroll_content = QWidget()
-        scroll_content.setStyleSheet("background: transparent;")
-        content_layout = QVBoxLayout(scroll_content)
-        content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(15)
-
-        # =========================================================================
-        # 1. HEADER: BANNER STATUS TRIASE MASIF
-        # =========================================================================
-        self.triage_banner = QFrame()
-        self.triage_banner.setFixedHeight(60)
-        self.triage_banner.setStyleSheet("background-color: #2C2C2C; border-radius: 8px;")
-        banner_layout = QVBoxLayout(self.triage_banner)
-
-        self.lbl_triage_status = QLabel("MENUNGGU DATA HASIL TRIASE...")
-        self.lbl_triage_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_triage_status.setStyleSheet(
-            "font-size: 20px; font-weight: bold; color: white; letter-spacing: 1px;"
-        )
-        banner_layout.addWidget(self.lbl_triage_status)
-        content_layout.addWidget(self.triage_banner)
-
-        # =========================================================================
-        # 2. BODY SECTION: SPLIT VIEW (KIRI: DATA | KANAN: GRAFIK DATA ASLI)
-        # =========================================================================
-        body_layout = QHBoxLayout()
-        body_layout.setSpacing(20)
-
-        # --- KOLOM KIRI: RINGKASAN DATA & TANDA VITAL PASIEN ---
-        left_container = QFrame()
-        left_container.setStyleSheet("background-color: #1E1E1E; border-radius: 8px; padding: 15px;")
-        left_layout = QVBoxLayout(left_container)
-        left_layout.setSpacing(12)
-
-        left_layout.addWidget(QLabel("<font size='4' color='#BDC3C7'><b>Ringkasan Medis Pasien</b></font>"))
-
-        info_grid = QGridLayout()
-        info_grid.setSpacing(10)
-
-        self.lbl_out_nama = QLabel("Nama: -")
-        self.lbl_out_umur = QLabel("Umur: -")
-        self.lbl_out_gender = QLabel("Jenis Kelamin: -")
-        self.lbl_out_kasus = QLabel("Kategori Kasus: -")
-        self.lbl_out_gcs = QLabel("Skor GCS: -")
-        self.lbl_out_temp = QLabel("Suhu Tubuh: -")
-
-        self.lbl_out_bp = QLabel("Tekanan Darah: --/-- mmHg")
-        self.lbl_out_hr = QLabel("Detak Jantung (HR): -- BPM")
-        self.lbl_out_spo2 = QLabel("Saturasi Oksigen (SpO2): -- %")
-
-        labels_to_style = [self.lbl_out_nama, self.lbl_out_umur, self.lbl_out_gender,
-                           self.lbl_out_kasus, self.lbl_out_gcs, self.lbl_out_bp,
-                           self.lbl_out_hr, self.lbl_out_spo2, self.lbl_out_temp]
-        for lbl in labels_to_style:
-            lbl.setStyleSheet("font-size: 14px; color: #E0E0E0;")
-
-        self.lbl_out_bp.setStyleSheet("font-size: 14px; color: #E0E0E0;")
-        self.lbl_out_hr.setStyleSheet("font-size: 14px; color: #E0E0E0;")
-        self.lbl_out_spo2.setStyleSheet("font-size: 14px; color: #E0E0E0;")
-
-        info_grid.addWidget(self.lbl_out_nama, 0, 0)
-        info_grid.addWidget(self.lbl_out_umur, 0, 1)
-        info_grid.addWidget(self.lbl_out_gender, 1, 0)
-        info_grid.addWidget(self.lbl_out_kasus, 1, 1)
-        info_grid.addWidget(self.lbl_out_gcs, 2, 0)
-        info_grid.addWidget(self.lbl_out_temp, 2, 1)
-
-        left_layout.addLayout(info_grid)
-
-        line = QFrame()
-        line.setFrameShape(QFrame.Shape.HLine)
-        line.setStyleSheet("background-color: #333;")
-        left_layout.addWidget(line)
-
-        left_layout.addWidget(QLabel("<font size='3' color='#BDC3C7'><b>Hasil Ekstraksi Parameter Klinis:</b></font>"))
-        left_layout.addWidget(self.lbl_out_bp)
-        left_layout.addWidget(self.lbl_out_hr)
-        left_layout.addWidget(self.lbl_out_spo2)
-        left_layout.addStretch()
-
-        body_layout.addWidget(left_container, stretch=4)
-
-        # --- KOLOM KANAN: OUTPUT GRAFIK (DISESUAIKAN) ---
-        right_container = QFrame()
-        right_container.setStyleSheet("background-color: #1E1E1E; border-radius: 8px; padding: 12px;")
-        right_layout = QVBoxLayout(right_container)
-
-        self.win_preview = pg.GraphicsLayoutWidget()
-        self.win_preview.setBackground('#1E1E1E')
-        self.win_preview.setMinimumHeight(320)
-        self.win_preview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        right_layout.addWidget(self.win_preview)
-
-        # Plot ECG (Hijau) - Judul disederhanakan
-        self.p_ecg = self.win_preview.addPlot(title="Sinyal ECG", viewBox=LockedViewBox())
-        self.p_ecg.showGrid(x=True, y=True)
-        self.p_ecg.setMouseEnabled(x=True, y=True)  
-        self.p_ecg.setMenuEnabled(False)
-        self.p_ecg.setLabel('left', 'Amplitudo')
-        self.curve_ecg = self.p_ecg.plot(pen=pg.mkPen('g', width=1.5))
-
-        self.win_preview.nextRow()
-
-        # Plot PPG (Merah) - Judul disederhanakan
-        self.p_ppg = self.win_preview.addPlot(title="Sinyal PPG", viewBox=LockedViewBox())
-        self.p_ppg.showGrid(x=True, y=True)
-        self.p_ppg.setMouseEnabled(x=True, y=True)
-        self.p_ppg.setMenuEnabled(False)
-        self.p_ppg.setLabel('left', 'Amplitudo')
-        self.p_ppg.setLabel('bottom', 'Waktu', units='s')
-        self.curve_ppg = self.p_ppg.plot(pen=pg.mkPen('r', width=1.5))
-        self.p_ppg.setXLink(self.p_ecg)
-
-        body_layout.addWidget(right_container, stretch=5)
-
-        content_layout.addLayout(body_layout, stretch=1)
-
-        scroll_area.setWidget(scroll_content)
-        outer_layout.addWidget(scroll_area, stretch=1)
-
-        # =========================================================================
-        # 3. FOOTER SECTION: BUTTON NAVIGASI (EMOTICON DIHAPUS)
-        # =========================================================================
-        footer_layout = QHBoxLayout()
-        footer_layout.setSpacing(15)
-
-        self.btn_export_pdf = QPushButton("CETAK STRIP TRIASE (PDF)")
-        self.btn_export_pdf.setFixedHeight(48)
-        self.btn_export_pdf.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_export_pdf.setStyleSheet(
-            "QPushButton { background-color: #3498DB; color: white; font-size: 15px; font-weight: bold; border-radius: 8px; }"
-            "QPushButton:hover { background-color: #2980B9; }"
-            "QPushButton:pressed { background-color: #21618C; }"
-        )
-        self.btn_export_pdf.clicked.connect(self.export_to_pdf)
-
-        self.btn_home = QPushButton("SELESAI & PASIEN BARU")
-        self.btn_home.setFixedHeight(48)
-        self.btn_home.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_home.setStyleSheet(
-            "QPushButton { background-color: #2ECC71; color: white; font-size: 15px; font-weight: bold; border-radius: 8px; }"
-            "QPushButton:hover { background-color: #27AE60; }"
-            "QPushButton:pressed { background-color: #1E8449; }"
-        )
-        self.btn_home.clicked.connect(self.handle_home_click)
-
-        footer_layout.addWidget(self.btn_export_pdf, stretch=1)
-        footer_layout.addWidget(self.btn_home, stretch=1)
-
-        outer_layout.addLayout(footer_layout)
-
-    def display_results(self, patient_info, ml_results):
-        """Menerima dan merender seluruh parameter klinis dari berkas data asli"""
-        self.patient_data = patient_info
-        self.calculation_results = ml_results
-
-        self.lbl_out_nama.setText(f"<b>Nama:</b> {patient_info['nama']}")
-        self.lbl_out_umur.setText(f"<b>Umur:</b> {patient_info['umur']} Tahun")
-        self.lbl_out_gender.setText(f"<b>Gender:</b> {patient_info['gender']}")
-        self.lbl_out_kasus.setText(f"<b>Kasus:</b> {patient_info['kasus']}")
-        self.lbl_out_gcs.setText(f"<b>Skor GCS:</b> {patient_info['gcs']}")
-
-        self.lbl_out_bp.setText(f"Tekanan Darah: {ml_results['systolic']}/{ml_results['diastolic']} mmHg")
-        self.lbl_out_hr.setText(f"Detak Jantung (HR): {ml_results['heart_rate']} BPM")
-        self.lbl_out_spo2.setText(f"Saturasi Oksigen (SpO2): {ml_results['spo2']} %")
-
-        csv_path = ml_results.get("csv_path", "")
-        time_data, ecg_data, ppg_data, avg_temp = self.load_raw_csv_data(csv_path)
-
-        self.lbl_out_temp.setText(f"<b>Suhu Tubuh:</b> {avg_temp:.2f} °C")
-
-        if time_data:
-            self.curve_ecg.setData(time_data, ecg_data)
-            self.curve_ppg.setData(time_data, ppg_data)
-            x_start = time_data[0]
-            x_end = x_start + self.DISPLAY_DURATION_SEC
-            self.p_ecg.setXRange(x_start, x_end, padding=0)
-            self.p_ecg.enableAutoRange(axis='y')
-            self.p_ppg.enableAutoRange(axis='y')
-
-        status = ml_results["triage_status"].upper()
-        if status == "SEVERE":
-            self.lbl_triage_status.setText("RESUSITASI")
-            self.triage_banner.setStyleSheet("background-color: #E74C3C; border-radius: 8px;")
-        elif status == "MODERATE":
-            self.lbl_triage_status.setText("DARURAT")
-            self.triage_banner.setStyleSheet("background-color: #F39C12; border-radius: 8px;")
+        lbl_logo = QLabel()
+        lbl_logo.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        lbl_logo.setStyleSheet("background: transparent;")
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        logo_path = os.path.abspath(os.path.join(current_dir, "..", "asset", "logo.png"))
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path)
+            lbl_logo.setPixmap(pixmap.scaledToWidth(160, Qt.TransformationMode.SmoothTransformation))
         else:
-            self.lbl_triage_status.setText("NON-DARURAT")
-            self.triage_banner.setStyleSheet("background-color: #2ECC71; border-radius: 8px;")
+            lbl_logo.setText("TriaGO")
+            lbl_logo.setStyleSheet("font-size: 28px; font-weight: 900; color: #214889;")
+        header_layout.addWidget(lbl_logo)
 
-    def load_raw_csv_data(self, csv_filepath):
-        time_data = []
-        ecg_data = []
-        ppg_data = []
-        temp_sum = 0
-        row_count = 0
+        main_layout.addLayout(header_layout)
 
-        if not csv_filepath or not os.path.exists(csv_filepath):
-            return [], [], [], 36.60
+        # =========================================================================
+        # 2. BODY LAYOUT (GRID 2x2 PROPORSI SEIMBANG & RESPONSUS)
+        # =========================================================================
+        content_grid = QGridLayout()
+        content_grid.setSpacing(12)
 
-        max_samples = int(self.DISPLAY_DURATION_SEC * self.SAMPLE_RATE_HZ)
+        # A. KOTAK SHAP ANALYSIS (Baris 0, Kolom 0)
+        lbl_shap_title = QLabel("SHAP Analysis")
+        lbl_shap_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+        
+        self.box_shap = QFrame()
+        self.box_shap.setMinimumHeight(160)  # Kunci tinggi minimum agar tidak tertekan gepeng
+        self.box_shap.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
+        shap_layout = QVBoxLayout(self.box_shap)
+        shap_layout.setContentsMargins(4, 4, 4, 4)
+        
+        self.plot_shap = pg.PlotWidget()
+        self.plot_shap.showGrid(x=True, y=False, alpha=0.2)
+        self.plot_shap.setLabel('bottom', 'SHAP Value (Dampak Fitur)', color='#555555')
+        shap_layout.addWidget(self.plot_shap)
 
-        try:
-            with open(csv_filepath, mode='r') as file:
-                reader = csv.reader(file)
-                header = next(reader)  
+        shap_cell = QVBoxLayout()
+        shap_cell.setSpacing(4)
+        shap_cell.addWidget(lbl_shap_title)
+        shap_cell.addWidget(self.box_shap, stretch=1)
+        content_grid.addLayout(shap_cell, 0, 0)
 
-                t_idx = header.index("Time (s)")
-                ppg_idx = header.index("PPG_Red")
-                ecg_idx = header.index("ECG")
-                temp_idx = header.index("Temp_Object")
+        # B. KOTAK SINYAL ECG (Baris 0, Kolom 1)
+        lbl_ecg_title = QLabel("Sinyal ECG")
+        lbl_ecg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
 
-                for row in reader:
-                    if not row:
-                        continue
+        self.box_ecg = QFrame()
+        self.box_ecg.setMinimumHeight(160)  # Kunci tinggi minimum
+        self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
+        ecg_layout = QVBoxLayout(self.box_ecg)
+        ecg_layout.setContentsMargins(4, 4, 4, 4)
 
-                    row_count += 1
-                    t_val = float(row[t_idx])
-                    t_obj = float(row[temp_idx])
-                    temp_sum += t_obj
+        self.plot_ecg = pg.PlotWidget()
+        self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
+        self.plot_ecg.setLabel('bottom', 'Waktu (s)', color='#555555')
+        self.plot_ecg.setLabel('left', 'Amplitudo', color='#555555')
+        ecg_layout.addWidget(self.plot_ecg)
 
-                    if len(time_data) < max_samples:
-                        time_data.append(t_val)
-                        ecg_data.append(float(row[ecg_idx]))
-                        ppg_data.append(float(row[ppg_idx]))
+        ecg_cell = QVBoxLayout()
+        ecg_cell.setSpacing(4)
+        ecg_cell.addWidget(lbl_ecg_title)
+        ecg_cell.addWidget(self.box_ecg, stretch=1)
+        content_grid.addLayout(ecg_cell, 0, 1)
 
-            avg_temp = temp_sum / row_count if row_count > 0 else 36.60
-            return time_data, ecg_data, ppg_data, avg_temp
+        # C. KOTAK PARAMETER MEDIS (Baris 1, Kolom 0)
+        lbl_param_title = QLabel("HASIL PARAMETER")
+        lbl_param_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
 
-        except Exception as e:
-            print(f"[ERROR] Gagal memproses visualisasi CSV: {e}")
-            return [], [], [], 36.60
+        self.box_parameter = QFrame()
+        self.box_parameter.setMinimumHeight(160)
+        self.box_parameter.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
+        param_layout = QGridLayout(self.box_parameter)
+        param_layout.setContentsMargins(6, 6, 6, 6)
+        param_layout.setSpacing(5)
 
-    def export_to_pdf(self):
-        """Membuat berkas PDF format A4 dengan skala layout yang proporsional dan tidak pipih"""
-        if not self.patient_data:
+        self.lbl_temp_val, self.lbl_temp_sub = self._create_param_card(param_layout, "Suhu Tubuh", "-- °C", 0, 0)
+        self.lbl_hr_val, _ = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM", 0, 1)
+        self.lbl_rr_val, _ = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM", 1, 0)
+        self.lbl_spo2_val, _ = self._create_param_card(param_layout, "Saturasi Oksigen", "-- %", 1, 1)
+        self.lbl_bp_val, _ = self._create_param_card(param_layout, "Tekanan Darah", "--/-- mmHg", 2, 0, colspan=2)
+
+        param_cell = QVBoxLayout()
+        param_cell.setSpacing(4)
+        param_cell.addWidget(lbl_param_title)
+        param_cell.addWidget(self.box_parameter, stretch=1)
+        content_grid.addLayout(param_cell, 1, 0)
+
+        # D. KOTAK SINYAL PPG IR (Baris 1, Kolom 1)
+        lbl_ppg_title = QLabel("Sinyal PPG")
+        lbl_ppg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
+
+        self.box_ppg = QFrame()
+        self.box_ppg.setMinimumHeight(160)  # Kunci tinggi minimum
+        self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
+        ppg_layout = QVBoxLayout(self.box_ppg)
+        ppg_layout.setContentsMargins(4, 4, 4, 4)
+
+        self.plot_ppg = pg.PlotWidget()
+        self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
+        self.plot_ppg.setLabel('bottom', 'Waktu (s)', color='#555555')
+        self.plot_ppg.setLabel('left', 'Amplitudo', color='#555555')
+        ppg_layout.addWidget(self.plot_ppg)
+
+        ppg_cell = QVBoxLayout()
+        ppg_cell.setSpacing(4)
+        ppg_cell.addWidget(lbl_ppg_title)
+        ppg_cell.addWidget(self.box_ppg, stretch=1)
+        content_grid.addLayout(ppg_cell, 1, 1)
+
+        # Mengatur rasio pembagian tinggi dan lebar persis 50% : 50%
+        content_grid.setRowStretch(0, 1)
+        content_grid.setRowStretch(1, 1)
+        content_grid.setColumnStretch(0, 1)
+        content_grid.setColumnStretch(1, 1)
+
+        main_layout.addLayout(content_grid, stretch=1)
+
+        # =========================================================================
+        # 3. FOOTER
+        # =========================================================================
+        self.btn_home = QPushButton("KEMBALI")
+        self.btn_home.setFixedHeight(42)
+        self.btn_home.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_home.setStyleSheet("""
+            QPushButton { 
+                background-color: #214889; 
+                color: white; 
+                font-size: 16px;
+                font-weight: bold; 
+                border-radius: 8px; 
+            }
+            QPushButton:hover { background-color: #183563; }
+            QPushButton:pressed { background-color: #0F2240; }
+        """)
+        self.btn_home.clicked.connect(self.handle_home_click)
+        main_layout.addWidget(self.btn_home)
+
+    def _create_param_card(self, grid_layout, title, default_val, row, col, colspan=1):
+        """Membuat kartu parameter yang ringkas dan responsif."""
+        card = QFrame()
+        card.setStyleSheet("QFrame { background-color: #F8FAF6; border: 1px solid #D5E5D0; border-radius: 6px; }")
+        vbox = QVBoxLayout(card)
+        vbox.setContentsMargins(8, 4, 8, 4)  # Margin ringkas agar tidak boros ruang vertikal
+        vbox.setSpacing(0)
+
+        lbl_title = QLabel(title)
+        lbl_title.setStyleSheet("font-size: 11px; font-weight: bold; color: #555555; border: none; background: transparent;")
+        
+        lbl_val = QLabel(default_val)
+        lbl_val.setStyleSheet("font-size: 18px; font-weight: 900; color: #214889; border: none; background: transparent;")
+        
+        lbl_sub = QLabel("")
+        lbl_sub.setStyleSheet("font-size: 10px; font-weight: 600; color: #778899; border: none; background: transparent;")
+        
+        vbox.addWidget(lbl_title)
+        vbox.addWidget(lbl_val)
+        vbox.addWidget(lbl_sub)
+        
+        grid_layout.addWidget(card, row, col, 1, colspan)
+        return lbl_val, lbl_sub
+
+    # =========================================================================
+    # UPDATE RESULTS: MENAMPILKAN PARAMETER & RENDERING SELURUH GRAFIK
+    # =========================================================================
+    def update_results(self, data):
+        """Memperbarui UI parameter medis, merender grafik SHAP/ECG/PPG, dan kirim API Backend."""
+        self.calculation_results = data
+
+        temp_core = data.get("temperature", 36.5)
+        temp_skin = data.get("temp_skin", 34.5)
+        temp_burton = data.get("temp_burton", 35.8)
+        temp_amb = data.get("temp_ambient", 28.0)
+
+        hr = data.get("hr", 0.0)
+        rr = data.get("rr", 0.0)
+        spo2 = data.get("spo2", 0.0)
+        sys_bp = data.get("systolic", 120)
+        dia_bp = data.get("diastolic", 80)
+        gcs = data.get("gcs", 15)
+
+        # 1. Update Teks Kartu Parameter Medis
+        self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
+        self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
+        self.lbl_hr_val.setText(f"{hr:.1f} BPM")
+        self.lbl_rr_val.setText(f"{rr:.1f} RPM")
+        self.lbl_spo2_val.setText(f"{spo2:.1f} %")
+        self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
+
+        # 2. Update Header Triase UI
+        triage_status_text = data.get("triage_status", "NON-DARURAT")
+        self.update_triage_header(triage_status_text)
+
+        # 3. Render Grafik SHAP Analysis
+        shap_features = data.get("shap_features", [])
+        shap_values = data.get("shap_values", [])
+        if len(shap_features) > 0 and len(shap_values) > 0:
+            self._render_real_shap(shap_features, shap_values)
+
+        # 4. Render Grafik Sinyal ECG 5 Detik
+        time_arr = np.array(data.get("time_125", []))
+        ecg_arr = np.array(data.get("ecg_smooth", []))
+        if len(time_arr) > 0 and len(ecg_arr) > 0:
+            sample_count = min(len(time_arr), 125 * 5)
+            t_slice = time_arr[-sample_count:]
+            ecg_slice = ecg_arr[-sample_count:]
+            t_rel = t_slice - t_slice[0]
+            
+            self.plot_ecg.clear()
+            self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
+            self.plot_ecg.setXRange(0, 5, padding=0)
+            self.plot_ecg.enableAutoRange(axis='y')
+
+        # 5. Render Grafik Sinyal PPG IR 5 Detik
+        ppg_arr = np.array(data.get("ir_clean", []))
+        if len(time_arr) > 0 and len(ppg_arr) > 0:
+            sample_count = min(len(time_arr), 125 * 5)
+            t_slice = time_arr[-sample_count:]
+            ppg_slice = ppg_arr[-sample_count:]
+            t_rel = t_slice - t_slice[0]
+            
+            self.plot_ppg.clear()
+            self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
+            self.plot_ppg.setXRange(0, 5, padding=0)
+            self.plot_ppg.enableAutoRange(axis='y')
+
+        # 6. Pengiriman Payload ke Flask API Backend
+        if self.api_client:
+            bed_id = data.get("bed", "A1")
+            vitals_dict = {
+                "hr": hr,
+                "spo2": spo2,
+                "rr": rr,
+                "temp_core": temp_core,
+                "sys": sys_bp,
+                "dia": dia_bp
+            }
+            triage_cat = self._map_status_to_color(triage_status_text)
+            xgb_score = data.get("xgboost_score", 0.85)
+
+            self.api_client.send_triage_result(
+                bed_id=bed_id,
+                gcs_score=gcs,
+                vitals=vitals_dict,
+                classification=triage_cat,
+                score=xgb_score
+            )
+
+    def _map_status_to_color(self, status_text):
+        """Konversi dari string teks UI ke standar warna backend/frontend."""
+        status_upper = str(status_text).upper()
+        if "RESUSITASI" in status_upper or status_upper == "RED":
+            return "red"
+        elif "DARURAT" in status_upper and "NON" not in status_upper or status_upper == "YELLOW":
+            return "yellow"
+        else:
+            return "green"
+
+    def _render_real_shap(self, features, shap_values):
+        """Menggambar Bar Chart SHAP secara Horizontal."""
+        self.plot_shap.clear()
+        self.plot_shap.getAxis('bottom').enableAutoSIPrefix(False)
+
+        shap_array = np.array(shap_values)
+        if len(features) == 0 or len(shap_array) == 0 or np.all(shap_array == 0):
             return
 
-        filename = f"Strip_Triase_{self.patient_data['nama']}.pdf"
-        pdf_writer = QPdfWriter(filename)
-        
-        # 1. Set Kertas ke A4
-        pdf_writer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
-        
-        # 2. Atur Margin (20mm di setiap sisi agar layout seimbang)
-        from PyQt6.QtCore import QMarginsF
-        pdf_writer.setPageMargins(QMarginsF(20.0, 20.0, 20.0, 20.0))
+        name_mapping = {
+            'temperature_c': 'Suhu',
+            'spo2': 'SpO2',
+            'respiratory_rate': 'Laju Nafas',
+            'heart_rate': 'Heart Rate',
+            'systolic_bp': 'Sistolik',
+            'diastolic_bp': 'Diastolik',
+            'gcs_total': 'Skor GCS',
+            'shock_index': 'Shock Index',
+            'map': 'MAP',
+            'pulse_pressure': 'Pulse Press',
+            'total_abnormal': 'Tot Abnormal'
+        }
 
-        painter = QPainter(pdf_writer)
-        doc = QTextDocument()
+        abs_vals = np.abs(shap_array)
+        top_k = min(7, len(features))
+        top_indices = np.argsort(abs_vals)[-top_k:] 
+        
+        top_features = [features[i] for i in top_indices]
+        top_values = [shap_array[i] for i in top_indices]
 
-        # =========================================================================
-        # SOLUSI MUTLAK: PENERAPAN SKALA RESOLUSI KANVAS A4
-        # Mengunci kerapatan piksel dokumen agar font dan tabel membesar proporsional.
-        # =========================================================================
-        dpi = pdf_writer.resolution()
-        scale_factor = dpi / 96.0  # Konversi skala dari standar layar ke DPI printer
+        labels = [name_mapping.get(f, str(f)) for f in top_features]
+        y_pos = np.arange(len(top_features))
+
+        for y, val in zip(y_pos, top_values):
+            color = '#E74C3C' if val < 0 else '#2ECC71'
+            x0 = min(0.0, float(val))
+            x1 = max(0.0, float(val))
+            
+            bar = pg.BarGraphItem(
+                x0=x0, x1=x1,
+                y=float(y),
+                height=0.45,
+                brush=pg.mkBrush(color),
+                pen=pg.mkPen(color)
+            )
+            self.plot_shap.addItem(bar)
+
+        axis_y = self.plot_shap.getAxis('left')
+        ticks = [list(zip(y_pos, labels))]
+        axis_y.setTicks(ticks)
         
-        # Ambil total lebar area cetak pixel yang tersedia dari printer
-        page_rect = pdf_writer.pageLayout().paintRectPixels(dpi)
-        
-        # Atur lebar internal dokumen HTML (dalam basis skala rasional)
-        doc.setTextWidth(page_rect.width() / scale_factor)
-        
-        # Paksa painter untuk melakukan scaling sebelum menggambar konten HTML
-        painter.scale(scale_factor, scale_factor)
-        status = self.calculation_results.get("triage_status", "").upper()
-        if status == "SEVERE":
-            bg_color = "#E74C3C"  # Merah (Resusitasi)
-        elif status == "MODERATE":
-            bg_color = "#F39C12"  # Oranye/Kuning (Darurat)
+        self.plot_shap.setYRange(-0.8, len(top_features) - 0.2)
+        self.plot_shap.enableAutoRange(axis='x')
+
+    def update_triage_header(self, status):
+        status = status.upper()
+        if "RESUSITASI" in status or status == "RED":
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
+            self.lbl_status_text.setText("RESUSITASI")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
+        elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
+            self.lbl_status_text.setText("DARURAT")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
         else:
-            bg_color = "#2ECC71"  # Hijau (Non-Darurat)
-        suhu_text = self.lbl_out_temp.text().replace("<b>Suhu Tubuh:</b> ", "")
-
-        # 3. HTML Content: Menggunakan ukuran standar px yang sekarang sudah ter-scaling otomatis
-        html_content = f"""
-        <div style='font-family: Arial, sans-serif; font-size: 14px; color: #000000; line-height: 1.6;'>
-            <h1 style='text-align: center; color: #2C3E50; margin-bottom: 5px; font-size: 26px;'>TriaGO MEDICAL REPORT</h1>
-            <hr style='border: 1px solid #34495E; margin-bottom: 20px;'>
-            <h2 style='color: #2980B9; border-bottom: 2px solid #BDC3C7; padding-bottom: 5px; font-size: 18px; margin-top: 25px;'>1. Identitas Pasien</h2>
-            <table width='100%' cellpadding='8' style='margin-bottom: 20px; font-size: 14px;'>
-                <tr>
-                    <td width='50%'><b>Nama Pasien:</b> {self.patient_data['nama']}</td>
-                    <td width='50%'><b>Umur:</b> {self.patient_data['umur']} Tahun</td>
-                </tr>
-                <tr>
-                    <td><b>Jenis Kelamin:</b> {self.patient_data['gender']}</td>
-                    <td><b>Kategori Kasus:</b> {self.patient_data['kasus']}</td>
-                </tr>
-                <tr>
-                    <td><b>Skor GCS:</b> {self.patient_data['gcs']}</td>
-                    <td><b>Rata-rata Suhu Tubuh:</b> {suhu_text}</td>
-                </tr>
-            </table>
-            
-            <h2 style='color: #2980B9; border-bottom: 2px solid #BDC3C7; padding-bottom: 5px; font-size: 18px; margin-top: 25px;'>2. Hasil Parameter Tanda Vital</h2>
-            <table width='100%' cellpadding='10' style='margin-bottom: 30px; font-size: 14px; border-collapse: collapse;'>
-                <tr style='background-color: #F8F9F9;'>
-                    <td width='40%' style='border-bottom: 1px solid #ddd;'><b>Parameter Klinis</b></td>
-                    <td width='60%' style='border-bottom: 1px solid #ddd;'><b>Nilai Hasil Ukur</b></td>
-                </tr>
-                <tr>
-                    <td style='border-bottom: 1px solid #ddd;'>Tekanan Darah</td>
-                    <td style='border-bottom: 1px solid #ddd;'>{self.calculation_results['systolic']}/{self.calculation_results['diastolic']} mmHg</td>
-                </tr>
-                <tr style='background-color: #F8F9F9;'>
-                    <td style='border-bottom: 1px solid #ddd;'>Detak Jantung (HR)</td>
-                    <td style='border-bottom: 1px solid #ddd;'>{self.calculation_results['heart_rate']} BPM</td>
-                </tr>
-                <tr>
-                    <td style='border-bottom: 1px solid #ddd;'>Saturasi Oksigen (SpO2)</td>
-                    <td style='border-bottom: 1px solid #ddd;'>{self.calculation_results['spo2']}%</td>
-                </tr>
-            </table>
-            
-            <br><br>
-            <div style='text-align: center; padding: 20px; background-color: #EAEDED; border: 1px solid #BDC3C7; border-radius: 6px; margin-top: 40px;'>
-                <span style='font-size: 16px; font-weight: bold; color: #2C3E50;'>
-                    STATUS AKHIR:<br><br>
-                    <span style='font-size: 18px; color: #FFFFFF; background-color: {bg_color}; padding: 10px 18px; border-radius: 4px;'>
-                        {self.lbl_triage_status.text()}
-                    </span>
-                </span>
-            </div>
-        </div>
-        """
-        doc.setHtml(html_content)
-        
-        # Render HTML ke kanvas printer yang sudah diskalakan
-        doc.drawContents(painter)
-        painter.end()
-        print(f"[INFO] Sukses cetak PDF format A4 proporsional ke: {filename}")
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
+            self.lbl_status_text.setText("NON-DARURAT")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
-        self.curve_ecg.clear()
-        self.curve_ppg.clear()
+        print("[LOG] Inputs cleared. Returning to home_page...")
         self.home_requested.emit()
 
+
 # =========================================================================
-# BLOK PENGETESAN MANDIRI (LOCAL TESTING BLOCK)
+# UJI MANDIRI LOCAL
 # =========================================================================
 if __name__ == "__main__":
-    # Inisialisasi aplikasi PyQt
     app = QApplication(sys.argv)
     
-    # Set style gelap agar serupa dengan main_gui utama
-    app.setStyleSheet("background-color: #121212; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;")
-    
-    # Buat instance widget output page
     test_window = OutputPage()
-    test_window.setWindowTitle("TriaGO - Output Page Test Environment")
-    test_window.resize(1024, 650)
+    test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
+    test_window.showMaximized()
     
-    # 1. Siapkan struktur data dummy registrasi pasien (Halaman 1)
-    dummy_patient_info = {
-        "nama": "Aisyah Test",
-        "umur": "24",
-        "gender": "Perempuan",
-        "kasus": "Trauma",
-        "gcs": "12"
+    fs = 125
+    t_dummy = np.linspace(0, 10, 10 * fs)
+    ecg_dummy = np.sin(2 * np.pi * 1.5 * t_dummy) + 0.2 * np.random.normal(size=len(t_dummy))
+    ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
+
+    dummy_results = {
+        "bed": "A1",
+        "patient_name": "Budi Santoso",
+        "gcs": 15,
+        "timestamp": "2026-07-25 10:55:00",
+        "temperature": 36.5,
+        "temp_skin": 34.2,
+        "temp_ambient": 27.5,
+        "hr": 110.5,
+        "rr": 16.0,
+        "spo2": 98.2,
+        "systolic": 120,
+        "diastolic": 80,
+        "time_125": t_dummy,
+        "ecg_smooth": ecg_dummy,
+        "ir_clean": ir_dummy,
+        "triage_status": "RESUSITASI",
+        "xgboost_score": 0.88,
+        "shap_features": ["gcs_total", "systolic_bp", "spo2", "heart_rate", "temperature_c"],
+        "shap_values": [0.35, -0.22, 0.18, -0.12, 0.05]
     }
+
+    test_window.update_results(dummy_results)
     
-    # 2. Siapkan struktur data dummy hasil pemrosesan model (Halaman 3)
-    # Pastikan file 'data_Test3_20260718_163310.csv' berada di folder yang sama dengan script ini
-    dummy_ml_results = {
-        "systolic": 118,
-        "diastolic": 76,
-        "heart_rate": 82,
-        "spo2": 99,
-        "triage_status": "SEVERE", # Coba ganti: "MILD", "MODERATE", atau "SEVERE"
-        "csv_path": "data_Test4_20260718_163546.csv" 
-    }
-    
-    # Hubungkan sinyal tombol home/kembali untuk melihat respon di terminal
-    test_window.home_requested.connect(lambda: print("[TEST] Tombol Selesai & Pasien Baru Diklik!"))
-    
-    # Eksekusi fungsi display untuk langsung merender data asli dari CSV
-    test_window.display_results(dummy_patient_info, dummy_ml_results)
-    
-    # Tampilkan jendela pengujian
-    test_window.show()
     sys.exit(app.exec())

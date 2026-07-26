@@ -1,89 +1,99 @@
+import matplotlib.pyplot as plt
+import numpy as np
 import serial
 import serial.tools.list_ports
 import time
 
-def find_stm32_port(fallback='COM16'):
-    for p in serial.tools.list_ports.comports():
-        # VID:PID for STM32 Virtual COM Port (0483:5740)
-        if "0483:5740" in p.hwid:
-            return p.device
-        # Alternative: look for USB Serial Device that is not Bluetooth
-        if "usb" in p.description.lower() and "bluetooth" not in p.description.lower():
-            return p.device
-    return fallback
+PORT = "COM7"  # Sesuaikan dengan port COM STM32 kamu
+BAUDRATE = 115200
 
-PORT = find_stm32_port('COM16') 
-BAUDRATE = 115200  # Sesuaikan dengan linecoding Virtual COM STM32 Anda
 
-def debug_cdc():
-    print(f"--- OPTIMIZED SNIFFER ACTIVE on {PORT} ---")
-    try:
-        # Buka port tanpa menggunakan rx_buf_size di init
-        ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-        ser.set_buffer_size(rx_size=1024*1024, tx_size=65536)
-        
-        ser.dtr = True; ser.rts = True
-        ser.reset_input_buffer()
-        ser.reset_output_buffer()
-        
-        # Trigger STM32
-        ser.write(b"START\n")
-        print("[INFO] Sent 'START' command to STM32...")
-        
-        raw_accumulator = b""
-        sample_count = 0
-        start_time = time.time()
-        
-        while True:
-            # OPTIMASI UTAMA: Berikan jeda 5ms agar buffer OS terisi penuh oleh data USB CDC
-            time.sleep(0.005) 
-            
-            bytes_to_read = ser.in_waiting
-            if bytes_to_read > 0:
-                # Baca bongkahan data besar sekaligus dari buffer
-                raw_accumulator += ser.read(bytes_to_read)
-                
-                if b'\n' in raw_accumulator:
-                    lines = raw_accumulator.split(b'\n')
-                    raw_accumulator = lines.pop() # Simpan sisa baris gantung
-                    
-                    for raw_line in lines:
-                        clean_bytes = raw_line.replace(b'\x00', b'')
-                        line = clean_bytes.decode('utf-8', errors='ignore').strip()
-                        
-                        if not line or "HEARTBEAT" in line: 
-                            continue
-                            
-                        data = line.split(',')
-                        if len(data) == 6:
-                            try:
-                                vals = list(map(float, data))
-                                sample_count += 1
-                                
-                                # Print setiap 40 sampel (sekitar 0.1 detik sekali pada 400Hz)
-                                if sample_count % 40 == 0:
-                                    elapsed = time.time() - start_time
-                                    hz = sample_count / elapsed
-                                    print(f"[{hz:.1f} Hz] Total Samples: {sample_count} | ECG: {int(vals[3])} | Obj: {vals[5]:.2f}°C | Ambient: {vals[4]:.2f}°C")
-                            except ValueError:
-                                pass
-                                
-            # Batasan uji coba 60 detik
-            if time.time() - start_time >= 60.0:
-                elapsed_actual = time.time() - start_time
-                print("\n--- 1-MINUTE TEST BENCH DONE ---")
-                print(f"Actual Elapsed Time : {elapsed_actual:.2f} s")
-                print(f"Total Samples Saved : {sample_count} samples")
-                print(f"Success Percentage  : {(sample_count / 24000) * 100:.2f}%")
-                break
-                    
-    except serial.SerialException as e:
-        print(f"[FATAL] Failed to open port: {e}")
-    except KeyboardInterrupt:
-        print("\n[INFO] Sniffer stopped by user.")
-    finally:
-        if 'ser' in locals() and ser.is_open:
-            ser.close()
+def live_ecg_plotter():
+  print(f"--- STABLE ECG PLOTTER ACTIVE on {PORT} ---")
+  try:
+    ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+    ser.set_buffer_size(rx_size=1024 * 1024, tx_size=65536)
+
+    ser.dtr = True
+    ser.rts = True
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+
+    # Siapkan jendela grafik real-time
+    plt.ion()
+    fig, ax = plt.subplots(figsize=(10, 4))
+    window_size = 300  # Jumlah titik sampel yang tampil di layar
+    xdata = list(range(window_size))
+    ydata = [0] * window_size
+    (line,) = ax.plot(xdata, ydata, color="red", linewidth=1.5)
+
+    ax.set_ylim(0, 4095)  # Rentang ADC 12-bit STM32
+    ax.set_xlim(0, window_size)
+    ax.set_title("Live ECG Signal Monitor (Optimized)")
+    ax.set_xlabel("Sampel")
+    ax.set_ylabel("Amplitudo")
+    ax.grid(True)
+
+    raw_accumulator = b""
+    sample_count = 0
+    start_time = time.time()
+    last_draw_time = time.time()
+
+    while True:
+      time.sleep(0.005)
+
+      bytes_to_read = ser.in_waiting
+      if bytes_to_read > 0:
+        raw_accumulator += ser.read(bytes_to_read)
+
+        if b"\n" in raw_accumulator:
+          lines = raw_accumulator.split(b"\n")
+          raw_accumulator = lines.pop()  # Simpan sisa baris gantung
+
+          new_data_arrived = False
+
+          for raw_line in lines:
+            clean_bytes = raw_line.replace(b"\x00", b"")
+            line_str = clean_bytes.decode("utf-8", errors="ignore").strip()
+
+            if not line_str:
+              continue
+
+            try:
+              val = float(line_str)
+              sample_count += 1
+
+              ydata.append(val)
+              ydata.pop(0)
+              new_data_arrived = True
+
+              if sample_count % 100 == 0:
+                elapsed = time.time() - start_time
+                hz = sample_count / elapsed
+                print(
+                    f"[{hz:.1f} Hz] Total Sampel: {sample_count} | ECG Value:"
+                    f" {int(val)}"
+                )
+
+            except ValueError:
+              pass
+
+          # Pengaman agar Matplotlib tidak crash saat merender gambar
+          if new_data_arrived and (time.time() - last_draw_time >= 0.03):
+            line.set_ydata(ydata)
+            fig.canvas.draw()
+            fig.canvas.flush_events()
+            last_draw_time = time.time()
+
+  except serial.SerialException as e:
+    print(f"[FATAL] Gagal membuka port: {e}")
+  except KeyboardInterrupt:
+    print("\n[INFO] Plotter dihentikan oleh pengguna.")
+  finally:
+    if "ser" in locals() and ser.is_open:
+      ser.close()
+      print("[INFO] Port serial ditutup.")
+
 
 if __name__ == "__main__":
-    debug_cdc()
+  live_ecg_plotter()
