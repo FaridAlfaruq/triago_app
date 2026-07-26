@@ -126,7 +126,7 @@ class OutputPage(QWidget):
         content_grid.addLayout(shap_cell, 0, 0)
 
         # B. KOTAK SINYAL ECG (Baris 0, Kolom 1)
-        lbl_ecg_title = QLabel("Sinyal ECG (5 Detik)")
+        lbl_ecg_title = QLabel("Sinyal ECG")
         lbl_ecg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
 
         self.box_ecg = QFrame()
@@ -137,8 +137,8 @@ class OutputPage(QWidget):
 
         self.plot_ecg = pg.PlotWidget()
         self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
-        self.plot_ecg.setLabel('bottom', 'Waktu (detik)', color='#555555')
-        self.plot_ecg.setLabel('left', 'Amplitudo (mV)', color='#555555')
+        self.plot_ecg.setLabel('bottom', 'Waktu (s)', color='#555555')
+        self.plot_ecg.setLabel('left', 'Amplitudo', color='#555555')
         ecg_layout.addWidget(self.plot_ecg)
 
         ecg_cell = QVBoxLayout()
@@ -171,7 +171,7 @@ class OutputPage(QWidget):
         content_grid.addLayout(param_cell, 1, 0)
 
         # D. KOTAK SINYAL PPG IR (Baris 1, Kolom 1)
-        lbl_ppg_title = QLabel("Sinyal PPG IR (5 Detik)")
+        lbl_ppg_title = QLabel("Sinyal PPG")
         lbl_ppg_title.setStyleSheet("font-size: 15px; font-weight: bold; color: #214889; background: transparent;")
 
         self.box_ppg = QFrame()
@@ -182,8 +182,8 @@ class OutputPage(QWidget):
 
         self.plot_ppg = pg.PlotWidget()
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
-        self.plot_ppg.setLabel('bottom', 'Waktu (detik)', color='#555555')
-        self.plot_ppg.setLabel('left', 'Amplitudo (a.u.)', color='#555555')
+        self.plot_ppg.setLabel('bottom', 'Waktu (s)', color='#555555')
+        self.plot_ppg.setLabel('left', 'Amplitudo', color='#555555')
         ppg_layout.addWidget(self.plot_ppg)
 
         ppg_cell = QVBoxLayout()
