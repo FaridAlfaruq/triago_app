@@ -146,6 +146,9 @@ class ProcessingWorker(QThread):
             resp_rate, resp_signal, resp_peaks = (
                 self.ecg_processor.calculate_respiration_rate(ecg_125, r_peaks, fs=125)
             )
+            rr_details = self.ecg_processor.last_respiration_details or {}
+            rr_quality = float(rr_details.get("quality", 0.0))
+            rr_measured = bool(resp_rate > 0)
 
             # -----------------------------------------------------------------
             # TAHAP 3: Pemrosesan Sinyal PPG 7 Tahap (50% - 75%)
@@ -299,6 +302,8 @@ class ProcessingWorker(QThread):
                 # Parameter Medis Lainnya
                 "hr": hr_val,
                 "rr": rr_val,
+                "rr_measured": rr_measured,
+                "rr_quality": rr_quality,
                 "spo2": spo2_val,
                 "systolic": sys_val,
                 "diastolic": dia_val,
