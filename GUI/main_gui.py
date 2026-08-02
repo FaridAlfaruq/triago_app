@@ -110,10 +110,22 @@ class TriaGoApplication(QMainWindow):
             raw_red = np.array([p["ppg"]["red"] for p in raw_data_list])
             raw_ir = np.array([p["ppg"]["ir"] for p in raw_data_list])
 
-            # Debug log verifikasi data suhu yang dihitung oleh plot_page.py
-            skin_temp = self.current_patient_info.get("temp_skin")
-            amb_temp = self.current_patient_info.get("temp_ambient")
-            print(f"[LOG MAIN_GUI] Data Suhu Pasien Siap -> Kulit: {skin_temp}°C | Lingkungan: {amb_temp}°C")
+            skin_temp = self.current_patient_info.get("temp_skin", 36.5)
+            amb_temp = self.current_patient_info.get("temp_ambient", 31.52)
+            
+            raw_temp_obj = np.array([
+                p.get("temp_skin", p.get("temp_obj", p.get("temperature", {}).get("object", skin_temp)))
+                for p in raw_data_list
+            ]) if raw_data_list else np.array([])
+            
+            raw_temp_amb = np.array([
+                p.get("temp_ambient", p.get("temp_amb", p.get("temperature", {}).get("ambient", amb_temp)))
+                for p in raw_data_list
+            ]) if raw_data_list else np.array([])
+
+            self.current_patient_info["raw_temp_obj"] = raw_temp_obj
+            self.current_patient_info["raw_temp_amb"] = raw_temp_amb
+            print(f"[LOG MAIN_GUI] Data Suhu Pasien Siap -> Kulit: {skin_temp}°C | Lingkungan: {amb_temp}°C (Populated {len(raw_temp_obj)} samples)")
 
             # Oper data ke LoadingPage
             self.page_loading.start_processing(
@@ -146,73 +158,82 @@ class TriaGoApplication(QMainWindow):
         self.stacked_widget.setCurrentIndex(4)
 
     def save_consolidated_csv(self, results):
-        """Menyimpan data registrasi, sinyal mentah (400 Hz), sinyal bersih (125 Hz), dan fitur ke folder data_pengukuran."""
+        """Menyimpan 2 file per pengukuran: CSV (10 kolom sinyal) dan JSON (metadata & fitur)."""
+        import json
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         bed_id = results.get("bed", "00")
         
-        # 1. Tentukan folder penyimpanan tetap
         folder_path = os.path.join(project_root, "data_pengukuran")
-        os.makedirs(folder_path, exist_ok=True)  # Otomatis buat folder jika belum ada
+        os.makedirs(folder_path, exist_ok=True)
         
-        # 2. Path file lengkap di dalam folder data_pengukuran
-        filename = os.path.join(folder_path, f"TriaGO_FullData_Bed{bed_id}_{timestamp_str}.csv")
+        base_name = f"{timestamp_str}_Bed{bed_id}"
+        csv_filename = os.path.join(folder_path, f"{base_name}.csv")
+        json_filename = os.path.join(folder_path, f"{base_name}.json")
         
         try:
-            # Ambil Sinyal Mentah (400 Hz)
+            # 1. Simpan CSV (10 Kolom)
             raw_time = results.get("raw_time", [])
-            raw_ecg = results.get("raw_ecg", [])
             raw_red = results.get("raw_red", [])
             raw_ir = results.get("raw_ir", [])
+            raw_ecg = results.get("raw_ecg", [])
             
-            # Ambil Sinyal Clean & Downsampled (125 Hz)
             time_125 = results.get("time_125", [])
-            ecg_clean = results.get("ecg_smooth", [])
+            red_clean = results.get("red_clean", [])
             ir_clean = results.get("ir_clean", [])
+            ecg_clean = results.get("ecg_smooth", [])
             
-            # Menggunakan pd.Series agar ukuran array yang berbeda (400 Hz vs 125 Hz) 
-            # dapat digabungkan tanpa menyebabkan error beda panjang array
+            temp_obj = results.get("temp_skin", results.get("temperature", 36.5))
+            temp_amb = results.get("temp_ambient", 31.52)
+            
+            n_raw = len(raw_time) if len(raw_time) > 0 else (len(time_125) if len(time_125) > 0 else 1)
+            
+            raw_temp_obj = results.get("raw_temp_obj")
+            if raw_temp_obj is None or len(raw_temp_obj) == 0:
+                raw_temp_obj = np.full(n_raw, temp_obj)
+                
+            raw_temp_amb = results.get("raw_temp_amb")
+            if raw_temp_amb is None or len(raw_temp_amb) == 0:
+                raw_temp_amb = np.full(n_raw, temp_amb)
+            
             df = pd.DataFrame({
-                # Sinyal Mentah (Sampling Rate 400 Hz)
-                "Raw_Time_s": pd.Series(raw_time),
-                "Raw_ECG": pd.Series(raw_ecg),
-                "Raw_PPG_Red": pd.Series(raw_red),
-                "Raw_PPG_IR": pd.Series(raw_ir),
-                
-                # Sinyal Filtered & Downsampled (Sampling Rate 125 Hz)
-                "Clean_Time_s": pd.Series(time_125),
-                "ECG_Clean": pd.Series(ecg_clean),
+                "Time (s)": pd.Series(raw_time),
+                "PPG_Red": pd.Series(raw_red),
+                "PPG_IR": pd.Series(raw_ir),
+                "ECG_Raw": pd.Series(raw_ecg),
+                "Resample Time (s)": pd.Series(time_125),
+                "PPG_Red_Clean": pd.Series(red_clean),
                 "PPG_IR_Clean": pd.Series(ir_clean),
-                
-                # Metadata & Input Registrasi
-                "Bed_Location": results.get("bed", "00"),
-                "GCS_Score": results.get("gcs", 15),
-                "Timestamp": results.get("timestamp", ""),
-                
-                # Parameter Hasil Ekstraksi & ML
-                "Suhu_C": results.get("temperature", 36.5),
-                "SpO2_Pct": results.get("spo2", 0.0),
-                "RR_RPM": results.get("rr", 0.0),
-                "RR_Measured": results.get("rr_measured", False),
-                "RR_Quality": results.get("rr_quality", 0.0),
-                "HR_BPM": results.get("hr", 0.0),
-                "BP_Systolic": results.get("systolic", 120),
-                "BP_Diastolic": results.get("diastolic", 80),
-                "PI_Red_Pct": results.get("pi_red", 0.0),
-                "PI_IR_Pct": results.get("pi_ir", 0.0),
-                "Triage_Status": results.get("triage_status", ""),
-                "Triage_Confidence": results.get("xgboost_score", 0.0),
-                "Triage_Model_Backend": results.get("model_backend", ""),
-                "Triage_Inference_ms": results.get("model_inference_ms"),
-                "Triage_Input_Quality": results.get("triage_input_quality", ""),
-                "Triage_Input_Warnings": "; ".join(
-                    results.get("triage_input_warnings", [])
-                ),
+                "ECG_Clean": pd.Series(ecg_clean),
+                "Suhu Obj": pd.Series(raw_temp_obj),
+                "Suhu Amb": pd.Series(raw_temp_amb)
             })
+            df.to_csv(csv_filename, index=False)
+            print(f"[LOG SUCCESS] File CSV Sinyal (10 Kolom) Berhasil Disimpan: {csv_filename}")
             
-            df.to_csv(filename, index=False)
-            print(f"[LOG SUCCESS] File CSV Konsolidasi Berhasil Disimpan di: {filename}")
+            # 2. Simpan JSON (Hasil Ekstraksi Fitur & Metadata)
+            metadata_json = {
+                "Timestamp": results.get("timestamp", timestamp_str),
+                "Bed": str(results.get("bed", bed_id)),
+                "GCS Score": int(results.get("gcs", 15)),
+                "HR": float(results.get("hr", 0.0)),
+                "RR": float(results.get("rr", 0.0)),
+                "SpO2": float(results.get("spo2", 0.0)),
+                "PI Red": float(results.get("pi_red", 0.0)),
+                "PI IR": float(results.get("pi_ir", 0.0)),
+                "SBP": float(results.get("systolic", 120)),
+                "DBP": float(results.get("diastolic", 80)),
+                "Suhu Core": float(results.get("temperature", 36.5)),
+                "Suhu Skin": float(results.get("temp_skin", temp_obj)),
+                "Suhu Amb": float(results.get("temp_ambient", temp_amb)),
+                "Triage Status": str(results.get("triage_status", "DARURAT")),
+                "Triage Confidence": float(results.get("xgboost_score", 0.0))
+            }
+            with open(json_filename, "w", encoding="utf-8") as f:
+                json.dump(metadata_json, f, indent=4)
+            print(f"[LOG SUCCESS] File JSON Metadata Berhasil Disimpan: {json_filename}")
+            
         except Exception as e:
-            print(f"[ERROR] Gagal menyimpan CSV konsolidasi: {e}")
+            print(f"[ERROR] Gagal menyimpan file pengukuran CSV/JSON: {e}")
 
     def reset_to_gatekeeper(self):
         """Reset seluruh input data pasien dan kembalikan tampilan ke Halaman Registrasi"""

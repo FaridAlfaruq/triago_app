@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import serial
 
-from akuisisi_data.get_stm32 import find_stm32_port, stream_stm32_data
+from akusisi_data.get_stm32 import find_stm32_port, stream_stm32_data
 from GUI.plot_page import STM32Worker
 
 
@@ -16,14 +16,14 @@ class SensorErrorFlowTests(unittest.TestCase):
     def test_missing_sensor_does_not_guess_hardcoded_port(self):
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("akuisisi_data.get_stm32.list_ports.comports", return_value=[]),
+            patch("akusisi_data.get_stm32.list_ports.comports", return_value=[]),
         ):
             self.assertIsNone(find_stm32_port())
 
     def test_missing_sensor_raises_actionable_error(self):
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("akuisisi_data.get_stm32.list_ports.comports", return_value=[]),
+            patch("akusisi_data.get_stm32.list_ports.comports", return_value=[]),
         ):
             stream = stream_stm32_data()
             with self.assertRaisesRegex(serial.SerialException, "Port STM32 tidak ditemukan"):
@@ -55,9 +55,9 @@ class SensorErrorFlowTests(unittest.TestCase):
                 self.is_open = False
 
         with (
-            patch("akuisisi_data.get_stm32.serial.Serial", return_value=SilentSerial()),
-            patch("akuisisi_data.get_stm32.time.sleep"),
-            patch("akuisisi_data.get_stm32.time.monotonic", side_effect=[0.0, 5.1]),
+            patch("akusisi_data.get_stm32.serial.Serial", return_value=SilentSerial()),
+            patch("akusisi_data.get_stm32.time.sleep"),
+            patch("akusisi_data.get_stm32.time.monotonic", side_effect=[0.0, 5.1]),
         ):
             stream = stream_stm32_data(port="COM42", data_timeout=5.0)
             with self.assertRaisesRegex(serial.SerialTimeoutException, "Tidak ada respons serial"):

@@ -1,0 +1,19 @@
+{
+  "target_scaler": {
+    "sbp_mean": 114.1925,
+    "sbp_std": 16.9032,
+    "dbp_mean": 76.4535,
+    "dbp_std": 9.7663
+  },
+  "fitted_on": "BPNet Train Set",
+  "units": "mmHg",
+  "feature_scales": {
+    "temperature_c": {"mean": 36.6, "std": 0.8},
+    "spo2": {"mean": 97.5, "std": 2.5},
+    "respiratory_rate": {"mean": 18.0, "std": 4.0},
+    "heart_rate": {"mean": 75.0, "std": 15.0},
+    "systolic_bp": {"mean": 114.1925, "std": 16.9032},
+    "diastolic_bp": {"mean": 76.4535, "std": 9.7663},
+    "gcs_total": {"mean": 14.8, "std": 0.8}
+  }
+}

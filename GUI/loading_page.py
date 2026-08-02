@@ -15,10 +15,9 @@ from PyQt6.QtGui import QPainter, QColor, QPainterPath, QFont, QPixmap
 # Menambahkan direktori utama (TriaGo) ke dalam sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Import modul pemrosesan ECG dan PPG dari processing_data
+# Import modul pemrosesan ECG, PPG, dan Model ONNX Triase
 from processing_data.processing_data import ECGProcessor, PPGProcessor
-from ml_xgboost.triage_xgboost import TriageModelError, TriageOnnxPredictor
-from ml_xgboost.triage_xgboost.preprocessing import TriagePreprocessingError
+from model.deployment_inference import TriageOnnxModel
 
 
 # =====================================================================
@@ -192,24 +191,15 @@ class ProcessingWorker(QThread):
 
             if self.triage_predictor is not None:
                 try:
-                    prediction = self.triage_predictor.predict(raw_data)
-                    triage_label = prediction.label
+                    label, conf, proba = self.triage_predictor.predict(raw_data)
+                    triage_label = label
                     triage_valid = True
                     triage_error = None
-                    triage_score = prediction.confidence
-                    triage_probabilities = list(prediction.probabilities)
-                    triage_features = prediction.feature_values
-                    inference_ms = prediction.inference_ms
-                    print(
-                        f"[ONNX] {prediction.label} "
-                        f"(confidence={prediction.confidence:.4f}, "
-                        f"inference={prediction.inference_ms:.3f} ms)"
-                    )
-                except (TriagePreprocessingError, TriageModelError) as exc:
-                    triage_error = str(exc)
-                    print(f"[ERROR ONNX] {triage_error}")
+                    triage_score = conf
+                    triage_probabilities = list(proba)
+                    print(f"[ONNX] {label} (confidence={conf:.4f})")
                 except Exception as exc:
-                    triage_error = f"Kesalahan tak terduga saat inferensi ONNX: {exc}"
+                    triage_error = f"Kesalahan saat inferensi ONNX: {exc}"
                     print(f"[ERROR ONNX] {triage_error}")
 
             input_quality = "measured" if not input_warnings else "fallback"
@@ -266,6 +256,8 @@ class ProcessingWorker(QThread):
                 "raw_ecg": self.raw_ecg,
                 "raw_red": self.raw_red,
                 "raw_ir": self.raw_ir,
+                "raw_temp_obj": patient.get("raw_temp_obj"),
+                "raw_temp_amb": patient.get("raw_temp_amb"),
                 "time_125": time_125,
                 "ecg_smooth": ecg_smooth,
                 "red_clean": red_clean,
@@ -363,12 +355,9 @@ class LoadingPage(QWidget):
     def _load_triage_model(self):
         """Muat dan warm-up sesi ONNX sekali selama umur aplikasi."""
         try:
-            self.triage_predictor = TriageOnnxPredictor(warm_up=True)
-            print(
-                "[SUCCESS ONNX] Model triase siap "
-                f"dalam {self.triage_predictor.load_ms:.2f} ms."
-            )
-        except TriageModelError as exc:
+            self.triage_predictor = TriageOnnxModel()
+            print("[SUCCESS ONNX] Model triase dari model/triage_xgboost_model.onnx berhasil dimuat.")
+        except Exception as exc:
             self.triage_model_error = str(exc)
             print(f"[ERROR ONNX] {self.triage_model_error}")
 
@@ -470,30 +459,7 @@ class LoadingPage(QWidget):
         # 1. Generate string timestamp saat ini (Format: TahunBulanTanggal_JamMenitDetik)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # 2. Tentukan folder penyimpanan tetap 'data_pengukuran'
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        folder_path = os.path.abspath(os.path.join(current_dir, "..", "data_pengukuran"))
-        os.makedirs(folder_path, exist_ok=True)  # Membuat folder otomatis jika belum ada
-
-        # 3. Buat path nama file lengkap di dalam folder data_pengukuran
-        filename = os.path.join(folder_path, f"ekstraksi_data_{timestamp}.csv")
-
-        # 4. Menyusun data parameter vital sign
-        summary_data = {
-            "HR_ECG_BPM": [results['hr']],
-            "RR_RPM": [results['rr']],
-            "SpO2_Percent": [results['spo2']],
-            "PI_Red_Percent": [results['pi_red']],
-            "PI_IR_Percent": [results['pi_ir']],
-            "HR_PPG_BPM": [results['ppg_hr']]
-        }
-        df_summary = pd.DataFrame(summary_data)
-        
-        # 5. Menyimpan file ke folder data_pengukuran
-        df_summary.to_csv(filename, index=False)
-        print(f"[LOG] Data ringkasan berhasil disimpan ke: {filename}")
-
-        # 6. Alirkan hasil ke Window Utama
+        # Alirkan hasil ke Window Utama untuk penyimpanan 2 file (CSV & JSON) dan pengalihan halaman
         if hasattr(self, "parent_main_win"):
             self.parent_main_win.processed_results = results
             self.parent_main_win.handle_output_phase(results)
