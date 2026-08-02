@@ -35,8 +35,8 @@ class OutputPage(QWidget):
         self.calculation_results = {}
         self.iot_json_payload = ""
         
-        # Inisialisasi API Client (Menghubungkan ke IP Server Laptop B)
-        self.api_client = TriageApiClient(base_url="http://10.85.145.98:5000") if TriageApiClient else None
+        # Inisialisasi API Client (Otomatis terhubung ke Azure Cloud Server)
+        self.api_client = TriageApiClient() if TriageApiClient else None
         
         self.setup_ui()
 
