@@ -78,7 +78,21 @@ def update_triage():
     assigned_bed_id = bed_manager.assign_patient_to_bed(data)
 
     if not assigned_bed_id:
-        return jsonify({"status": "error", "message": "Gagal mengalokasikan bed"}), 500
+        # Semua bed di semua zona penuh. JANGAN buang data pasien --
+        # tetap simpan ke MySQL (ditandai bed_id "WAITING") supaya
+        # data pengukuran tidak hilang, lalu beri tahu operator.
+        print(f"[SERVER LOG][WARN] Semua bed penuh untuk kategori '{data.get('triage_category')}'. "
+              f"Data disimpan sebagai antrian, tidak ditempatkan di bed manapun.")
+
+        db_payload = {**data, "bed_id": "WAITING", "zone": "-"}
+        saved_to_db = save_patient(db_payload)
+
+        return jsonify({
+            "status": "warning",
+            "message": "Semua bed penuh — pasien masuk daftar tunggu, data tetap dicatat.",
+            "assigned_bed": None,
+            "saved_to_database": saved_to_db,
+        }), 200
 
     updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
 
@@ -113,6 +127,16 @@ def update_triage():
 def get_all_beds():
     """Mengembalikan status seluruh bed (Zona A, B, C) untuk inisialisasi web."""
     return jsonify(bed_manager.get_all_beds_status())
+
+
+@app.route("/api/beds/reset", methods=["POST"])
+def reset_all_beds():
+    """Kosongkan SEMUA bed sekaligus. Endpoint khusus untuk testing/development
+    supaya tidak perlu discharge satu-satu atau restart Flask berulang kali."""
+    updated_beds = bed_manager.reset_all_beds()
+    socketio.emit("beds_reset", updated_beds)
+    print("[SERVER LOG] Semua bed telah direset ke status kosong.")
+    return jsonify({"status": "success", "data": updated_beds}), 200
 
 
 @app.route("/api/beds/<bed_id>/discharge", methods=["POST"])

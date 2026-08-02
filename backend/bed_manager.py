@@ -37,9 +37,18 @@ class BedManager:
             "arrival_timestamp": None,
         }
 
+    # Urutan zona yang dicoba per kategori triase.
+    # Prioritas utama tetap zona sesuai kategori, tapi kalau penuh,
+    # cascading ke zona lain daripada menolak pasien sama sekali.
+    _ZONE_FALLBACK = {
+        "red":    ["A", "B", "C"],
+        "yellow": ["B", "A", "C"],
+        "green":  ["C", "B", "A"],
+    }
+
     def assign_patient_to_bed(self, data: dict):
         category = data.get("triage_category")
-        target_zone = "A" if category == "red" else ("B" if category == "yellow" else "C")
+        zone_order = self._ZONE_FALLBACK.get(category, ["C", "B", "A"])
 
         with self._lock:
             assigned_bed_id = data.get("bed_id")
@@ -48,13 +57,16 @@ class BedManager:
                 or assigned_bed_id not in self.beds
                 or self.beds[assigned_bed_id]["status"] != "empty"
             ):
-                assigned_bed_id = self._find_available_bed(target_zone)
+                assigned_bed_id = None
+                for zone in zone_order:
+                    assigned_bed_id = self._find_available_bed(zone)
+                    if assigned_bed_id:
+                        break
 
             if assigned_bed_id:
                 self.beds[assigned_bed_id].update({
                     "status": category,
                     "gcs_score": data.get("gcs_score", 15),
-                    # FIX: sebelumnya di-hardcode None sehingga nama pasien hilang
                     "patient_name": data.get("patient_name"),
                     "relative_name": data.get("relative_name"),
                     "xgboost_score": data.get("xgboost_score"),
@@ -79,6 +91,12 @@ class BedManager:
             target_minutes = self.beds[bed_id]["target_minutes"]
             self.beds[bed_id] = self._create_empty_bed(bed_id, zone, target_minutes)
         return True
+
+    def reset_all_beds(self):
+        """Kosongkan SEMUA bed sekaligus. Berguna untuk testing tanpa perlu restart Flask."""
+        with self._lock:
+            self._init_beds()
+        return self.beds
 
     def get_all_beds_status(self):
         return self.beds
