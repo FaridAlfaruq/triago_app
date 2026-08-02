@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "status": "research_only",
+  "artifact": {
+    "path": "models/triage_xgboost_model.onnx",
+    "format": "onnx",
+    "size_bytes": 2725086,
+    "sha256": "f1ce36a410a06c7f5564173e59924bf50605eb482667040519d5322d00f849e9",
+    "producer": "OnnxMLTools 1.16.0",
+    "opset": {
+      "domain": "ai.onnx.ml",
+      "version": 1
+    }
+  },
+  "input": {
+    "name": "float_input",
+    "dtype": "float32",
+    "shape": [
+      "batch",
+      17
+    ]
+  },
+  "outputs": [
+    {
+      "name": "label",
+      "dtype": "int64",
+      "shape": [
+        "batch"
+      ]
+    },
+    {
+      "name": "probabilities",
+      "dtype": "float32",
+      "shape": [
+        "batch",
+        3
+      ]
+    }
+  ],
+  "class_mapping": {
+    "0": "resuscitation",
+    "1": "urgent",
+    "2": "non_urgent"
+  },
+  "esi_to_class": {
+    "1": 0,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 2
+  },
+  "raw_features": [
+    {
+      "name": "temperature_c",
+      "clip": [
+        30.0,
+        43.0
+      ]
+    },
+    {
+      "name": "spo2",
+      "clip": [
+        50.0,
+        100.0
+      ]
+    },
+    {
+      "name": "respiratory_rate",
+      "clip": [
+        4.0,
+        60.0
+      ]
+    },
+    {
+      "name": "heart_rate",
+      "clip": [
+        20.0,
+        230.0
+      ]
+    },
+    {
+      "name": "systolic_bp",
+      "clip": [
+        40.0,
+        260.0
+      ]
+    },
+    {
+      "name": "diastolic_bp",
+      "clip": [
+        20.0,
+        160.0
+      ]
+    },
+    {
+      "name": "gcs_total",
+      "clip": [
+        3.0,
+        15.0
+      ]
+    }
+  ],
+  "feature_order": [
+    "temperature_c",
+    "spo2",
+    "respiratory_rate",
+    "heart_rate",
+    "systolic_bp",
+    "diastolic_bp",
+    "gcs_total",
+    "shock_index",
+    "mean_arterial_pressure",
+    "pulse_pressure",
+    "modified_shock_index",
+    "temp_deviation",
+    "oxygen_deficit",
+    "gcs_deficit",
+    "cardiopulmonary_stress",
+    "neuro_hemodynamic_index",
+    "news_vital_score"
+  ],
+  "imputation": {
+    "strategy": "training_median",
+    "values": null,
+    "blocking_for_missing_inputs": true,
+    "note": "Median data latih belum disertakan dalam artefak sumber."
+  },
+  "evaluation": {
+    "holdout_samples": 16000,
+    "baseline_accuracy": 0.8766,
+    "baseline_f1_macro": 0.8851,
+    "exported_model_accuracy": 0.8743,
+    "exported_model_f1_macro": 0.8745
+  }
+}
