@@ -10,11 +10,15 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
 
-# Impor API Client dari folder services
+# Impor API Client dari folder service
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 try:
     from service.api_client import TriageApiClient
 except ImportError:
-    # Fallback jika struktur direktori berbeda saat run independen
     TriageApiClient = None
 
 # Konfigurasi Global Tema PyQtGraph
@@ -31,8 +35,8 @@ class OutputPage(QWidget):
         self.calculation_results = {}
         self.iot_json_payload = ""
         
-        # Inisialisasi API Client
-        self.api_client = TriageApiClient() if TriageApiClient else None
+        # Inisialisasi API Client (Menghubungkan ke IP Server Laptop B)
+        self.api_client = TriageApiClient(base_url="http://10.85.145.98:5000") if TriageApiClient else None
         
         self.setup_ui()
 
@@ -445,7 +449,7 @@ if __name__ == "__main__":
         "time_125": t_dummy,
         "ecg_smooth": ecg_dummy,
         "ir_clean": ir_dummy,
-        "triage_status": "RESUSITASI",
+        "triage_status": "DARURAT",
         "xgboost_score": 0.88,
         "shap_features": ["gcs_total", "systolic_bp", "spo2", "heart_rate", "temperature_c"],
         "shap_values": [0.35, -0.22, 0.18, -0.12, 0.05]
