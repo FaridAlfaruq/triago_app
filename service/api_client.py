@@ -33,7 +33,12 @@ class TriageApiClient:
         try:
             response = requests.post(self.endpoint_update, json=payload, timeout=self.timeout)
             if response.status_code == 200:
-                print(f"[API SUCCESS] Data Bed {bed_id} berhasil dikirim ke Dashboard Web.")
+                resp_data = response.json() if response.content else {}
+                saved_db = resp_data.get("saved_to_database", False)
+                if saved_db:
+                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Backend & BERHASIL disimpan ke Database (phpMyAdmin).")
+                else:
+                    print(f"[API WARNING] Data Bed {bed_id} berhasil dikirim ke Web Dashboard, tetapi GAGAL disimpan ke Database MySQL.")
                 return True
             else:
                 print(f"[API ERROR] Server menolak data: Status {response.status_code}")
