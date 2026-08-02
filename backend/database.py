@@ -78,17 +78,17 @@ def save_patient(data: dict) -> bool:
     )
     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
-
     vitals = data.get("vitals", {})
+    if not isinstance(vitals, dict):
+        vitals = {}
 
-    # -----------------------------------------------------------------
-    # PENTING: key di sini HARUS sama persis dengan key yang dikirim
-    # GUI/hardware di dalam payload "vitals". Berdasarkan dashboard.js
-    # (yang sudah terbukti menampilkan data dengan benar), key aslinya
-    # adalah: hr, spo2, temp_core, rr, sys, dia — BUKAN heart_rate,
-    # temperature, respiration_rate. Ini penyebab data sebelumnya
-    # kosong di MySQL walau muncul lengkap di dashboard.
-    # -----------------------------------------------------------------
+    def _get_vital(keys, default=None):
+        for k in keys:
+            val = vitals.get(k)
+            if val is not None:
+                return val
+        return default
+
     values = (
         data.get("bed_id"),
         data.get("zone"),
@@ -97,12 +97,12 @@ def save_patient(data: dict) -> bool:
         data.get("relative_name"),
         data.get("gcs_score"),
         data.get("xgboost_score"),
-        vitals.get("hr"),          # heart_rate
-        vitals.get("spo2"),        # spo2
-        vitals.get("temp_core"),   # temperature
-        vitals.get("rr"),          # respiration_rate
-        vitals.get("sys"),         # systolic_bp
-        vitals.get("dia"),         # diastolic_bp
+        _get_vital(["hr", "heart_rate"]),
+        _get_vital(["spo2"]),
+        _get_vital(["temp_core", "temperature", "temp", "temp_skin"]),
+        _get_vital(["rr", "respiration_rate"]),
+        _get_vital(["sys", "systolic_bp", "systolic"]),
+        _get_vital(["dia", "diastolic_bp", "diastolic"]),
         data.get("arrival_timestamp", int(time.time() * 1000)),
     )
 

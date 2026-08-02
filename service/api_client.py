@@ -41,7 +41,8 @@ class TriageApiClient:
                     print(f"[API WARNING] Data Bed {bed_id} berhasil dikirim ke Web Dashboard, tetapi GAGAL disimpan ke Database MySQL.")
                 return True
             else:
-                print(f"[API ERROR] Server menolak data: Status {response.status_code}")
+                err_msg = response.text if response.text else f"Status {response.status_code}"
+                print(f"[API ERROR] Server menolak data (Status {response.status_code}): {err_msg}")
                 return False
         except requests.exceptions.RequestException as e:
             print(f"[API WARNING] Gagal terhubung ke Flask Server ({self.base_url}): {e}")
