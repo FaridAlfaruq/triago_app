@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGD Command Center</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>IGD command center</h1>
+    <p>Bed management &amp; patient status</p>
+  </div>
+  <div class="live-clock">
+    <div class="clock-time mono" id="clock">--.--.--</div>
+    <div class="clock-date" id="clockDate">-</div>
+    <div class="clock-facility">IGD Rumah Sakit A</div>
+  </div>
+</header>
+
+<div class="stats-row">
+  <div class="stat-col">
+    <div class="pill-badge pill-red">Resusitasi</div>
+    <div class="stat-card stat-red"><div class="n" id="countRed">0</div><div class="l">Pasien</div></div>
+  </div>
+  <div class="stat-col">
+    <div class="pill-badge pill-yellow">Urgent</div>
+    <div class="stat-card stat-yellow"><div class="n" id="countYellow">0</div><div class="l">Pasien</div></div>
+  </div>
+  <div class="stat-col">
+    <div class="pill-badge pill-green">Non-urgent</div>
+    <div class="stat-card stat-green"><div class="n" id="countGreen">0</div><div class="l">Pasien</div></div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- ============ KIRI: BED LAYOUT PER ZONA ============ -->
+  <div class="panel wrapper">
+    <div class="panel-title">
+      <span>Bed layout</span>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-box empty"></span>Kosong</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--red)"></span>Resusitasi</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--yellow)"></span>Urgent</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--green)"></span>Non-urgent</div>
+      </div>
+    </div>
+
+    <div class="zone-block">
+      <div class="zone-label">Zona A — Resusitasi</div>
+      <div class="bed-grid" id="zoneA"></div>
+    </div>
+
+    <div class="zone-block">
+      <div class="zone-label">Zona B — Darurat</div>
+      <div class="bed-grid" id="zoneB"></div>
+    </div>
+
+    <div class="zone-block">
+      <div class="zone-label">Zona C — Non-Darurat</div>
+      <div class="bed-grid" id="zoneC"></div>
+    </div>
+  </div>
+
+  <!-- ============ KANAN: DETAIL BED + KAPASITAS + LOGO ============ -->
+  <div>
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-title"><span id="panelBedTitle">DETAIL BED</span></div>
+      <div id="bedDetailContent">
+        <p style="color:var(--text-muted); font-size:12px;">Klik salah satu bed di sebelah kiri untuk melihat detail.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><span>Kapasitas IGD</span></div>
+      <div class="cap-row"><span>Bed terisi</span><span class="mono" id="occupied">0 / 0</span></div>
+      <div class="cap-row"><span>Bed tersedia</span><span class="mono" id="available">0 bed</span></div>
+    </div>
+
+    <div class="logo-block">
+      <img src="images/logo triago.png" alt="Triago Logo" class="logo-img">
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: LENGKAPI DATA PASIEN ============ -->
+<div class="modal-overlay fullscreen" id="patientFormModal">
+  <div class="modal">
+    <h3>Lengkapi Data Pasien — Bed <span id="formBedId">—</span></h3>
+
+    <label class="form-label" for="inputPatientName">Nama Pasien</label>
+    <input type="text" id="inputPatientName" class="form-input" placeholder="Nama pasien">
+
+    <label class="form-label" for="inputRelativeName">Nama Penanggung Jawab</label>
+    <input type="text" id="inputRelativeName" class="form-input" placeholder="Nama keluarga / penanggung jawab">
+
+    <button class="modal-close" onclick="savePatientData()">Simpan</button>
+    <button class="modal-discharge" onclick="closeFormModal()">Batal</button>
+  </div>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
