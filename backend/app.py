@@ -15,7 +15,7 @@ except ImportError:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEBSITE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "website"))
 SERVER_HOST = os.environ.get("TRIAGO_HOST", "0.0.0.0")
-SERVER_PORT = int(os.environ.get("TRIAGO_PORT", "5000"))
+SERVER_PORT = int(os.environ.get("PORT", os.environ.get("TRIAGO_PORT", "5000")))
 DEBUG_MODE = os.environ.get("TRIAGO_DEBUG", "0").lower() in {"1", "true", "yes"}
 CORS_ORIGINS = os.environ.get("TRIAGO_CORS_ORIGINS", "*")
 
