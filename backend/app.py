@@ -1,13 +1,17 @@
+import sys
 import os
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 try:
-    from .bed_manager import BedManager
-    from .database import save_patient, get_patient_history, update_patient_info
-except ImportError:
-    # Tetap mendukung eksekusi langsung: python backend/app.py
+    from backend.bed_manager import BedManager
+    from backend.database import save_patient, get_patient_history, update_patient_info
+except (ImportError, ModuleNotFoundError):
     from bed_manager import BedManager
     from database import save_patient, get_patient_history, update_patient_info
 

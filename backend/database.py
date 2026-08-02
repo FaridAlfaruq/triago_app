@@ -1,7 +1,14 @@
 import os
 import time
-import mysql.connector
-from mysql.connector import Error
+import sqlite3
+
+try:
+    import mysql.connector
+    from mysql.connector import Error
+    HAS_MYSQL = True
+except ImportError:
+    HAS_MYSQL = False
+    Error = Exception
 
 # =========================================================================
 # KONFIGURASI (ambil dari environment variable, jangan hardcode password)
@@ -15,14 +22,23 @@ _db = None
 
 
 def _connect():
-    """Membuat koneksi baru ke MySQL."""
+    """Membuat koneksi ke MySQL atau SQLite fallback."""
     global _db
-    _db = mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-    )
+    if HAS_MYSQL:
+        try:
+            _db = mysql.connector.connect(
+                host=DB_HOST,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                database=DB_NAME,
+            )
+            return
+        except Exception:
+            pass
+
+    # Fallback to local SQLite database in backend directory
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "triage.db")
+    _db = sqlite3.connect(db_path, check_same_thread=False)
     print(f"[DATABASE] Berhasil terkoneksi ke MySQL ({DB_HOST}/{DB_NAME})")
 
 
