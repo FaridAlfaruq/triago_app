@@ -2,103 +2,103 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>IGD Command Center — Mockup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGD Command Center</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 
 <header>
   <div class="title-block">
     <h1>IGD command center</h1>
-    <p>Auto bed management &amp; patient status — RSUD demo</p>
+    <p>Bed management &amp; patient status</p>
   </div>
   <div class="live-clock">
-    <div class="live-dot"></div>
-    <div>
-      <div class="clock-time mono" id="clock">--:--:--</div>
-      <div class="clock-date" id="clockDate">-</div>
-    </div>
+    <div class="clock-time mono" id="clock">--.--.--</div>
+    <div class="clock-date" id="clockDate">-</div>
+    <div class="clock-facility">IGD Rumah Sakit A</div>
   </div>
 </header>
 
-<div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
-  <div class="stat-card stat-red"><div class="n" id="countRed">0</div><div class="l">Resusitasi</div></div>
-  <div class="stat-card stat-yellow"><div class="n" id="countYellow">0</div><div class="l">Darurat</div></div>
-  <div class="stat-card stat-green"><div class="n" id="countGreen">0</div><div class="l">Non-darurat</div></div>
+<div class="stats-row">
+  <div class="stat-col">
+    <div class="pill-badge pill-red">Resusitasi</div>
+    <div class="stat-card stat-red"><div class="n" id="countRed">0</div><div class="l">Pasien</div></div>
+  </div>
+  <div class="stat-col">
+    <div class="pill-badge pill-yellow">Urgent</div>
+    <div class="stat-card stat-yellow"><div class="n" id="countYellow">0</div><div class="l">Pasien</div></div>
+  </div>
+  <div class="stat-col">
+    <div class="pill-badge pill-green">Non-urgent</div>
+    <div class="stat-card stat-green"><div class="n" id="countGreen">0</div><div class="l">Pasien</div></div>
+  </div>
 </div>
 
 <div class="layout">
-  <!-- LAYOUT KIRI: GRID ZONA BED -->
+  <!-- ============ KIRI: BED LAYOUT PER ZONA ============ -->
   <div class="panel wrapper">
     <div class="panel-title">
-      <span>Layout bed — realtime</span>
+      <span>Bed layout</span>
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--empty);border:1px solid var(--border-strong)"></div>Kosong</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Merah</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Kuning</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Hijau</div>
+        <div class="legend-item"><span class="legend-box empty"></span>Kosong</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--red)"></span>Resusitasi</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--yellow)"></span>Urgent</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--green)"></span>Non-urgent</div>
       </div>
     </div>
 
-    <!-- ZONA A (5 Bed Kritis) -->
-    <div class="zone">
-      <div class="zone-label"><span>Zona resusitasi</span><span class="zone-target">Target: segera (0 mnt)</span></div>
+    <div class="zone-block">
+      <div class="zone-label">Zona A — Resusitasi</div>
       <div class="bed-grid" id="zoneA"></div>
     </div>
 
-    <!-- ZONA B (4 Bed Darurat) -->
-    <div class="zone">
-      <div class="zone-label"><span>Zona darurat</span><span class="zone-target">Target: &le;10 mnt</span></div>
+    <div class="zone-block">
+      <div class="zone-label">Zona B — Darurat</div>
       <div class="bed-grid" id="zoneB"></div>
     </div>
 
-    <!-- ZONA C (3 Bed Non-Darurat) -->
-    <div class="zone">
-      <div class="zone-label"><span>Zona non-darurat</span><span class="zone-target">Target: &le;60 mnt</span></div>
+    <div class="zone-block">
+      <div class="zone-label">Zona C — Non-Darurat</div>
       <div class="bed-grid" id="zoneC"></div>
     </div>
   </div>
 
-  <!-- LAYOUT KANAN: AMBULANS & DETAIL BED INTERAKTIF -->
+  <!-- ============ KANAN: DETAIL BED + KAPASITAS + LOGO ============ -->
   <div>
     <div class="panel" style="margin-bottom:18px;">
-      <div class="panel-title"><span>Ambulans incoming</span><span class="mono" id="ambCount">0 unit</span></div>
-      <div id="ambList"></div>
+      <div class="panel-title"><span id="panelBedTitle">DETAIL BED</span></div>
+      <div id="bedDetailContent">
+        <p style="color:var(--text-muted); font-size:12px;">Klik salah satu bed di sebelah kiri untuk melihat detail.</p>
+      </div>
     </div>
 
-    <!-- PANEL SISI KANAN: MENGGANTIKAN RINGKASAN KAPASITAS -->
-    <div class="panel" id="sideBedPanel">
-      <div class="panel-title"><span id="panelBedTitle">DETAIL BED — Pilih Bed</span></div>
-      
-      <div id="bedDetailContent">
-        <p style="color: var(--text-secondary); font-size: 12px;">Klik salah satu kotak bed pada layout untuk melihat hasil pemeriksaan dan tanda vital pasien.</p>
-      </div>
+    <div class="panel">
+      <div class="panel-title"><span>Kapasitas IGD</span></div>
+      <div class="cap-row"><span>Bed terisi</span><span class="mono" id="occupied">0 / 0</span></div>
+      <div class="cap-row"><span>Bed tersedia</span><span class="mono" id="available">0 bed</span></div>
+    </div>
+
+    <div class="logo-block">
+      <img src="images/logo triago.png" alt="Triago Logo" class="logo-img">
     </div>
   </div>
 </div>
 
-<!-- MODAL POPUP FORMULIR REGISTRASI PASIEN -->
-<div class="modal-overlay" id="patientFormModal">
-  <div class="modal" style="width: 320px;">
-    <h3>Formulir Data Pasien</h3>
-    <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">Input data identitas kerabat/pasien untuk Bed <span id="formBedId">-</span></p>
-    
-    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-      <label>Nama Pasien:</label>
-      <input type="text" id="inputPatientName" placeholder="Contoh: Ahmad Subagjo" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-page); color: white;">
-      
-      <label>Usia / NIK:</label>
-      <input type="text" id="inputPatientAge" placeholder="Contoh: 45 Tahun / 3578..." style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-page); color: white;">
+<!-- ============ MODAL: LENGKAPI DATA PASIEN ============ -->
+<div class="modal-overlay fullscreen" id="patientFormModal">
+  <div class="modal">
+    <h3>Lengkapi Data Pasien — Bed <span id="formBedId">—</span></h3>
 
-      <label>Nama Penanggung Jawab (Kerabat):</label>
-      <input type="text" id="inputRelativeName" placeholder="Contoh: Siti (Istri)" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-page); color: white;">
-    </div>
+    <label class="form-label" for="inputPatientName">Nama Pasien</label>
+    <input type="text" id="inputPatientName" class="form-input" placeholder="Nama pasien">
 
-    <div style="display: flex; gap: 8px; margin-top: 15px;">
-      <button class="modal-close" style="background: var(--green); color: white; border: none;" onclick="savePatientData()">Simpan Data</button>
-      <button class="modal-close" onclick="closeFormModal()">Batal</button>
-    </div>
+    <label class="form-label" for="inputRelativeName">Nama Penanggung Jawab</label>
+    <input type="text" id="inputRelativeName" class="form-input" placeholder="Nama keluarga / penanggung jawab">
+
+    <button class="modal-close" onclick="savePatientData()">Simpan</button>
+    <button class="modal-discharge" onclick="closeFormModal()">Batal</button>
   </div>
 </div>
 

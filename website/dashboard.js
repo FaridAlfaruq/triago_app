@@ -101,10 +101,24 @@ function displayBedDetail(bedId) {
     <div class="modal-row" style="border-color:var(--border)"><span>Nama Pasien</span><span class="mono">${bedInfo.patient_name || '<i>Belum Diisi</i>'}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Penanggung Jawab</span><span class="mono">${bedInfo.relative_name || '<i>Belum Diisi</i>'}</span></div>
 
-    <button onclick="openFormModal('${bedId}')" style="width:100%; margin-top:15px; padding:8px; background:var(--accent); color:#000; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
+    <button onclick="openFormModal('${bedId}')" style="width:100%; margin-top:15px; padding:8px; background:var(--accent); color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
       + Lengkapi Data Pasien
     </button>
+    <button onclick="dischargeBed('${bedId}')" style="width:100%; margin-top:8px; padding:8px; background:var(--red); color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
+      Kosongkan Bed
+    </button>
   `;
+}
+
+async function dischargeBed(bedId) {
+  try {
+    const res = await fetch(`/api/beds/${bedId}/discharge`, { method: 'POST' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    // Panel detail otomatis terupdate lewat event 'bed_updated' dari socket.
+  } catch (error) {
+    console.error('[ERROR] Gagal mengosongkan bed:', error);
+    alert('Gagal mengosongkan bed. Coba lagi.');
+  }
 }
 
 // MODAL REGISTRASI PASIEN
@@ -119,15 +133,26 @@ function closeFormModal() {
   document.getElementById('patientFormModal').classList.remove('show');
 }
 
-function savePatientData() {
+async function savePatientData() {
   const bedId = document.getElementById('formBedId').textContent;
-  const patientName = document.getElementById('inputPatientName').value;
-  const relativeName = document.getElementById('inputRelativeName').value;
+  const patientName = document.getElementById('inputPatientName').value.trim();
+  const relativeName = document.getElementById('inputRelativeName').value.trim();
 
-  if (bedsData[bedId]) {
-    bedsData[bedId].patient_name = patientName || 'Pasien Tanpa Nama';
-    bedsData[bedId].relative_name = relativeName || '—';
-    displayBedDetail(bedId);
+  try {
+    const res = await fetch(`/api/beds/${bedId}/patient`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patient_name: patientName || 'Pasien Tanpa Nama',
+        relative_name: relativeName || '—'
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    // Tidak perlu update manual di sini — event 'bed_updated' dari socket
+    // akan datang dan otomatis merefresh grid + panel detail.
+  } catch (error) {
+    console.error('[ERROR] Gagal menyimpan data pasien ke backend:', error);
+    alert('Gagal menyimpan data pasien. Coba lagi.');
   }
   closeFormModal();
 }
@@ -135,6 +160,12 @@ function savePatientData() {
 if (socket) {
   socket.on('bed_updated', (updatedBed) => {
     bedsData[updatedBed.bed_id] = updatedBed;
+    renderAllZones();
+    tickCountdowns();
+  });
+
+  socket.on('beds_reset', (allBeds) => {
+    bedsData = allBeds;
     renderAllZones();
     tickCountdowns();
   });
@@ -166,10 +197,15 @@ function tickCountdowns() {
 function updateStats() {
   const beds = document.querySelectorAll('.bed');
   const counts = { red: 0, yellow: 0, green: 0 };
-  beds.forEach(b => { if (b.dataset.cat) counts[b.dataset.cat]++; });
+  let occupied = 0;
+  beds.forEach(b => {
+    if (b.dataset.cat) { counts[b.dataset.cat]++; occupied++; }
+  });
   document.getElementById('countRed').textContent = counts.red;
   document.getElementById('countYellow').textContent = counts.yellow;
   document.getElementById('countGreen').textContent = counts.green;
+  document.getElementById('occupied').textContent = occupied + ' / ' + beds.length;
+  document.getElementById('available').textContent = (beds.length - occupied) + ' bed';
 }
 
 function tickClock() {
