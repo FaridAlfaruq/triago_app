@@ -72,13 +72,23 @@ def save_patient(data: dict) -> bool:
         spo2,
         temperature,
         respiration_rate,
+        systolic_bp,
+        diastolic_bp,
         arrival_timestamp
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     vitals = data.get("vitals", {})
 
+    # -----------------------------------------------------------------
+    # PENTING: key di sini HARUS sama persis dengan key yang dikirim
+    # GUI/hardware di dalam payload "vitals". Berdasarkan dashboard.js
+    # (yang sudah terbukti menampilkan data dengan benar), key aslinya
+    # adalah: hr, spo2, temp_core, rr, sys, dia — BUKAN heart_rate,
+    # temperature, respiration_rate. Ini penyebab data sebelumnya
+    # kosong di MySQL walau muncul lengkap di dashboard.
+    # -----------------------------------------------------------------
     values = (
         data.get("bed_id"),
         data.get("zone"),
@@ -87,10 +97,12 @@ def save_patient(data: dict) -> bool:
         data.get("relative_name"),
         data.get("gcs_score"),
         data.get("xgboost_score"),
-        vitals.get("heart_rate"),
-        vitals.get("spo2"),
-        vitals.get("temperature"),
-        vitals.get("respiration_rate"),
+        vitals.get("hr"),          # heart_rate
+        vitals.get("spo2"),        # spo2
+        vitals.get("temp_core"),   # temperature
+        vitals.get("rr"),          # respiration_rate
+        vitals.get("sys"),         # systolic_bp
+        vitals.get("dia"),         # diastolic_bp
         data.get("arrival_timestamp", int(time.time() * 1000)),
     )
 
