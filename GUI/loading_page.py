@@ -3,7 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
-import shap
 from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QFrame, QApplication, QGraphicsOpacityEffect
