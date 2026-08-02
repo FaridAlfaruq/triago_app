@@ -139,22 +139,30 @@ async function savePatientData() {
   const relativeName = document.getElementById('inputRelativeName').value.trim();
 
   try {
-    const res = await fetch(`/api/beds/${bedId}/patient`, {
-      method: 'PATCH',
+    const response = await fetch(`/api/beds/${bedId}/patient`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        patient_name: patientName || 'Pasien Tanpa Nama',
-        relative_name: relativeName || '—'
+        patient_name: patientName,
+        relative_name: relativeName
       })
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    // Tidak perlu update manual di sini — event 'bed_updated' dari socket
-    // akan datang dan otomatis merefresh grid + panel detail.
-  } catch (error) {
-    console.error('[ERROR] Gagal menyimpan data pasien ke backend:', error);
-    alert('Gagal menyimpan data pasien. Coba lagi.');
+
+    const result = await response.json();
+    if (response.ok && result.status === 'success') {
+      if (bedsData[bedId]) {
+        bedsData[bedId].patient_name = patientName || 'Pasien Tanpa Nama';
+        bedsData[bedId].relative_name = relativeName || '—';
+        displayBedDetail(bedId);
+      }
+      closeFormModal();
+    } else {
+      alert('Gagal menyimpan data pasien: ' + (result.message || 'Error tidak diketahui'));
+    }
+  } catch (err) {
+    console.error('[ERROR] Gagal menyimpan data pasien ke server:', err);
+    alert('Gagal menyimpan data pasien. Pastikan koneksi server backend terhubung!');
   }
-  closeFormModal();
 }
 
 if (socket) {
