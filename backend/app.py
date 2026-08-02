@@ -65,59 +65,61 @@ def update_triage():
     Menerima JSON payload parameter vital sign & hasil klasifikasi,
     lalu (1) mengalokasikan bed, (2) menyimpan ke MySQL, (3) broadcast ke dashboard.
     """
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
 
-    print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:", flush=True)
-    print(f" -> Bed ID Target : {data.get('bed_id')}", flush=True)
-    print(f" -> Kategori Triase: {data.get('triage_category')}", flush=True)
-    print(f" -> Pasien         : {data.get('patient_name')}", flush=True)
+        print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:", flush=True)
+        print(f" -> Bed ID Target : {data.get('bed_id')}", flush=True)
+        print(f" -> Kategori Triase: {data.get('triage_category')}", flush=True)
+        print(f" -> Pasien         : {data.get('patient_name')}", flush=True)
 
-    # 1. Masukkan/Update status pasien pada BedManager (in-memory, untuk dashboard real-time)
-    assigned_bed_id = bed_manager.assign_patient_to_bed(data)
+        # 1. Masukkan/Update status pasien pada BedManager (in-memory, untuk dashboard real-time)
+        assigned_bed_id = bed_manager.assign_patient_to_bed(data)
 
-    if not assigned_bed_id:
-        # Semua bed di semua zona penuh. JANGAN buang data pasien --
-        # tetap simpan ke MySQL (ditandai bed_id "WAITING") supaya
-        # data pengukuran tidak hilang, lalu beri tahu operator.
-        print(f"[SERVER LOG][WARN] Semua bed penuh untuk kategori '{data.get('triage_category')}'. "
-              f"Data disimpan sebagai antrian, tidak ditempatkan di bed manapun.")
+        if not assigned_bed_id:
+            # Semua bed di semua zona penuh. JANGAN buang data pasien --
+            # tetap simpan ke MySQL (ditandai bed_id "WAITING") supaya
+            # data pengukuran tidak hilang, lalu beri tahu operator.
+            print(f"[SERVER LOG][WARN] Semua bed penuh untuk kategori '{data.get('triage_category')}'. "
+                  f"Data disimpan sebagai antrian, tidak ditempatkan di bed manapun.", flush=True)
 
-        db_payload = {**data, "bed_id": "WAITING", "zone": "-"}
+            db_payload = {**data, "bed_id": "WAITING", "zone": "-"}
+            saved_to_db = save_patient(db_payload)
+
+            return jsonify({
+                "status": "warning",
+                "message": "Semua bed penuh — pasien masuk daftar tunggu, data tetap dicatat.",
+                "assigned_bed": None,
+                "saved_to_database": saved_to_db,
+            }), 200
+
+        updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
+
+        # 2. SIMPAN KE MYSQL
+        db_payload = {**data, "bed_id": assigned_bed_id, "zone": updated_bed_info["zone"]}
         saved_to_db = save_patient(db_payload)
+        if not saved_to_db:
+            print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.", flush=True)
+
+        # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
+        socketio.emit("bed_updated", updated_bed_info)
+
+        print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n", flush=True)
 
         return jsonify({
-            "status": "warning",
-            "message": "Semua bed penuh — pasien masuk daftar tunggu, data tetap dicatat.",
-            "assigned_bed": None,
+            "status": "success",
+            "message": f"Data berhasil diupdate pada bed {assigned_bed_id}",
+            "assigned_bed": assigned_bed_id,
             "saved_to_database": saved_to_db,
+            "data": updated_bed_info,
         }), 200
-
-    updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
-
-    # 2. SIMPAN KE MYSQL
-    # Zona diambil dari bed yang BENAR-BENAR dialokasikan (bisa berbeda dari
-    # bed_id yang diminta kalau bed itu ternyata sudah terisi).
-    db_payload = {**data, "bed_id": assigned_bed_id, "zone": updated_bed_info["zone"]}
-    saved_to_db = save_patient(db_payload)
-    if not saved_to_db:
-        # Kegagalan simpan ke DB tidak boleh menghentikan update dashboard real-time,
-        # tapi harus tercatat di log server.
-        print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.", flush=True)
-
-    # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
-    socketio.emit("bed_updated", updated_bed_info)
-
-    print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n", flush=True)
-
-    return jsonify({
-        "status": "success",
-        "message": f"Data berhasil diupdate pada bed {assigned_bed_id}",
-        "assigned_bed": assigned_bed_id,
-        "saved_to_database": saved_to_db,
-        "data": updated_bed_info,
-    }), 200
+    except Exception as e:
+        import traceback
+        print(f"[SERVER ERROR] Terjadi kesalahan saat memproses data triage: {e}", flush=True)
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 # =========================================================================
