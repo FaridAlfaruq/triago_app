@@ -5,9 +5,11 @@ from flask_socketio import SocketIO
 
 try:
     from .bed_manager import BedManager
+    from .database import save_patient, get_patient_history
 except ImportError:
     # Tetap mendukung eksekusi langsung: python backend/app.py
     from bed_manager import BedManager
+    from database import save_patient, get_patient_history
 
 # Inisialisasi Flask App & Arahkan static folder ke folder 'website'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -60,36 +62,48 @@ def health_check():
 def update_triage():
     """
     Endpoint yang dipanggil oleh TriageApiClient di output_page.py.
-    Menerima JSON payload 6 parameter vital sign & hasil klasifikasi.
+    Menerima JSON payload parameter vital sign & hasil klasifikasi,
+    lalu (1) mengalokasikan bed, (2) menyimpan ke MySQL, (3) broadcast ke dashboard.
     """
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
 
-    print(f"\n[SERVER LOG] Menerima data baru dari hardware/GUI:")
+    print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:")
     print(f" -> Bed ID Target : {data.get('bed_id')}")
     print(f" -> Kategori Triase: {data.get('triage_category')}")
     print(f" -> Pasien         : {data.get('patient_name')}")
 
-    # 1. Masukkan/Update status pasien pada BedManager
+    # 1. Masukkan/Update status pasien pada BedManager (in-memory, untuk dashboard real-time)
     assigned_bed_id = bed_manager.assign_patient_to_bed(data)
-    
-    if assigned_bed_id:
-        updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
-        
-        # 2. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
-        socketio.emit("bed_updated", updated_bed_info)
-        
-        print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n")
-        
-        return jsonify({
-            "status": "success", 
-            "message": f"Data berhasil diupdate pada bed {assigned_bed_id}",
-            "assigned_bed": assigned_bed_id,
-            "data": updated_bed_info
-        }), 200
-    
-    return jsonify({"status": "error", "message": "Gagal mengalokasikan bed"}), 500
+
+    if not assigned_bed_id:
+        return jsonify({"status": "error", "message": "Gagal mengalokasikan bed"}), 500
+
+    updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
+
+    # 2. SIMPAN KE MYSQL
+    # Zona diambil dari bed yang BENAR-BENAR dialokasikan (bisa berbeda dari
+    # bed_id yang diminta kalau bed itu ternyata sudah terisi).
+    db_payload = {**data, "bed_id": assigned_bed_id, "zone": updated_bed_info["zone"]}
+    saved_to_db = save_patient(db_payload)
+    if not saved_to_db:
+        # Kegagalan simpan ke DB tidak boleh menghentikan update dashboard real-time,
+        # tapi harus tercatat di log server.
+        print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.")
+
+    # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
+    socketio.emit("bed_updated", updated_bed_info)
+
+    print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n")
+
+    return jsonify({
+        "status": "success",
+        "message": f"Data berhasil diupdate pada bed {assigned_bed_id}",
+        "assigned_bed": assigned_bed_id,
+        "saved_to_database": saved_to_db,
+        "data": updated_bed_info,
+    }), 200
 
 
 # =========================================================================
@@ -101,12 +115,36 @@ def get_all_beds():
     return jsonify(bed_manager.get_all_beds_status())
 
 
+@app.route("/api/beds/<bed_id>/discharge", methods=["POST"])
+def discharge_bed(bed_id):
+    """Mengosongkan kembali sebuah bed, mis. setelah pasien dipindahkan/selesai ditangani."""
+    success = bed_manager.discharge_bed(bed_id)
+    if not success:
+        return jsonify({"status": "error", "message": f"Bed {bed_id} tidak ditemukan"}), 404
+
+    updated_bed_info = bed_manager.get_all_beds_status()[bed_id]
+    socketio.emit("bed_updated", updated_bed_info)
+    print(f"[SERVER LOG] Bed {bed_id} telah dikosongkan kembali.")
+
+    return jsonify({"status": "success", "bed_id": bed_id, "data": updated_bed_info}), 200
+
+
 # =========================================================================
-# 4. WEBSOCKET EVENTS
+# 4. ENDPOINT RIWAYAT PASIEN (OPSIONAL, dari MySQL)
+# =========================================================================
+@app.route("/api/history", methods=["GET"])
+def get_history():
+    limit = request.args.get("limit", default=50, type=int)
+    return jsonify(get_patient_history(limit=limit))
+
+
+# =========================================================================
+# 5. WEBSOCKET EVENTS
 # =========================================================================
 @socketio.on("connect")
 def handle_connect():
     print("[SOCKET LOG] Client Web Dashboard terhubung.")
+
 
 @socketio.on("disconnect")
 def handle_disconnect():
@@ -125,7 +163,7 @@ if __name__ == "__main__":
         f"{SERVER_PORT}"
     )
     print("Cari IP Raspi  : hostname -I\n")
-    
+
     socketio.run(
         app,
         host=SERVER_HOST,
