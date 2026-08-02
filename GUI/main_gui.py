@@ -141,10 +141,22 @@ class TriaGoApplication(QMainWindow):
             print(f"[ERROR] Gagal mengolah data RAM di LoadingPage: {e}")
 
     def handle_output_phase(self, calculation_results):
-        """Fase 3: Menyimpan 1 File CSV Konsolidasi Tunggal & Buka Halaman Output"""
+        """Fase 3: Evaluasi SQA, Menyimpan 2 File (CSV & JSON), & Buka Halaman Output."""
         print("[LOG SUCCESS] Memproses fase output akhir...")
         
-        # 1. SIMPAN 1 FILE CSV KONSOLIDASI MASTER
+        # PERIKSA HASIL SQA 10S WINDOW (STRIDE 2S)
+        if not calculation_results.get("sqa_passed", True):
+            from PyQt6.QtWidgets import QMessageBox
+            err_msg = calculation_results.get(
+                "sqa_error",
+                "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi).\nSilakan pastikan sensor terpasang baik dan lakukan pengambilan data ulang."
+            )
+            print(f"[WARN MAIN_GUI SQA REJECTED] {err_msg}")
+            QMessageBox.warning(self, "Pengambilan Data Ulang (SQA Gagal)", err_msg)
+            self.reset_to_gatekeeper()
+            return
+
+        # 1. SIMPAN 2 FILE KONSOLIDASI (CSV & JSON)
         self.save_consolidated_csv(calculation_results)
         
         # 2. Update Halaman Output (Grafik 5s, Parameter, SHAP, & JSON IoT)

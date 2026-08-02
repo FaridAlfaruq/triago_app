@@ -15,9 +15,10 @@ from PyQt6.QtGui import QPainter, QColor, QPainterPath, QFont, QPixmap
 # Menambahkan direktori utama (TriaGo) ke dalam sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Import modul pemrosesan ECG, PPG, dan Model ONNX Triase
+# Import modul pemrosesan ECG, PPG, Model ONNX Triase, dan Deep Learning BPNet
 from processing_data.processing_data import ECGProcessor, PPGProcessor
 from model.deployment_inference import TriageOnnxModel
+from model.bpnet_inference import BPNetTflitePredictor
 
 
 # =====================================================================
@@ -37,6 +38,7 @@ class ProcessingWorker(QThread):
         fs_orig=400,
         triage_predictor=None,
         triage_model_error=None,
+        bpnet_predictor=None,
         parent=None,
     ):
         super().__init__(parent)
@@ -48,6 +50,7 @@ class ProcessingWorker(QThread):
         self.fs_orig = fs_orig
         self.triage_predictor = triage_predictor
         self.triage_model_error = triage_model_error
+        self.bpnet_predictor = bpnet_predictor
         
         # Inisialisasi Processor ECG & PPG
         self.ecg_processor = ECGProcessor(target_fs=125)
@@ -169,8 +172,38 @@ class ProcessingWorker(QThread):
             dia_val = float(patient.get('diastolic') if patient.get('diastolic') is not None else 80)
             gcs_val = float(patient.get('gcs') if patient.get('gcs') is not None else 15)
 
-            # Susun tujuh tanda vital mentah. Adapter ONNX melakukan clipping
-            # dan membangun sepuluh fitur turunan sesuai notebook training.
+            # -----------------------------------------------------------------
+            # TAHAP 3.5: SQA 10s Window (Stride 2s) & Deep Learning BPNet Inference
+            # -----------------------------------------------------------------
+            sqa_passed = True
+            sqa_error = None
+            passed_segments = 0
+            total_segments = 0
+            
+            if self.bpnet_predictor is not None and len(ecg_smooth) >= 1250 and len(ir_clean) >= 1250:
+                try:
+                    bp_res = self.bpnet_predictor.predict_recording(
+                        ecg_125=ecg_smooth,
+                        ppg_125=ir_clean,
+                        fs=125.0,
+                        window_sec=10.0,
+                        stride_sec=2.0
+                    )
+                    sqa_passed = bp_res["sqa_passed"]
+                    passed_segments = bp_res["passed_segments"]
+                    total_segments = bp_res["total_segments"]
+
+                    if sqa_passed:
+                        sys_val = float(bp_res["sbp"])
+                        dia_val = float(bp_res["dbp"])
+                        print(f"[BPNET DL SUCCESS] SBP={sys_val:.1f} mmHg, DBP={dia_val:.1f} mmHg (dari {passed_segments}/{total_segments} segmen 10s lolos SQA)")
+                    else:
+                        sqa_error = "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi). Silakan lakukan pengambilan data ulang."
+                        print(f"[WARN SQA FAILED] {sqa_error}")
+                except Exception as exc:
+                    print(f"[ERROR BPNET] Gagal inferensi BPNet: {exc}")
+
+            # Susun tujuh tanda vital mentah untuk ONNX XGBoost Triase
             raw_data = {
                 'temperature_c': temp_val,
                 'spo2': spo2_val,
@@ -235,6 +268,12 @@ class ProcessingWorker(QThread):
                 "pi_red": pi_red,
                 "pi_ir": pi_ir,
                 "ppg_hr": ppg_hr,
+
+                # Status & Evaluasi SQA
+                "sqa_passed": sqa_passed,
+                "sqa_error": sqa_error,
+                "sqa_passed_segments": passed_segments,
+                "sqa_total_segments": total_segments,
 
                 # Output model triase ONNX
                 "triage_status": triage_label,
@@ -348,18 +387,25 @@ class LoadingPage(QWidget):
         self._fade_in_anim = None
         self.worker = None
         self.triage_predictor = None
+        self.bpnet_predictor = None
         self.triage_model_error = None
         self.setup_ui()
         self._load_triage_model()
 
     def _load_triage_model(self):
-        """Muat dan warm-up sesi ONNX sekali selama umur aplikasi."""
+        """Muat model ONNX Triase dan Deep Learning BPNet."""
         try:
             self.triage_predictor = TriageOnnxModel()
             print("[SUCCESS ONNX] Model triase dari model/triage_xgboost_model.onnx berhasil dimuat.")
         except Exception as exc:
             self.triage_model_error = str(exc)
             print(f"[ERROR ONNX] {self.triage_model_error}")
+
+        try:
+            self.bpnet_predictor = BPNetTflitePredictor()
+            print("[SUCCESS BPNET] Model Deep Learning BPNet TFLite & SQA Pipeline berhasil dimuat.")
+        except Exception as exc:
+            print(f"[WARN BPNET] Model BPNet TFLite belum siap ({exc}). Memakai fallback BP.")
 
     def setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -446,6 +492,7 @@ class LoadingPage(QWidget):
             fs_orig=fs_orig,
             triage_predictor=self.triage_predictor,
             triage_model_error=self.triage_model_error,
+            bpnet_predictor=self.bpnet_predictor,
         )
         self.worker.status_updated.connect(self.update_ui_state)
         self.worker.processing_finished.connect(self.handle_processing_completion)
