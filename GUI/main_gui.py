@@ -192,6 +192,8 @@ class TriaGoApplication(QMainWindow):
                 "Suhu_C": results.get("temperature", 36.5),
                 "SpO2_Pct": results.get("spo2", 0.0),
                 "RR_RPM": results.get("rr", 0.0),
+                "RR_Measured": results.get("rr_measured", False),
+                "RR_Quality": results.get("rr_quality", 0.0),
                 "HR_BPM": results.get("hr", 0.0),
                 "BP_Systolic": results.get("systolic", 120),
                 "BP_Diastolic": results.get("diastolic", 80),

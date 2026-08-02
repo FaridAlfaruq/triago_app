@@ -1,7 +1,9 @@
+import os
+
 import serial
 import time
 
-PORT = 'COM7' 
+PORT = os.environ.get("TRIAGO_SERIAL_PORT", "COM16")
 BAUDRATE = 115200  # Sesuaikan dengan linecoding Virtual COM STM32 Anda
 
 def debug_cdc():
