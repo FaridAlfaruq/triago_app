@@ -119,17 +119,36 @@ function closeFormModal() {
   document.getElementById('patientFormModal').classList.remove('show');
 }
 
-function savePatientData() {
+async function savePatientData() {
   const bedId = document.getElementById('formBedId').textContent;
-  const patientName = document.getElementById('inputPatientName').value;
-  const relativeName = document.getElementById('inputRelativeName').value;
+  const patientName = document.getElementById('inputPatientName').value.trim();
+  const relativeName = document.getElementById('inputRelativeName').value.trim();
 
-  if (bedsData[bedId]) {
-    bedsData[bedId].patient_name = patientName || 'Pasien Tanpa Nama';
-    bedsData[bedId].relative_name = relativeName || '—';
-    displayBedDetail(bedId);
+  try {
+    const response = await fetch(`/api/beds/${bedId}/patient`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patient_name: patientName,
+        relative_name: relativeName
+      })
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === 'success') {
+      if (bedsData[bedId]) {
+        bedsData[bedId].patient_name = patientName || 'Pasien Tanpa Nama';
+        bedsData[bedId].relative_name = relativeName || '—';
+        displayBedDetail(bedId);
+      }
+      closeFormModal();
+    } else {
+      alert('Gagal menyimpan data pasien: ' + (result.message || 'Error tidak diketahui'));
+    }
+  } catch (err) {
+    console.error('[ERROR] Gagal menyimpan data pasien ke server:', err);
+    alert('Gagal menyimpan data pasien. Pastikan koneksi server backend terhubung!');
   }
-  closeFormModal();
 }
 
 if (socket) {

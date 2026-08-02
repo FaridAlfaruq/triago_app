@@ -82,6 +82,16 @@ class BedManager:
                 return bed_id
         return None
 
+    def update_patient_identity(self, bed_id: str, patient_name: str, relative_name: str):
+        with self._lock:
+            if bed_id not in self.beds:
+                return False
+            self.beds[bed_id].update({
+                "patient_name": patient_name,
+                "relative_name": relative_name
+            })
+            return True
+
     def discharge_bed(self, bed_id):
         """Kosongkan kembali sebuah bed (mis. setelah pasien dipindah/selesai ditangani)."""
         with self._lock:

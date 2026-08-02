@@ -139,3 +139,32 @@ def get_patient_history(limit: int = 50):
         return []
     finally:
         cursor.close()
+
+
+def update_patient_info(bed_id: str, patient_name: str, relative_name: str) -> bool:
+    """Memperbarui nama pasien dan penanggung jawab pada baris terbaru di MySQL untuk bed tertentu."""
+    try:
+        conn = get_connection()
+    except Error:
+        print("[DATABASE][ERROR] Gagal update identitas pasien karena koneksi MySQL gagal.", flush=True)
+        return False
+
+    cursor = conn.cursor()
+    sql = """
+    UPDATE patient_data 
+    SET patient_name = %s, relative_name = %s 
+    WHERE bed_id = %s 
+    ORDER BY arrival_timestamp DESC 
+    LIMIT 1
+    """
+    try:
+        cursor.execute(sql, (patient_name, relative_name, bed_id))
+        conn.commit()
+        print(f"[DATABASE] Identitas pasien Bed {bed_id} berhasil diperbarui di MySQL.", flush=True)
+        return True
+    except Error as err:
+        print(f"[DATABASE][ERROR] Gagal update identitas pasien: {err}", flush=True)
+        conn.rollback()
+        return False
+    finally:
+        cursor.close()

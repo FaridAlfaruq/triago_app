@@ -5,11 +5,11 @@ from flask_socketio import SocketIO
 
 try:
     from .bed_manager import BedManager
-    from .database import save_patient, get_patient_history
+    from .database import save_patient, get_patient_history, update_patient_info
 except ImportError:
     # Tetap mendukung eksekusi langsung: python backend/app.py
     from bed_manager import BedManager
-    from database import save_patient, get_patient_history
+    from database import save_patient, get_patient_history, update_patient_info
 
 # Inisialisasi Flask App & Arahkan static folder ke folder 'website'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -139,6 +139,32 @@ def reset_all_beds():
     socketio.emit("beds_reset", updated_beds)
     print("[SERVER LOG] Semua bed telah direset ke status kosong.")
     return jsonify({"status": "success", "data": updated_beds}), 200
+
+
+@app.route("/api/beds/<bed_id>/patient", methods=["POST"])
+def update_bed_patient(bed_id):
+    """Memperbarui nama pasien dan penanggung jawab pada bed tertentu."""
+    data = request.get_json(silent=True) or {}
+    patient_name = data.get("patient_name", "").strip() or "Pasien Tanpa Nama"
+    relative_name = data.get("relative_name", "").strip() or "—"
+
+    success = bed_manager.update_patient_identity(bed_id, patient_name, relative_name)
+    if not success:
+        return jsonify({"status": "error", "message": f"Bed {bed_id} tidak ditemukan"}), 404
+
+    # Simpan/update ke MySQL database
+    saved_to_db = update_patient_info(bed_id, patient_name, relative_name)
+
+    updated_bed_info = bed_manager.get_all_beds_status()[bed_id]
+    socketio.emit("bed_updated", updated_bed_info)
+    print(f"[SERVER LOG] Identitas pasien Bed {bed_id} diperbarui: {patient_name} / {relative_name}", flush=True)
+
+    return jsonify({
+        "status": "success",
+        "message": f"Data pasien Bed {bed_id} berhasil diperbarui",
+        "saved_to_database": saved_to_db,
+        "data": updated_bed_info
+    }), 200
 
 
 @app.route("/api/beds/<bed_id>/discharge", methods=["POST"])
