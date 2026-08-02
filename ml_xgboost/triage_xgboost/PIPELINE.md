@@ -15,7 +15,7 @@ setiap pemeriksaan.
 pemrosesan sinyal yang sudah ada tetap menghitung:
 
 1. heart rate dari R-peak ECG;
-2. respiratory rate dari ECG-derived respiration;
+2. respiratory rate dari quality-weighted multi-EDR ECG, beserta quality score;
 3. SpO2 dan perfusion index dari PPG;
 4. estimasi suhu inti dari suhu kulit dan lingkungan.
 

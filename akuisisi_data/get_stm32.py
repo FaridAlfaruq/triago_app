@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 
 import serial
@@ -7,6 +6,7 @@ from serial.tools import list_ports
 
 
 DEFAULT_BAUDRATE = 921600
+DEFAULT_DATA_TIMEOUT_SECONDS = 5.0
 
 
 def find_stm32_port():
@@ -25,14 +25,25 @@ def find_stm32_port():
     if len(ports) == 1:
         return ports[0].device
 
-    return "COM7" if sys.platform.startswith("win") else "/dev/ttyACM0"
+    return None
 
 
-def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):
+def stream_stm32_data(
+    port=None,
+    baudrate=DEFAULT_BAUDRATE,
+    should_stop=None,
+    data_timeout=DEFAULT_DATA_TIMEOUT_SECONDS,
+):
     """Alirkan paket STM32 sampai koneksi berhenti atau diminta berhenti."""
-    port = port or find_stm32_port()
     should_stop = should_stop or (lambda: False)
     try:
+        port = port or find_stm32_port()
+        if not port:
+            raise serial.SerialException(
+                "Port STM32 tidak ditemukan. Sambungkan sensor atau set "
+                "TRIAGO_SERIAL_PORT."
+            )
+
         ser = serial.Serial(port, baudrate, timeout=1)
         # set_buffer_size tidak tersedia pada seluruh platform/driver serial.
         if hasattr(ser, "set_buffer_size"):
@@ -49,6 +60,7 @@ def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):
         ser.write(b"START\n")
         
         raw_accumulator = b""
+        last_valid_packet_at = time.monotonic()
         
         while not should_stop():
             # === TAMBAH: NAPAS KOMPUTASI (5 ms) ===
@@ -94,10 +106,19 @@ def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):
                                         "object": vals[5]
                                     }
                                 }
+                                last_valid_packet_at = time.monotonic()
                             except ValueError:
                                 yield {"status": "ERROR", "message": f"Non-numeric data detected: {line}"}
                         else:
                             yield {"status": "WARNING", "message": f"Incomplete columns ({len(data)}/6): {line}"}
+
+            if (
+                data_timeout is not None
+                and time.monotonic() - last_valid_packet_at >= data_timeout
+            ):
+                raise serial.SerialTimeoutException(
+                    f"Sensor terhubung tetapi tidak mengirim paket valid selama {data_timeout:g} detik."
+                )
                                 
     except serial.SerialException as e:
         print(f"[FATAL] Gagal mengakses port serial: {e}")

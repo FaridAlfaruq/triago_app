@@ -272,6 +272,12 @@ class OutputPage(QWidget):
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
         self.lbl_rr_val.setText(f"{rr:.1f} RPM")
+        if data.get("rr_measured", False):
+            self.lbl_rr_val.setToolTip(
+                f"Kualitas estimasi RR: {float(data.get('rr_quality', 0.0)):.2f}"
+            )
+        else:
+            self.lbl_rr_val.setToolTip("RR tidak terukur; nilai fallback digunakan")
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 

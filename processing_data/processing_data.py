@@ -3,6 +3,8 @@ from scipy.interpolate import CubicSpline
 from scipy.ndimage import median_filter
 from scipy.signal import butter, filtfilt, find_peaks, iirnotch, resample, savgol_filter
 
+from respiratory_rate.pipeline import ECGRespirationEstimator
+
 
 class ECGProcessor:
   """Kelas OOP untuk preprocessing sinyal ECG, visualisasi grafik halus,
@@ -18,6 +20,8 @@ class ECGProcessor:
         Sampling rate target setelah downsampling (default: 125 Hz).
     """
     self.target_fs = target_fs
+    self.respiration_estimator = ECGRespirationEstimator()
+    self.last_respiration_details = None
 
   # =========================================================================
   # 1. FUNGSI FILTER INDIVIDUAL & UTILS
@@ -246,8 +250,8 @@ class ECGProcessor:
     hr = 60.0 / np.mean(np.diff(r_peaks) / fs)
     return float(np.round(hr, 2))
 
-  def calculate_respiration_rate(self, ecg, r_peaks, fs=125):
-    """Menghitung Respiration Rate (RPM) menggunakan EDR (ECG-Derived Respiration)."""
+  def calculate_respiration_rate_legacy(self, ecg, r_peaks, fs=125):
+    """Metode EDR slope lama, dipertahankan sebagai baseline eksperimen."""
     n_samples = len(ecg)
     total_seconds = n_samples / fs
     r_peaks = np.array(r_peaks)
@@ -312,6 +316,17 @@ class ECGProcessor:
     )
     return float(np.round(resp_rate, 2)), resp_signal_full, resp_peaks
 
+  def calculate_respiration_rate(self, ecg, r_peaks, fs=125):
+    """Estimasi RR ECG-only dengan quality-weighted multi-EDR spectral fusion.
+
+    Bentuk nilai balik tetap kompatibel dengan pipeline lama. Diagnostik
+    tambahan (RQI, bobot fitur, dan hasil per window) disimpan pada
+    ``last_respiration_details``.
+    """
+    details = self.respiration_estimator.estimate(ecg, r_peaks, fs=fs)
+    self.last_respiration_details = details
+    return details["rr"], details["resp_signal"], details["resp_peaks"]
+
   # =========================================================================
   # 4. MAIN PIPELINE UTAMA
   # =========================================================================
@@ -373,6 +388,16 @@ class ECGProcessor:
         'rr': resp_rate,
         'resp_signal': resp_signal_full,
         'resp_peaks': resp_peaks,
+        'rr_quality': (
+            self.last_respiration_details['quality']
+            if self.last_respiration_details is not None
+            else 0.0
+        ),
+        'rr_windows': (
+            self.last_respiration_details['windows']
+            if self.last_respiration_details is not None
+            else []
+        ),
     }
 
 class PPGProcessor:
