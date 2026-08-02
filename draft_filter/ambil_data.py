@@ -13,7 +13,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from akusisi_data.get_stm32 import stream_stm32_data
+from akuisisi_data.get_stm32 import stream_stm32_data
 from processing_data.preprocessing_LiveData import LiveSignalFilter
 
 # === OPTIMASI GLOBAL PYQTGRAPH ===
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         # Konfigurasi Parameter Waktu & Sampel
         self.SAMPLE_RATE_HZ = 400
         self.WARMUP_DURATION_SEC = 2.0
-        self.RECORD_DURATION_SEC = 60.0
+        self.RECORD_DURATION_SEC = 5.0
         
         self.total_target_samples = int((self.WARMUP_DURATION_SEC + self.RECORD_DURATION_SEC) * self.SAMPLE_RATE_HZ)
 

@@ -4,7 +4,7 @@ import serial
 import serial.tools.list_ports
 import time
 
-PORT = "COM7"  # Sesuaikan dengan port COM STM32 kamu
+PORT = "COM16"  # Sesuaikan dengan port COM STM32 kamu
 BAUDRATE = 115200
 
 

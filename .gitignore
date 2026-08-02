@@ -10,3 +10,6 @@ venv/
 
 # Mengabaikan file log data pasien sementara
 *.log
+
+# abaikan dataset rr
+/draft_filter/bidmc/

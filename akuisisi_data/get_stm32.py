@@ -25,7 +25,7 @@ def find_stm32_port():
     if len(ports) == 1:
         return ports[0].device
 
-    return "COM7" if sys.platform.startswith("win") else "/dev/ttyACM0"
+    return "COM16" if sys.platform.startswith("win") else "/dev/ttyACM0"
 
 
 def stream_stm32_data(port=None, baudrate=DEFAULT_BAUDRATE, should_stop=None):

@@ -1,7 +1,7 @@
 import serial
 import time
 
-PORT = 'COM7' 
+PORT = 'COM16' 
 BAUDRATE = 115200  # Sesuaikan dengan linecoding Virtual COM STM32 Anda
 
 def debug_cdc():
