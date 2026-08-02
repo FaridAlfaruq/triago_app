@@ -141,21 +141,9 @@ class TriaGoApplication(QMainWindow):
             print(f"[ERROR] Gagal mengolah data RAM di LoadingPage: {e}")
 
     def handle_output_phase(self, calculation_results):
-        """Fase 3: Evaluasi SQA, Menyimpan 2 File (CSV & JSON), & Buka Halaman Output."""
+        """Fase 3: Menyimpan 2 File (CSV & JSON), & Buka Halaman Output."""
         print("[LOG SUCCESS] Memproses fase output akhir...")
         
-        # PERIKSA HASIL SQA 10S WINDOW (STRIDE 2S)
-        if not calculation_results.get("sqa_passed", True):
-            from PyQt6.QtWidgets import QMessageBox
-            err_msg = calculation_results.get(
-                "sqa_error",
-                "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi).\nSilakan pastikan sensor terpasang baik dan lakukan pengambilan data ulang."
-            )
-            print(f"[WARN MAIN_GUI SQA REJECTED] {err_msg}")
-            QMessageBox.warning(self, "Pengambilan Data Ulang (SQA Gagal)", err_msg)
-            self.reset_to_gatekeeper()
-            return
-
         # 1. SIMPAN 2 FILE KONSOLIDASI (CSV & JSON)
         self.save_consolidated_csv(calculation_results)
         
@@ -168,6 +156,12 @@ class TriaGoApplication(QMainWindow):
         
         # 3. Pindah ke Halaman Output (Index 4)
         self.stacked_widget.setCurrentIndex(4)
+
+    def handle_sqa_retry(self):
+        """Dipanggil ketika SQA gagal untuk mengarahkan pengguna kembali ke Perekaman Data."""
+        print("[LOG MAIN_GUI] SQA Gagal. Mengarahkan pengguna kembali ke Halaman Perekaman Data (Plot Page)...")
+        # Kembali ke Halaman Plot Perekaman Sinyal (Index 1)
+        self.stacked_widget.setCurrentIndex(1)
 
     def save_consolidated_csv(self, results):
         """Menyimpan 2 file per pengukuran: CSV (10 kolom sinyal) dan JSON (metadata & fitur)."""
