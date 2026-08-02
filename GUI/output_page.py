@@ -326,13 +326,19 @@ class OutputPage(QWidget):
             triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.85)
 
-            self.api_client.send_triage_result(
+            is_sent = self.api_client.send_triage_result(
                 bed_id=bed_id,
                 gcs_score=gcs,
                 vitals=vitals_dict,
                 classification=triage_cat,
                 score=xgb_score
             )
+            if is_sent:
+                print(f"[GUI LOG] [BERHASIL] Data pengukuran Bed {bed_id} telah terkirim ke backend dan diproses ke database.")
+            else:
+                print(f"[GUI LOG] [GAGAL] Data pengukuran Bed {bed_id} TIDAK terkirim ke backend / database.")
+        else:
+            print("[GUI LOG] [WARNING] API Client belum diinisialisasi, data tidak dikirim ke backend/database.")
 
     def _map_status_to_color(self, status_text):
         """Konversi dari string teks UI ke standar warna backend/frontend."""
@@ -414,6 +420,7 @@ class OutputPage(QWidget):
             self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
+        
         print("[LOG] Inputs cleared. Returning to home_page...")
         self.home_requested.emit()
 
