@@ -50,33 +50,34 @@ def compute_spectral_snr(sig_seg, fs=125.0, f_low=0.5, f_high=8.0):
     return float(band_power / total_power)
 
 
-def evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0, hr_diff_max=5.0):
-    """Evaluasi Kualitas Sinyal Multimodal Ketat (ECG & PPG 10-Detik):
+def evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0, hr_diff_max=12.0):
+    """Evaluasi Kualitas Sinyal Multimodal (ECG & PPG 10-Detik):
 
+    Sensitifitas Disesuaikan untuk Penggunaan Klinis/Hardware Riil:
     1. Check Flatline / NaNs / Infs
-    2. Peak Detection ECG & PPG
-    3. Range HR Fisiologis (40 - 180 bpm)
-    4. HR Mismatch ECG vs PPG (<= 5 bpm)
-    5. Indeks Statistik PPG (Skewness > -0.1, Kurtosis >= 1.8)
-    6. Relative Spectral Power Ratio (SNR >= 50%)
+    2. Peak Detection ECG & PPG (Min 3 puncak)
+    3. Range HR Fisiologis (35 - 200 bpm)
+    4. HR Mismatch ECG vs PPG (<= 12 bpm)
+    5. Indeks Statistik PPG (Skewness > -0.4, Kurtosis >= 1.2)
+    6. Relative Spectral Power Ratio (SNR >= 35%)
     """
     if np.isnan(ecg_seg).any() or np.isnan(ppg_seg).any():
         return False, "NaN/Inf Found"
     if np.std(ecg_seg) < 1e-4 or np.std(ppg_seg) < 1e-4:
         return False, "Flatline Signal"
 
-    ecg_peaks, _ = find_peaks(ecg_seg, distance=int(0.4 * fs), prominence=0.4 * np.std(ecg_seg))
-    if len(ecg_peaks) < 4:
+    ecg_peaks, _ = find_peaks(ecg_seg, distance=int(0.3 * fs), prominence=0.3 * np.std(ecg_seg))
+    if len(ecg_peaks) < 3:
         return False, f"Puncak ECG Terlalu Sedikit ({len(ecg_peaks)})"
 
-    ppg_peaks, _ = find_peaks(ppg_seg, distance=int(0.4 * fs), prominence=0.25 * np.std(ppg_seg))
-    if len(ppg_peaks) < 4:
+    ppg_peaks, _ = find_peaks(ppg_seg, distance=int(0.3 * fs), prominence=0.20 * np.std(ppg_seg))
+    if len(ppg_peaks) < 3:
         return False, f"Puncak PPG Terlalu Sedikit ({len(ppg_peaks)})"
 
     hr_ecg = 60.0 / np.mean(np.diff(ecg_peaks) / fs)
     hr_ppg = 60.0 / np.mean(np.diff(ppg_peaks) / fs)
 
-    if not (40.0 <= hr_ecg <= 180.0) or not (40.0 <= hr_ppg <= 180.0):
+    if not (35.0 <= hr_ecg <= 200.0) or not (35.0 <= hr_ppg <= 200.0):
         return False, f"HR Luar Batas (ECG: {hr_ecg:.1f}, PPG: {hr_ppg:.1f})"
 
     if abs(hr_ecg - hr_ppg) > hr_diff_max:
@@ -85,13 +86,13 @@ def evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0, hr_diff_max=5.0):
     s_sqa = compute_ppg_skewness(ppg_seg)
     k_sqa = compute_ppg_kurtosis(ppg_seg)
 
-    if s_sqa <= -0.1:
+    if s_sqa <= -0.4:
         return False, f"PPG Skewness Invalid ({s_sqa:.2f})"
-    if k_sqa < 1.8:
+    if k_sqa < 1.2:
         return False, f"PPG Kurtosis Invalid ({k_sqa:.2f})"
 
     snr_ratio = compute_spectral_snr(ppg_seg, fs=fs, f_low=0.5, f_high=8.0)
-    if snr_ratio < 0.50:
+    if snr_ratio < 0.35:
         return False, f"PPG Low Spectral SNR ({snr_ratio*100:.1f}%)"
 
     return True, "VALID_SQA"
@@ -242,8 +243,14 @@ class BPNetTflitePredictor:
         start = 0
         n_samples = min(len(ecg_125), len(ppg_125))
 
+        print("\n==========================================================")
+        print("        EVALUASI PER-SEGMEN SIGNAL QUALITY ASSESSMENT (SQA)")
+        print("==========================================================")
+
         while start + window_len <= n_samples:
             total_segments += 1
+            t_start_sec = start / fs
+            t_end_sec = (start + window_len) / fs
             ecg_seg = ecg_125[start:start + window_len]
             ppg_seg = ppg_125[start:start + window_len]
 
@@ -256,20 +263,38 @@ class BPNetTflitePredictor:
                 sbp_val, dbp_val = self.predict_segment(feat_7ch)
                 sbp_preds.append(sbp_val)
                 dbp_preds.append(dbp_val)
+                print(f" [Segmen #{total_segments:02d}] ({t_start_sec:4.1f}s - {t_end_sec:4.1f}s) -> [OK] LOLOS SQA (SBP: {sbp_val:.1f}, DBP: {dbp_val:.1f})")
             else:
                 reason_key = reason.split('(')[0].strip()
                 rejections[reason_key] = rejections.get(reason_key, 0) + 1
+                print(f" [Segmen #{total_segments:02d}] ({t_start_sec:4.1f}s - {t_end_sec:4.1f}s) -> [REJECT] DITOLAK: {reason}")
 
             start += stride_len
+
+        rejected_segments = total_segments - passed_segments
+        print("----------------------------------------------------------")
+        print(f" [RINGKASAN SQA] Total Segmen 10s Dibuat  : {total_segments} segmen")
+        print(f" [RINGKASAN SQA] Segmen Lolos (Valid)     : {passed_segments} segmen ({passed_segments/max(total_segments,1)*100:.1f}%)")
+        print(f" [RINGKASAN SQA] Segmen Ditolak (Noise)    : {rejected_segments} segmen ({rejected_segments/max(total_segments,1)*100:.1f}%)")
+        if rejections:
+            print(" [RINGKASAN SQA] Detail Alasan Penolakan Segmen:")
+            for reason_key, count in rejections.items():
+                print(f"   * {reason_key:<32} : {count} segmen ({count/max(total_segments,1)*100:.1f}%)")
+        print("==========================================================\n")
+
+        # Susun string ringkasan alasan penolakan untuk popup GUI
+        reasons_summary = ", ".join([f"{k} ({v} segmen)" for k, v in rejections.items()]) if rejections else "Noise/Artefak Sinyal"
 
         if passed_segments == 0:
             return {
                 "sqa_passed": False,
                 "passed_segments": 0,
+                "rejected_segments": total_segments,
                 "total_segments": total_segments,
                 "sbp": 120.0,
                 "dbp": 80.0,
-                "rejections": rejections
+                "rejections": rejections,
+                "sqa_error": f"Tidak ada segmen 10s yang lolos SQA.\nAlasan Penolakan: {reasons_summary}.\nSilakan pastikan sensor terpasang dengan baik dan lakukan pengambilan data ulang."
             }
 
         # Mengambil rerata (atau median) dari seluruh segmen yang lolos SQA
@@ -279,6 +304,7 @@ class BPNetTflitePredictor:
         return {
             "sqa_passed": True,
             "passed_segments": passed_segments,
+            "rejected_segments": rejected_segments,
             "total_segments": total_segments,
             "sbp": round(sbp_avg, 1),
             "dbp": round(dbp_avg, 1),
