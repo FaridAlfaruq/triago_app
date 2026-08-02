@@ -272,18 +272,35 @@ class OutputPage(QWidget):
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C | Tb (Burton): {temp_burton:.1f}°C")
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
         self.lbl_rr_val.setText(f"{rr:.1f} RPM")
+        if data.get("rr_measured", False):
+            self.lbl_rr_val.setToolTip(
+                f"Kualitas estimasi RR: {float(data.get('rr_quality', 0.0)):.2f}"
+            )
+        else:
+            self.lbl_rr_val.setToolTip("RR tidak terukur; nilai fallback digunakan")
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
 
         # 2. Update Header Triase UI
         triage_status_text = data.get("triage_status", "NON-DARURAT")
         self.update_triage_header(triage_status_text)
+        input_warnings = data.get("triage_input_warnings", [])
+        if input_warnings:
+            self.lbl_status_text.setToolTip(
+                "Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings)
+            )
+        else:
+            self.lbl_status_text.setToolTip("")
 
         # 3. Render Grafik SHAP Analysis
         shap_features = data.get("shap_features", [])
         shap_values = data.get("shap_values", [])
         if len(shap_features) > 0 and len(shap_values) > 0:
             self._render_real_shap(shap_features, shap_values)
+        else:
+            # Jangan mempertahankan grafik milik pasien sebelumnya ketika
+            # explanation untuk model ONNX belum tersedia.
+            self.plot_shap.clear()
 
         # 4. Render Grafik Sinyal ECG 5 Detik
         time_arr = np.array(data.get("time_125", []))
@@ -313,7 +330,7 @@ class OutputPage(QWidget):
             self.plot_ppg.enableAutoRange(axis='y')
 
         # 6. Pengiriman Payload ke Flask API Backend
-        if self.api_client:
+        if self.api_client and data.get("triage_valid", False):
             bed_id = data.get("bed", "A1")
             vitals_dict = {
                 "hr": hr,
@@ -324,7 +341,7 @@ class OutputPage(QWidget):
                 "dia": dia_bp
             }
             triage_cat = self._map_status_to_color(triage_status_text)
-            xgb_score = data.get("xgboost_score", 0.85)
+            xgb_score = data.get("xgboost_score", 0.0)
 
             is_sent = self.api_client.send_triage_result(
                 bed_id=bed_id,
@@ -333,12 +350,11 @@ class OutputPage(QWidget):
                 classification=triage_cat,
                 score=xgb_score
             )
-            if is_sent:
-                print(f"[GUI LOG] [BERHASIL] Data pengukuran Bed {bed_id} telah terkirim ke backend dan diproses ke database.")
-            else:
-                print(f"[GUI LOG] [GAGAL] Data pengukuran Bed {bed_id} TIDAK terkirim ke backend / database.")
-        else:
-            print("[GUI LOG] [WARNING] API Client belum diinisialisasi, data tidak dikirim ke backend/database.")
+        elif self.api_client:
+            print(
+                "[WARN API] Hasil triase tidak dikirim karena inferensi model gagal: "
+                f"{data.get('triage_error', 'alasan tidak diketahui')}"
+            )
 
     def _map_status_to_color(self, status_text):
         """Konversi dari string teks UI ke standar warna backend/frontend."""
@@ -368,9 +384,15 @@ class OutputPage(QWidget):
             'diastolic_bp': 'Diastolik',
             'gcs_total': 'Skor GCS',
             'shock_index': 'Shock Index',
-            'map': 'MAP',
+            'mean_arterial_pressure': 'MAP',
             'pulse_pressure': 'Pulse Press',
-            'total_abnormal': 'Tot Abnormal'
+            'modified_shock_index': 'Modified Shock Index',
+            'temp_deviation': 'Deviasi Suhu',
+            'oxygen_deficit': 'Defisit Oksigen',
+            'gcs_deficit': 'Defisit GCS',
+            'cardiopulmonary_stress': 'Stres Kardiopulmoner',
+            'neuro_hemodynamic_index': 'Indeks Neurohemodinamik',
+            'news_vital_score': 'NEWS Vital'
         }
 
         abs_vals = np.abs(shap_array)
@@ -406,7 +428,11 @@ class OutputPage(QWidget):
 
     def update_triage_header(self, status):
         status = status.upper()
-        if "RESUSITASI" in status or status == "RED":
+        if "TIDAK TERSEDIA" in status or "ERROR" in status:
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #7F8C8D;")
+            self.lbl_status_text.setText("TIDAK TERSEDIA")
+            self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #E5E8E8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #566573;")
+        elif "RESUSITASI" in status or status == "RED":
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
             self.lbl_status_text.setText("RESUSITASI")
             self.lbl_status_text.setStyleSheet("font-size: 22px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
