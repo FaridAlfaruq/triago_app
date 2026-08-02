@@ -69,10 +69,10 @@ def update_triage():
     if not data:
         return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
 
-    print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:")
-    print(f" -> Bed ID Target : {data.get('bed_id')}")
-    print(f" -> Kategori Triase: {data.get('triage_category')}")
-    print(f" -> Pasien         : {data.get('patient_name')}")
+    print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:", flush=True)
+    print(f" -> Bed ID Target : {data.get('bed_id')}", flush=True)
+    print(f" -> Kategori Triase: {data.get('triage_category')}", flush=True)
+    print(f" -> Pasien         : {data.get('patient_name')}", flush=True)
 
     # 1. Masukkan/Update status pasien pada BedManager (in-memory, untuk dashboard real-time)
     assigned_bed_id = bed_manager.assign_patient_to_bed(data)
@@ -90,12 +90,12 @@ def update_triage():
     if not saved_to_db:
         # Kegagalan simpan ke DB tidak boleh menghentikan update dashboard real-time,
         # tapi harus tercatat di log server.
-        print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.")
+        print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.", flush=True)
 
     # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
     socketio.emit("bed_updated", updated_bed_info)
 
-    print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n")
+    print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n", flush=True)
 
     return jsonify({
         "status": "success",

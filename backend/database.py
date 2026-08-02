@@ -72,9 +72,11 @@ def save_patient(data: dict) -> bool:
         spo2,
         temperature,
         respiration_rate,
+        systolic_bp,
+        diastolic_bp,
         arrival_timestamp
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     vitals = data.get("vitals", {})
@@ -87,20 +89,22 @@ def save_patient(data: dict) -> bool:
         data.get("relative_name"),
         data.get("gcs_score"),
         data.get("xgboost_score"),
-        vitals.get("heart_rate"),
+        vitals.get("heart_rate") if "heart_rate" in vitals else vitals.get("hr"),
         vitals.get("spo2"),
-        vitals.get("temperature"),
-        vitals.get("respiration_rate"),
+        vitals.get("temperature") if "temperature" in vitals else (vitals.get("temp_core") if "temp_core" in vitals else vitals.get("temp")),
+        vitals.get("respiration_rate") if "respiration_rate" in vitals else vitals.get("rr"),
+        vitals.get("systolic_bp") if "systolic_bp" in vitals else (vitals.get("systolic") if "systolic" in vitals else vitals.get("sys")),
+        vitals.get("diastolic_bp") if "diastolic_bp" in vitals else (vitals.get("diastolic") if "diastolic" in vitals else vitals.get("dia")),
         data.get("arrival_timestamp", int(time.time() * 1000)),
     )
 
     try:
         cursor.execute(sql, values)
         conn.commit()
-        print("[DATABASE] Data pasien berhasil disimpan ke MySQL.")
+        print("[DATABASE] Data pasien berhasil disimpan ke MySQL.", flush=True)
         return True
     except Error as err:
-        print(f"[DATABASE][ERROR] Gagal insert data pasien: {err}")
+        print(f"[DATABASE][ERROR] Gagal insert data pasien: {err}", flush=True)
         conn.rollback()
         return False
     finally:
