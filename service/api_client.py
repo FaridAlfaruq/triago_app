@@ -8,7 +8,7 @@ class TriageApiClient:
         self.base_url = (
             base_url
             or os.environ.get("TRIAGO_API_URL")
-            or "https://triago-bmeits-dsc7btake6fhhxde.southeastasia-01.azurewebsites.net"
+            or "https://triago-bmeits-dsc7btake6fhhxde.indonesiacentral-01.azurewebsites.net"
         ).rstrip("/")
         self.endpoint_update = f"{self.base_url}/api/triage/update"
         self.timeout = 5.0
