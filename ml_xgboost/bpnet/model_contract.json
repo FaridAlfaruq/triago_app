@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "research_only",
+  "artifact": {
+    "path": "models/triago_bpnet_v53_quant.tflite",
+    "format": "tflite",
+    "quantization": "dynamic_range",
+    "size_bytes": 501792,
+    "sha256": "ec060df2fe9383472db04038b36e3cf9eb4011da6cdb3a95c0063b1cacdc0e08",
+    "description": "MLIR Converted."
+  },
+  "signature": {
+    "name": "serving_default",
+    "input": {
+      "name": "static_multichannel_input",
+      "tensor_name": "serving_default_static_multichannel_input:0",
+      "dtype": "float32",
+      "shape": [
+        1,
+        1250,
+        7
+      ]
+    },
+    "outputs": {
+      "sbp_output": {
+        "tensor_index": 204,
+        "dtype": "float32",
+        "shape": [
+          1,
+          1
+        ],
+        "unit": "z_score"
+      },
+      "dbp_output": {
+        "tensor_index": 203,
+        "dtype": "float32",
+        "shape": [
+          1,
+          1
+        ],
+        "unit": "z_score"
+      }
+    }
+  },
+  "signal": {
+    "duration_seconds": 10,
+    "sampling_rate_hz": 125,
+    "channels": [
+      "normalized_ecg",
+      "normalized_ppg",
+      "normalized_vpg",
+      "normalized_apg",
+      "normalized_ecg_ppg_cross_product",
+      "normalized_ecg_hilbert_envelope",
+      "normalized_ppg_hilbert_envelope"
+    ]
+  },
+  "target_scaler": {
+    "required": true,
+    "artifact_path": "target_scaler_params.json",
+    "available": false,
+    "required_fields": [
+      "sbp_mean",
+      "sbp_std",
+      "dbp_mean",
+      "dbp_std"
+    ]
+  },
+  "verification": {
+    "flatbuffer_schema_valid": true,
+    "saved_notebook_benchmark_available": false,
+    "clinical_metrics_verified": false
+  }
+}

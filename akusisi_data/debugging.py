@@ -1,7 +1,9 @@
+import os
+
 import serial
 import time
 
-PORT = 'COM7' 
+PORT = os.environ.get("TRIAGO_SERIAL_PORT", "COM16")
 BAUDRATE = 115200  # Sesuaikan dengan linecoding Virtual COM STM32 Anda
 
 def debug_cdc():
@@ -13,14 +15,19 @@ def debug_cdc():
         ser.dtr = True; ser.rts = True
         ser.reset_input_buffer()
         ser.reset_output_buffer()
-        
+
+        time.sleep(0.5)
+
         # Trigger STM32
         ser.write(b"START\n")
+        ser.flush()
         print("[INFO] Sent 'START' command to STM32...")
         
         raw_accumulator = b""
         sample_count = 0
+        status_count = 0
         start_time = time.time()
+        last_start_time = start_time
         
         while True:
             time.sleep(0.005) 
@@ -37,7 +44,13 @@ def debug_cdc():
                         clean_bytes = raw_line.replace(b'\x00', b'')
                         line = clean_bytes.decode('utf-8', errors='ignore').strip()
                         
-                        if not line or "HEARTBEAT" in line or "SYS_STATUS" in line: 
+                        if not line or "HEARTBEAT" in line:
+                            continue
+
+                        if "SYS_STATUS" in line:
+                            status_count += 1
+                            if status_count == 1:
+                                print(f"[CONNECTED] {line}")
                             continue
                             
                         data = line.split(',')
@@ -65,7 +78,22 @@ def debug_cdc():
                                           f"ECG: {ecg_val:<4} | Obj: {obj_temp:.2f}°C | Amb: {amb_temp:.2f}°C")
                                           
                             except ValueError:
-                                pass
+                                print(f"[WARN] Non-numeric packet: {line}")
+
+            now = time.time()
+            if sample_count == 0 and now - last_start_time >= 1.0:
+                ser.write(b"START\n")
+                ser.flush()
+                last_start_time = now
+                print("[RETRY] Sent 'START' again; waiting for 6-column data...")
+
+            if sample_count == 0 and now - start_time >= 10.0:
+                print(
+                    "[ERROR] STM32 terhubung dan sensor sehat, tetapi firmware "
+                    "tidak memulai stream setelah menerima START."
+                )
+                print(f"[INFO] SYS_STATUS received: {status_count}")
+                break
                                 
             # Batasan uji coba 60 detik
             if time.time() - start_time >= 60.0:
