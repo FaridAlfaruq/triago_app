@@ -8,10 +8,10 @@ class TriageApiClient:
         self.base_url = (
             base_url
             or os.environ.get("TRIAGO_API_URL")
-            or "http://127.0.0.1:5000"
+            or "https://triago-bmeits-dsc7btake6fhhxde.southeastasia-01.azurewebsites.net"
         ).rstrip("/")
         self.endpoint_update = f"{self.base_url}/api/triage/update"
-        self.timeout = 3.0
+        self.timeout = 5.0
 
     def send_triage_result(self, bed_id: str, gcs_score: int, vitals: dict, classification: str, score: float) -> bool:
         """Mengirimkan payload triage dengan Suhu Inti dan Skor GCS."""
