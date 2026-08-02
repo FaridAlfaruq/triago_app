@@ -107,6 +107,7 @@ def save_patient(data: dict) -> bool:
     )
 
     try:
+        print(f"[DATABASE DEBUG] Values tuple inserted to MySQL: {values}", flush=True)
         cursor.execute(sql, values)
         conn.commit()
         print("[DATABASE] Data pasien berhasil disimpan ke MySQL.", flush=True)
