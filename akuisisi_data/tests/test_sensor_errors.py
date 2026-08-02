@@ -48,6 +48,9 @@ class SensorErrorFlowTests(unittest.TestCase):
             def write(self, _data):
                 pass
 
+            def flush(self):
+                pass
+
             def close(self):
                 self.is_open = False
 
@@ -57,7 +60,7 @@ class SensorErrorFlowTests(unittest.TestCase):
             patch("akuisisi_data.get_stm32.time.monotonic", side_effect=[0.0, 5.1]),
         ):
             stream = stream_stm32_data(port="COM42", data_timeout=5.0)
-            with self.assertRaisesRegex(serial.SerialTimeoutException, "tidak mengirim paket valid"):
+            with self.assertRaisesRegex(serial.SerialTimeoutException, "Tidak ada respons serial"):
                 next(stream)
 
     def test_worker_forwards_connection_error_to_gui_signal(self):
