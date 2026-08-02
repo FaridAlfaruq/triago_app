@@ -273,7 +273,9 @@ class ProcessingWorker(QThread):
                 "sqa_passed": sqa_passed,
                 "sqa_error": sqa_error,
                 "sqa_passed_segments": passed_segments,
+                "sqa_rejected_segments": total_segments - passed_segments,
                 "sqa_total_segments": total_segments,
+                "sqa_rejections": bp_res.get("rejections", {}) if 'bp_res' in locals() else {},
 
                 # Output model triase ONNX
                 "triage_status": triage_label,

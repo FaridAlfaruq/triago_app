@@ -1,0 +1,17 @@
+{
+    "Timestamp": "2026-08-02 23:45:26",
+    "Bed": "01",
+    "GCS Score": 15,
+    "HR": 75.54,
+    "RR": 23.67,
+    "SpO2": 98.05,
+    "PI Red": 0.38,
+    "PI IR": 0.91,
+    "SBP": 108.0,
+    "DBP": 68.5,
+    "Suhu Core": 30.0,
+    "Suhu Skin": 24.5,
+    "Suhu Amb": 24.5,
+    "Triage Status": "DARURAT",
+    "Triage Confidence": 0.998271107673645
+}
