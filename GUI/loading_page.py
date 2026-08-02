@@ -126,14 +126,20 @@ class ProcessingWorker(QThread):
             WEIGHT_CORE = 0.64
             WEIGHT_SKIN = 0.36
 
-            # Ambil nilai mentah dari patient_info
-            raw_temp_skin = patient.get('temp_skin')
-            raw_temp_amb = patient.get('temp_ambient')
+            # Ambil nilai mentah suhu dari patient_info (dukung scalar maupun array)
+            raw_temp_skin = patient.get('temp_skin') if patient.get('temp_skin') is not None else patient.get('temp_obj')
+            if raw_temp_skin is None and patient.get('raw_temp_obj') is not None and len(patient.get('raw_temp_obj')) > 0:
+                raw_temp_skin = float(np.mean(patient.get('raw_temp_obj')))
+
+            raw_temp_amb = patient.get('temp_ambient') if patient.get('temp_ambient') is not None else patient.get('temp_amb')
+            if raw_temp_amb is None and patient.get('raw_temp_amb') is not None and len(patient.get('raw_temp_amb')) > 0:
+                raw_temp_amb = float(np.mean(patient.get('raw_temp_amb')))
+
             input_warnings = []
 
             # Logging warning jika salah satu/kedua suhu bernilai None
             if raw_temp_skin is None or raw_temp_amb is None:
-                print(f"[WARN WORKER TEMP] ⚠️ Parameter 'temp_skin' ({raw_temp_skin}) atau 'temp_ambient' ({raw_temp_amb}) tidak ditemukan pada patient_info! Memakai nilai default (Kulit: 34.5°C, Amb: 28.0°C).")
+                print(f"[WARN WORKER TEMP] Parameter 'temp_skin' ({raw_temp_skin}) atau 'temp_ambient' ({raw_temp_amb}) tidak ditemukan pada patient_info! Memakai nilai default (Kulit: 34.5°C, Amb: 28.0°C).")
                 input_warnings.append("temperature memakai nilai fallback")
 
             temp_skin_val = float(raw_temp_skin if raw_temp_skin is not None else 34.5)
@@ -433,17 +439,17 @@ class LoadingPage(QWidget):
         main_layout.addWidget(self.lbl_logo)
 
         # 2. Container Card
-        card_container = QFrame()
-        card_container.setStyleSheet("""
+        self.card_container = QFrame()
+        self.card_container.setStyleSheet("""
             QFrame {
                 background-color: #214889; 
                 border-radius: 28px; 
             }
         """)
-        card_container.setFixedWidth(540)
-        card_container.setFixedHeight(128)
+        self.card_container.setFixedWidth(540)
+        self.card_container.setFixedHeight(128)
 
-        card_layout = QVBoxLayout(card_container)
+        card_layout = QVBoxLayout(self.card_container)
         card_layout.setContentsMargins(30, 22, 30, 22)
         card_layout.setSpacing(10)
 
@@ -470,7 +476,7 @@ class LoadingPage(QWidget):
         self._status_effect.setOpacity(1.0)
         self.lbl_status.setGraphicsEffect(self._status_effect)
 
-        main_layout.addWidget(card_container)
+        main_layout.addWidget(self.card_container)
 
     def start_processing(
         self,
@@ -482,6 +488,12 @@ class LoadingPage(QWidget):
         fs_orig=400,
     ):
         """Memicu pemrosesan sinyal dan klasifikasi ML."""
+        self.card_container.setStyleSheet("""
+            QFrame {
+                background-color: #214889; 
+                border-radius: 28px; 
+            }
+        """)
         self.progress_bar.setValue(0)
         self.lbl_status.setText("Memulai pemrosesan data...")
 
@@ -502,12 +514,47 @@ class LoadingPage(QWidget):
 
     def handle_processing_completion(self, results):
         """Dipanggil otomatis ketika pemrosesan data selesai."""
-        print("[LOG] Pemrosesan data selesai!")
-        self.lbl_status.setText("Pemrosesan Data Selesai!")
+        from PyQt6.QtCore import QTimer
+        sqa_passed = results.get("sqa_passed", True)
 
-        # 1. Generate string timestamp saat ini (Format: TahunBulanTanggal_JamMenitDetik)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+        if not sqa_passed:
+            reasons_dict = results.get("sqa_rejections", {})
+            reasons_str = ", ".join([f"{k}" for k in reasons_dict.keys()]) if reasons_dict else "Artefak/Noise Tinggi"
+            
+            print(f"[SQA FAILED UI] Kualitas sinyal tidak stabil ({reasons_str})")
+            self.progress_bar.animate_to(100)
+            self._fade_to_text(f"Kualitas sinyal tidak stabil ({reasons_str})")
+            
+            # Ubah warna kartu loading ke merah/oranye peringatan
+            self.card_container.setStyleSheet("""
+                QFrame {
+                    background-color: #D35400; 
+                    border-radius: 28px; 
+                }
+            """)
+
+            def _step_prompt_retake():
+                self._fade_to_text("Silakan lakukan pengambilan data ulang...")
+                QTimer.singleShot(2200, _redirect_retake)
+
+            def _redirect_retake():
+                self.card_container.setStyleSheet("""
+                    QFrame {
+                        background-color: #214889; 
+                        border-radius: 28px; 
+                    }
+                """)
+                if hasattr(self, "parent_main_win"):
+                    self.parent_main_win.handle_sqa_retry()
+                else:
+                    self._fade_to_text("Siap pengambilan data ulang.")
+
+            QTimer.singleShot(2000, _step_prompt_retake)
+            return
+
+        print("[LOG] Pemrosesan data selesai!")
+        self._fade_to_text("Pemrosesan Data Selesai!")
+
         # Alirkan hasil ke Window Utama untuk penyimpanan 2 file (CSV & JSON) dan pengalihan halaman
         if hasattr(self, "parent_main_win"):
             self.parent_main_win.processed_results = results
