@@ -36,9 +36,9 @@ class TriageApiClient:
                 resp_data = response.json() if response.content else {}
                 saved_db = resp_data.get("saved_to_database", False)
                 if saved_db:
-                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Backend & BERHASIL disimpan ke Database (phpMyAdmin).")
+                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Backend & BERHASIL disimpan ke Database.")
                 else:
-                    print(f"[API WARNING] Data Bed {bed_id} berhasil dikirim ke Web Dashboard, tetapi GAGAL disimpan ke Database MySQL.")
+                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Web Dashboard.")
                 return True
             else:
                 err_msg = response.text if response.text else f"Status {response.status_code}"

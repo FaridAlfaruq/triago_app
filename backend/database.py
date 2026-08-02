@@ -19,11 +19,39 @@ DB_PASSWORD = os.environ.get("TRIAGO_DB_PASSWORD", "parapencariberkah")
 DB_NAME = os.environ.get("TRIAGO_DB_NAME", "triago")
 
 _db = None
+_is_sqlite = False
+
+
+def _init_sqlite_schema(conn):
+    """Membuat tabel patient_data di SQLite jika belum ada."""
+    schema = """
+    CREATE TABLE IF NOT EXISTS patient_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        bed_id TEXT,
+        zone TEXT,
+        status TEXT,
+        patient_name TEXT,
+        relative_name TEXT,
+        gcs_score INTEGER,
+        xgboost_score REAL,
+        heart_rate REAL,
+        spo2 REAL,
+        temperature REAL,
+        respiration_rate REAL,
+        systolic_bp INTEGER,
+        diastolic_bp INTEGER,
+        arrival_timestamp INTEGER
+    );
+    """
+    cursor = conn.cursor()
+    cursor.execute(schema)
+    conn.commit()
+    cursor.close()
 
 
 def _connect():
     """Membuat koneksi ke MySQL atau SQLite fallback."""
-    global _db
+    global _db, _is_sqlite
     if HAS_MYSQL:
         try:
             _db = mysql.connector.connect(
@@ -32,6 +60,8 @@ def _connect():
                 password=DB_PASSWORD,
                 database=DB_NAME,
             )
+            _is_sqlite = False
+            print(f"[DATABASE] Berhasil terkoneksi ke MySQL ({DB_HOST}/{DB_NAME})")
             return
         except Exception:
             pass
@@ -39,61 +69,54 @@ def _connect():
     # Fallback to local SQLite database in backend directory
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "triage.db")
     _db = sqlite3.connect(db_path, check_same_thread=False)
-    print(f"[DATABASE] Berhasil terkoneksi ke MySQL ({DB_HOST}/{DB_NAME})")
+    _db.row_factory = sqlite3.Row
+    _is_sqlite = True
+    _init_sqlite_schema(_db)
+    print(f"[DATABASE] Berhasil menggunakan database SQLite3 ({db_path})")
 
 
 def get_connection():
-    """Mengembalikan koneksi aktif. Reconnect otomatis bila koneksi terputus
-    (mengatasi error 'MySQL server has gone away' pada server yang jalan lama)."""
+    """Mengembalikan koneksi aktif."""
     global _db
     try:
-        if _db is None or not _db.is_connected():
+        if _db is None:
             _connect()
-    except Error as err:
-        print(f"[DATABASE][ERROR] Gagal konek ke MySQL: {err}")
-        raise
+        elif not _is_sqlite and HAS_MYSQL:
+            if not getattr(_db, "is_connected", lambda: True)():
+                _connect()
+    except Exception as err:
+        print(f"[DATABASE][WARN] Reconnecting database due to error: {err}")
+        _connect()
     return _db
 
 
-# Percobaan koneksi pertama saat modul di-import.
-# Dibuat try/except supaya Flask TIDAK crash total kalau MySQL belum
-# menyala saat backend pertama kali dijalankan (misal urutan boot Raspberry Pi).
+# Percobaan koneksi pertama saat modul di-import
 try:
     _connect()
-except Error as err:
-    print(f"[DATABASE][WARN] MySQL belum siap saat startup: {err}")
-    print("[DATABASE][WARN] Server tetap berjalan, akan mencoba reconnect otomatis saat ada data masuk.")
+except Exception as err:
+    print(f"[DATABASE][WARN] Database initialization notice: {err}")
 
 
 def save_patient(data: dict) -> bool:
-    """Simpan satu baris hasil pengukuran/klasifikasi pasien ke tabel patient_data.
-    Mengembalikan True bila berhasil, False bila gagal (server tidak akan ikut crash)."""
+    """Simpan satu baris hasil pengukuran/klasifikasi pasien ke tabel patient_data."""
     try:
         conn = get_connection()
-    except Error:
-        print("[DATABASE][ERROR] Data TIDAK disimpan karena koneksi MySQL gagal.")
+    except Exception as e:
+        print(f"[DATABASE][ERROR] Data TIDAK disimpan karena koneksi database gagal: {e}")
         return False
 
     cursor = conn.cursor()
-    sql = """
+    
+    placeholder = "?" if _is_sqlite else "%s"
+    sql = f"""
     INSERT INTO patient_data(
-        bed_id,
-        zone,
-        status,
-        patient_name,
-        relative_name,
-        gcs_score,
-        xgboost_score,
-        heart_rate,
-        spo2,
-        temperature,
-        respiration_rate,
-        systolic_bp,
-        diastolic_bp,
-        arrival_timestamp
+        bed_id, zone, status, patient_name, relative_name,
+        gcs_score, xgboost_score, heart_rate, spo2, temperature,
+        respiration_rate, systolic_bp, diastolic_bp, arrival_timestamp
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES ({placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder},{placeholder})
     """
+    
     vitals = data.get("vitals", {})
     if not isinstance(vitals, dict):
         vitals = {}
@@ -123,12 +146,12 @@ def save_patient(data: dict) -> bool:
     )
 
     try:
-        print(f"[DATABASE DEBUG] Values tuple inserted to MySQL: {values}", flush=True)
         cursor.execute(sql, values)
         conn.commit()
-        print("[DATABASE] Data pasien berhasil disimpan ke MySQL.", flush=True)
+        db_type = "SQLite3" if _is_sqlite else "MySQL"
+        print(f"[DATABASE] Data pasien {data.get('bed_id')} berhasil disimpan ke {db_type}.", flush=True)
         return True
-    except Error as err:
+    except Exception as err:
         print(f"[DATABASE][ERROR] Gagal insert data pasien: {err}", flush=True)
         conn.rollback()
         return False
@@ -137,20 +160,25 @@ def save_patient(data: dict) -> bool:
 
 
 def get_patient_history(limit: int = 50):
-    """Ambil riwayat pengukuran terbaru dari MySQL (opsional, untuk laporan/riwayat)."""
+    """Ambil riwayat pengukuran terbaru dari database."""
     try:
         conn = get_connection()
-    except Error:
+    except Exception:
         return []
 
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     try:
-        cursor.execute(
-            "SELECT * FROM patient_data ORDER BY arrival_timestamp DESC LIMIT %s",
-            (limit,),
-        )
-        return cursor.fetchall()
-    except Error as err:
+        placeholder = "?" if _is_sqlite else "%s"
+        query = f"SELECT * FROM patient_data ORDER BY arrival_timestamp DESC LIMIT {placeholder}"
+        cursor.execute(query, (limit,))
+        
+        if _is_sqlite:
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+        else:
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    except Exception as err:
         print(f"[DATABASE][ERROR] Gagal mengambil riwayat pasien: {err}")
         return []
     finally:
@@ -158,27 +186,29 @@ def get_patient_history(limit: int = 50):
 
 
 def update_patient_info(bed_id: str, patient_name: str, relative_name: str) -> bool:
-    """Memperbarui nama pasien dan penanggung jawab pada baris terbaru di MySQL untuk bed tertentu."""
+    """Memperbarui nama pasien dan penanggung jawab pada baris terbaru."""
     try:
         conn = get_connection()
-    except Error:
-        print("[DATABASE][ERROR] Gagal update identitas pasien karena koneksi MySQL gagal.", flush=True)
+    except Exception:
+        print("[DATABASE][ERROR] Gagal update identitas pasien karena koneksi database gagal.", flush=True)
         return False
 
     cursor = conn.cursor()
-    sql = """
-    UPDATE patient_data 
-    SET patient_name = %s, relative_name = %s 
-    WHERE bed_id = %s 
-    ORDER BY arrival_timestamp DESC 
-    LIMIT 1
-    """
+    placeholder = "?" if _is_sqlite else "%s"
+    
+    if _is_sqlite:
+        sql = f"UPDATE patient_data SET patient_name = {placeholder}, relative_name = {placeholder} WHERE id = (SELECT id FROM patient_data WHERE bed_id = {placeholder} ORDER BY arrival_timestamp DESC LIMIT 1)"
+        params = (patient_name, relative_name, bed_id)
+    else:
+        sql = f"UPDATE patient_data SET patient_name = {placeholder}, relative_name = {placeholder} WHERE bed_id = {placeholder} ORDER BY arrival_timestamp DESC LIMIT 1"
+        params = (patient_name, relative_name, bed_id)
+
     try:
-        cursor.execute(sql, (patient_name, relative_name, bed_id))
+        cursor.execute(sql, params)
         conn.commit()
-        print(f"[DATABASE] Identitas pasien Bed {bed_id} berhasil diperbarui di MySQL.", flush=True)
+        print(f"[DATABASE] Identitas pasien Bed {bed_id} berhasil diperbarui.", flush=True)
         return True
-    except Error as err:
+    except Exception as err:
         print(f"[DATABASE][ERROR] Gagal update identitas pasien: {err}", flush=True)
         conn.rollback()
         return False
