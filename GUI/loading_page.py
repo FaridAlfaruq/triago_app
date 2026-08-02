@@ -2,8 +2,6 @@ import sys
 import os
 import numpy as np
 import pandas as pd
-import joblib
-import shap
 from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QFrame, QApplication, QGraphicsOpacityEffect
@@ -19,37 +17,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import modul pemrosesan ECG dan PPG dari processing_data
 from processing_data.processing_data import ECGProcessor, PPGProcessor
-
-
-# =============================================================================
-# HELPER: FUNGSI FEATURE ENGINEERING KLINIS (18 FITUR KLINIS)
-# =============================================================================
-def apply_feature_engineering(df_features):
-    """Menghasilkan 11 fitur turunan klinis sesuai pipeline training Colab."""
-    df = df_features.copy()
-
-    # 1. Fitur Klinis Utama
-    df['shock_index'] = df['heart_rate'] / (df['systolic_bp'] + 0.1)
-    df['map'] = df['diastolic_bp'] + (1/3 * (df['systolic_bp'] - df['diastolic_bp']))
-    df['pulse_pressure'] = df['systolic_bp'] - df['diastolic_bp']
-
-    # 2. Fitur Indikator Kegawatan
-    df['hypoxia'] = (df['spo2'] < 90).astype(int)
-    df['tachypnea'] = (df['respiratory_rate'] > 24).astype(int)
-    df['abnormal_temp'] = ((df['temperature_c'] >= 38.0) | (df['temperature_c'] <= 35.0)).astype(int)
-    df['abnormal_hr'] = ((df['heart_rate'] > 100) | (df['heart_rate'] < 60)).astype(int)
-
-    # Indikator GCS
-    df['gcs_squared'] = df['gcs_total'] ** 2
-    df['gcs_map_index'] = df['gcs_total'] * df['map']
-    df['gcs_shock_index'] = df['shock_index'] / (df['gcs_total'] + 0.1)
-
-    # 3. Total Akumulasi Kegawatan
-    df['total_abnormal'] = (
-        df['hypoxia'] + df['tachypnea'] + df['abnormal_temp'] + df['abnormal_hr']
-    )
-
-    return df
+from ml_xgboost.triage_xgboost import TriageModelError, TriageOnnxPredictor
+from ml_xgboost.triage_xgboost.preprocessing import TriagePreprocessingError
 
 
 # =====================================================================
@@ -67,6 +36,8 @@ class ProcessingWorker(QThread):
         raw_ir=None,
         patient_info=None,
         fs_orig=400,
+        triage_predictor=None,
+        triage_model_error=None,
         parent=None,
     ):
         super().__init__(parent)
@@ -76,48 +47,12 @@ class ProcessingWorker(QThread):
         self.raw_ir = raw_ir
         self.patient_info = patient_info or {}
         self.fs_orig = fs_orig
+        self.triage_predictor = triage_predictor
+        self.triage_model_error = triage_model_error
         
         # Inisialisasi Processor ECG & PPG
         self.ecg_processor = ECGProcessor(target_fs=125)
         self.ppg_processor = PPGProcessor(target_fs=125)
-
-        # Absolute Path File Model XGBoost
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.model_path = os.path.abspath(os.path.join(current_dir, "..", "ml_xgboost", "triage_model.joblib"))
-        print(f"[INFO] Path Target: {self.model_path}")
-        if not os.path.exists(self.model_path):
-            print(f"[ERROR] ❌ File model tidak ditemukan pada path yang ditentukan!")
-        else:
-            print("[SUCCESS]  File model ditemukan.")
-            
-            try:
-                # 2. Cek Memuat Model (Load Test)
-                self.model = joblib.load(self.model_path)
-                print("[SUCCESS]  Model berhasil dimuat ke memori (joblib.load beroperasi penuh).")
-                print(f"[INFO] Tipe objek: {type(self.model).__name__}")
-                
-                # 3. Test Eksekusi (Dummy Inference)
-                # Mendeteksi jumlah fitur yang dibutuhkan secara otomatis
-                n_features = getattr(self.model, "n_features_in_", None)
-                
-                if n_features is not None:
-                    print(f"[INFO] Fitur terdeteksi pada model: {n_features} input.")
-                    dummy_input = np.zeros((1, n_features))
-                    
-                    # Jalankan prediksi uji coba
-                    test_output = self.model.predict(dummy_input)
-                    print(f"[SUCCESS]  Test eksekusi model berhasil!")
-                    print(f"[INFO] Output uji coba: {test_output}")
-                else:
-                    print("[WARN] ⚠️ Jumlah fitur (n_features_in_) tidak terdeteksi otomatis. Melewati test dummy inference.")
-
-            except ModuleNotFoundError as e:
-                print(f"[ERROR] ❌ Library pendukung tidak ditemukan saat memuat model: {e}")
-                print("[HINT] Pastikan versi `xgboost` dan `scikit-learn` pada environment runtime sesuai dengan environment saat training.")
-            except Exception as e:
-                print(f"[ERROR] ❌ Gagal membuka atau menjalankan model: {e}")
-
-        print("="*50 + "\n")
 
     def run(self):
             # -----------------------------------------------------------------
@@ -189,10 +124,12 @@ class ProcessingWorker(QThread):
             # Ambil nilai mentah dari patient_info
             raw_temp_skin = patient.get('temp_skin')
             raw_temp_amb = patient.get('temp_ambient')
+            input_warnings = []
 
             # Logging warning jika salah satu/kedua suhu bernilai None
             if raw_temp_skin is None or raw_temp_amb is None:
                 print(f"[WARN WORKER TEMP] ⚠️ Parameter 'temp_skin' ({raw_temp_skin}) atau 'temp_ambient' ({raw_temp_amb}) tidak ditemukan pada patient_info! Memakai nilai default (Kulit: 34.5°C, Amb: 28.0°C).")
+                input_warnings.append("temperature memakai nilai fallback")
 
             temp_skin_val = float(raw_temp_skin if raw_temp_skin is not None else 34.5)
             temp_amb_val = float(raw_temp_amb if raw_temp_amb is not None else 28.0)
@@ -210,73 +147,71 @@ class ProcessingWorker(QThread):
             print(f"[LOG BURTON FORMULA] T_skin={temp_skin_val:.2f}°C, T_amb={temp_amb_val:.2f}°C => T_core={temp_val:.2f}°C, T_burton={t_burton_calc:.2f}°C")
 
             # Parameter vital sign lainnya
+            if spo2 <= 0:
+                input_warnings.append("spo2 memakai nilai fallback 98")
+            if resp_rate <= 0:
+                input_warnings.append("respiratory_rate memakai nilai fallback 16")
+            if hr_ecg <= 0:
+                input_warnings.append("heart_rate memakai nilai fallback 75")
+            if patient.get('systolic') is None:
+                input_warnings.append("systolic_bp memakai nilai fallback 120")
+            if patient.get('diastolic') is None:
+                input_warnings.append("diastolic_bp memakai nilai fallback 80")
+            if patient.get('gcs') is None:
+                input_warnings.append("gcs_total memakai nilai fallback 15")
+
             spo2_val = float(spo2 if spo2 > 0 else 98.0)
             rr_val = float(resp_rate if resp_rate > 0 else 16.0)
             hr_val = float(hr_ecg if hr_ecg > 0 else 75.0)
-            sys_val = float(patient.get('systolic', 120))
-            dia_val = float(patient.get('diastolic', 80))
-            gcs_val = float(patient.get('gcs', 15))
+            sys_val = float(patient.get('systolic') if patient.get('systolic') is not None else 120)
+            dia_val = float(patient.get('diastolic') if patient.get('diastolic') is not None else 80)
+            gcs_val = float(patient.get('gcs') if patient.get('gcs') is not None else 15)
 
-            # 1. Susun 7 Fitur Mentah untuk Input Machine Learning
+            # Susun tujuh tanda vital mentah. Adapter ONNX melakukan clipping
+            # dan membangun sepuluh fitur turunan sesuai notebook training.
             raw_data = {
-                'temperature_c': [temp_val],  # Memakai T_core hasil kalkulasi
-                'spo2': [spo2_val],
-                'respiratory_rate': [rr_val],
-                'heart_rate': [hr_val],
-                'systolic_bp': [sys_val],
-                'diastolic_bp': [dia_val],
-                'gcs_total': [gcs_val]
+                'temperature_c': temp_val,
+                'spo2': spo2_val,
+                'respiratory_rate': rr_val,
+                'heart_rate': hr_val,
+                'systolic_bp': sys_val,
+                'diastolic_bp': dia_val,
+                'gcs_total': gcs_val,
             }
 
-            # 2. Jalankan Feature Engineering (18 Fitur)
-            df_base = pd.DataFrame(raw_data)
-            df_engineered = apply_feature_engineering(df_base)
+            triage_label = "TIDAK TERSEDIA"
+            triage_valid = False
+            triage_error = self.triage_model_error or "Model ONNX belum dimuat."
+            triage_score = 0.0
+            triage_probabilities = []
+            triage_features = {}
+            inference_ms = None
 
-            EXPECTED_FEATURES = [
-                'temperature_c', 'spo2', 'respiratory_rate', 'heart_rate', 
-                'systolic_bp', 'diastolic_bp', 'gcs_total', 'shock_index', 
-                'map', 'pulse_pressure', 'hypoxia', 'tachypnea', 
-                'abnormal_temp', 'abnormal_hr', 'gcs_squared', 
-                'gcs_map_index', 'gcs_shock_index', 'total_abnormal'
-            ]
-            df_input = df_engineered[EXPECTED_FEATURES]
-
-            triage_label = "NON-DARURAT"
-            shap_features = EXPECTED_FEATURES
-            shap_vals_sample = np.zeros(len(EXPECTED_FEATURES))
-
-            # 3. Prediksi & SHAP Analysis via XGBoost
-            if os.path.exists(self.model_path):
+            if self.triage_predictor is not None:
                 try:
-                    pipeline = joblib.load(self.model_path)
+                    prediction = self.triage_predictor.predict(raw_data)
+                    triage_label = prediction.label
+                    triage_valid = True
+                    triage_error = None
+                    triage_score = prediction.confidence
+                    triage_probabilities = list(prediction.probabilities)
+                    triage_features = prediction.feature_values
+                    inference_ms = prediction.inference_ms
+                    print(
+                        f"[ONNX] {prediction.label} "
+                        f"(confidence={prediction.confidence:.4f}, "
+                        f"inference={prediction.inference_ms:.3f} ms)"
+                    )
+                except (TriagePreprocessingError, TriageModelError) as exc:
+                    triage_error = str(exc)
+                    print(f"[ERROR ONNX] {triage_error}")
+                except Exception as exc:
+                    triage_error = f"Kesalahan tak terduga saat inferensi ONNX: {exc}"
+                    print(f"[ERROR ONNX] {triage_error}")
 
-                    # Prediksi Kelas Triase
-                    pred_class = pipeline.predict(df_input)[0]
-                    class_mapping = {0: "RESUSITASI", 1: "DARURAT", 2: "NON-DARURAT"}
-                    triage_label = class_mapping.get(pred_class, "NON-DARURAT")
-
-                    # SHAP Value Calculation
-                    scaler = pipeline.named_steps['scaler']
-                    model = pipeline.named_steps['model']
-                    
-                    X_scaled = scaler.transform(df_input)
-                    explainer = shap.TreeExplainer(model)
-                    shap_values = explainer.shap_values(X_scaled)
-
-                    # Penanganan Universal Array SHAP Multi-Class
-                    if isinstance(shap_values, list):
-                        shap_vals_sample = shap_values[pred_class][0]
-                    elif isinstance(shap_values, np.ndarray):
-                        if shap_values.ndim == 3:
-                            if shap_values.shape[0] == 3:
-                                shap_vals_sample = shap_values[pred_class][0]
-                            else:
-                                shap_vals_sample = shap_values[0, :, pred_class]
-                        elif shap_values.ndim == 2:
-                            shap_vals_sample = shap_values[0]
-
-                except Exception as e:
-                    print(f"[ERROR ML INFERENCE] Gagal memprediksi/menghitung SHAP: {e}")
+            input_quality = "measured" if not input_warnings else "fallback"
+            if input_warnings:
+                print("[WARN ONNX INPUT] " + "; ".join(input_warnings))
 
             # -----------------------------------------------------------------
             # TAHAP 5: Konsolidasi Seluruh Data ke Dictionary RAM (100%)
@@ -306,10 +241,20 @@ class ProcessingWorker(QThread):
                 "pi_ir": pi_ir,
                 "ppg_hr": ppg_hr,
 
-                # Output ML & SHAP
+                # Output model triase ONNX
                 "triage_status": triage_label,
-                "shap_features": shap_features,
-                "shap_values": shap_vals_sample,
+                "triage_valid": triage_valid,
+                "triage_error": triage_error,
+                "triage_input_quality": input_quality,
+                "triage_input_warnings": input_warnings,
+                "triage_probabilities": triage_probabilities,
+                "triage_features": triage_features,
+                "xgboost_score": triage_score,
+                "model_backend": "onnxruntime",
+                "model_inference_ms": inference_ms,
+                # SHAP model lama sengaja tidak digunakan untuk menjelaskan model baru.
+                "shap_features": [],
+                "shap_values": [],
 
                 # Sinyal Raw & Filtered
                 "raw_time": self.raw_time,
@@ -405,7 +350,22 @@ class LoadingPage(QWidget):
         self._fade_out_anim = None
         self._fade_in_anim = None
         self.worker = None
+        self.triage_predictor = None
+        self.triage_model_error = None
         self.setup_ui()
+        self._load_triage_model()
+
+    def _load_triage_model(self):
+        """Muat dan warm-up sesi ONNX sekali selama umur aplikasi."""
+        try:
+            self.triage_predictor = TriageOnnxPredictor(warm_up=True)
+            print(
+                "[SUCCESS ONNX] Model triase siap "
+                f"dalam {self.triage_predictor.load_ms:.2f} ms."
+            )
+        except TriageModelError as exc:
+            self.triage_model_error = str(exc)
+            print(f"[ERROR ONNX] {self.triage_model_error}")
 
     def setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -490,6 +450,8 @@ class LoadingPage(QWidget):
             raw_ir=raw_ir,
             patient_info=patient_info,
             fs_orig=fs_orig,
+            triage_predictor=self.triage_predictor,
+            triage_model_error=self.triage_model_error,
         )
         self.worker.status_updated.connect(self.update_ui_state)
         self.worker.processing_finished.connect(self.handle_processing_completion)

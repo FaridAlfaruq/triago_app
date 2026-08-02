@@ -9,6 +9,11 @@ model final ke ONNX.
 - `notebooks/Triage_XGBoost.ipynb`: proses training dan ekspor.
 - `models/triage_xgboost_model.onnx`: model ONNX hasil ekspor.
 - `model_contract.json`: kontrak input, output, preprocessing, dan label.
+- `preprocessing.py`: validasi, clipping, dan feature engineering 17 fitur.
+- `inference.py`: adapter ONNX Runtime yang memuat sesi sekali dan menghasilkan
+  label, confidence, serta waktu inferensi.
+- `PIPELINE.md`: alur integrasi langkah demi langkah dengan GUI.
+- `tests/`: unit test preprocessing dan smoke test model asli.
 
 Model ONNX telah lolos pemeriksaan struktur. Input-nya `float_input` bertipe
 `float32` dengan bentuk `[batch, 17]`. Output-nya adalah `label` dan
@@ -43,3 +48,13 @@ biaya kesalahan klinis dan pengujian lanjutan, bukan accuracy saja.
 
 Notebook mencatat satu sampel ONNX menghasilkan probabilitas yang sama dengan
 XGBoost asli. Tambahkan golden test multi-sampel sebelum model diintegrasikan.
+
+## Integrasi GUI
+
+`GUI/loading_page.py` sekarang menggunakan adapter ONNX ini sebagai backend
+triase. Model dimuat dan di-warm-up satu kali ketika `LoadingPage` dibuat,
+kemudian sesi dipakai ulang oleh worker. Jalur inferensi utama tidak lagi
+membuka `triage_model.joblib` atau menghitung SHAP model lama.
+
+Lihat `PIPELINE.md` untuk kontrak kegagalan, metadata hasil, dan batasan input
+fallback yang masih perlu diselesaikan.

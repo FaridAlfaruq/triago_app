@@ -6,8 +6,8 @@ normalisasi, dan pengujian deployment tersedia.
 
 ## Struktur
 
-- `model.py` dan `triage_model.joblib`: implementasi lama yang masih dipakai
-  `GUI/loading_page.py`. Lokasinya dipertahankan untuk menjaga kompatibilitas.
+- `model.py` dan `triage_model.joblib`: implementasi legacy yang dipertahankan
+  sebagai artefak pembanding, tetapi tidak lagi berada pada jalur inferensi GUI.
 - `triage_xgboost/`: notebook penelitian, model ONNX, dan kontrak model triase.
 - `bpnet/`: notebook penelitian, model TFLite, dan kontrak model estimasi tekanan
   darah.
@@ -18,8 +18,8 @@ artefak pendamping yang masih belum tersedia.
 
 ## Status deployment
 
-Model belum boleh dipakai langsung untuk keputusan klinis. Sebelum integrasi ke
-aplikasi, lengkapi dan uji hal berikut:
+Model belum boleh dipakai langsung untuk keputusan klinis. Sebelum penggunaan
+klinis, lengkapi dan uji hal berikut:
 
 1. preprocessing produksi yang identik dengan notebook;
 2. parameter imputasi atau normalisasi yang berasal dari data latih;
