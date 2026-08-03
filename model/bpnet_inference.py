@@ -14,12 +14,15 @@ from scipy.stats import skew, kurtosis
 from scipy.signal import welch, find_peaks, correlate
 
 try:
-    import tensorflow.lite as tflite
+    import ai_edge_litert.interpreter as tflite
 except ImportError:
     try:
         import tflite_runtime.interpreter as tflite
     except ImportError:
-        tflite = None
+        try:
+            import tensorflow.lite as tflite
+        except ImportError:
+            tflite = None
 
 MODEL_DIR = Path(__file__).resolve().parent
 DEFAULT_TFLITE_PATH = MODEL_DIR / "triago_bpnet_v53_quant.tflite"
@@ -157,7 +160,7 @@ def extract_7channel_features(ecg_seg, ppg_seg, fs=125.0):
 class BPNetTflitePredictor:
     def __init__(self, model_path=None, scaler_path=None):
         if tflite is None:
-            raise ImportError("Interpreter TFLite (tensorflow / tflite_runtime) tidak tersedia di environment.")
+            raise ImportError("Interpreter TFLite (ai-edge-litert / tflite_runtime / tensorflow.lite) tidak tersedia di environment.")
         self.model_path = model_path or DEFAULT_TFLITE_PATH
         self.scaler_path = scaler_path or DEFAULT_SCALER_PATH
 
