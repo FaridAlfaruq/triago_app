@@ -11,7 +11,7 @@ class TriageApiClient:
             or "https://triago-bmeits-dsc7btake6fhhxde.indonesiacentral-01.azurewebsites.net"
         ).rstrip("/")
         self.endpoint_update = f"{self.base_url}/api/triage/update"
-        self.timeout = 15.0
+        self.timeout = 30.0
 
     def send_triage_result(self, bed_id: str, gcs_score: int, vitals: dict, classification: str, score: float) -> bool:
         """Mengirimkan payload triage dengan Suhu Inti dan Skor GCS."""
@@ -30,20 +30,25 @@ class TriageApiClient:
             }
         }
 
-        try:
-            response = requests.post(self.endpoint_update, json=payload, timeout=self.timeout)
-            if response.status_code == 200:
-                resp_data = response.json() if response.content else {}
-                saved_db = resp_data.get("saved_to_database", False)
-                if saved_db:
-                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Backend & BERHASIL disimpan ke Database.")
+        # Percobaan pengiriman data (dengan 1x retry jika server Azure sedang bangkit dari mode sleep)
+        for attempt in range(1, 3):
+            try:
+                response = requests.post(self.endpoint_update, json=payload, timeout=self.timeout)
+                if response.status_code == 200:
+                    resp_data = response.json() if response.content else {}
+                    saved_db = resp_data.get("saved_to_database", False)
+                    if saved_db:
+                        print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Backend & BERHASIL disimpan ke Database.")
+                    else:
+                        print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Web Dashboard.")
+                    return True
                 else:
-                    print(f"[API SUCCESS] Data Bed {bed_id} BERHASIL dikirim ke Web Dashboard.")
-                return True
-            else:
-                err_msg = response.text if response.text else f"Status {response.status_code}"
-                print(f"[API ERROR] Server menolak data (Status {response.status_code}): {err_msg}")
-                return False
-        except requests.exceptions.RequestException as e:
-            print(f"[API WARNING] Gagal terhubung ke Flask Server ({self.base_url}): {e}")
-            return False
+                    err_msg = response.text if response.text else f"Status {response.status_code}"
+                    print(f"[API ERROR] Server menolak data (Status {response.status_code}): {err_msg}")
+                    return False
+            except requests.exceptions.RequestException as e:
+                if attempt == 1:
+                    print(f"[API WARN] Percobaan 1 timed-out (Server Azure sedang membangunkan container), mencoba ulang...")
+                else:
+                    print(f"[API WARNING] Gagal terhubung ke Flask Server ({self.base_url}): {e}")
+        return False
