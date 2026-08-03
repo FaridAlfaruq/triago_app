@@ -108,7 +108,9 @@ def update_triage():
             print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.", flush=True)
 
         # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
+        socketio.emit("bed_update", updated_bed_info)
         socketio.emit("bed_updated", updated_bed_info)
+        socketio.emit("beds_matrix_update", bed_manager.get_all_beds_status())
 
         print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n", flush=True)
 

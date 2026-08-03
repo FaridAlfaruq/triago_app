@@ -227,4 +227,30 @@ document.addEventListener('DOMContentLoaded', () => {
   tickClock();
   setInterval(tickClock, 1000);
   setInterval(tickCountdowns, 1000);
+
+  // REAL-TIME SOCKET.IO LISTENERS FOR INSTANT BED UPDATES WITHOUT REFRESH
+  if (socket) {
+    socket.on('connect', () => {
+      console.log('[SOCKET] Terhubung ke TriaGO Real-Time Server.');
+    });
+
+    socket.on('bed_update', handleSingleBedUpdate);
+    socket.on('bed_updated', handleSingleBedUpdate);
+
+    function handleSingleBedUpdate(bedInfo) {
+      console.log('[SOCKET] Real-time Bed Update:', bedInfo);
+      if (bedInfo && bedInfo.bed_id) {
+        bedsData[bedInfo.bed_id] = bedInfo;
+        renderAllZones();
+      }
+    }
+
+    socket.on('beds_matrix_update', (allBeds) => {
+      console.log('[SOCKET] Real-time Matrix Update:', allBeds);
+      if (allBeds && typeof allBeds === 'object') {
+        bedsData = allBeds;
+        renderAllZones();
+      }
+    });
+  }
 });

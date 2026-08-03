@@ -109,4 +109,38 @@ class BedManager:
         return self.beds
 
     def get_all_beds_status(self):
-        return self.beds
+        """Mengembalikan status seluruh bed, di-hydrate otomatis dari database jika ada data pasien aktif."""
+        with self._lock:
+            try:
+                try:
+                    from backend.database import get_patient_history
+                except (ImportError, ModuleNotFoundError):
+                    from database import get_patient_history
+
+                history = get_patient_history(limit=50)
+                if history:
+                    # Proses riwayat pasien terbaru dari database (urutan waktu terlama ke terbaru)
+                    for row in reversed(history):
+                        bed_id = row.get("bed_id")
+                        status = row.get("status")
+                        if bed_id and bed_id in self.beds and status and status != "empty":
+                            self.beds[bed_id].update({
+                                "status": status,
+                                "gcs_score": row.get("gcs_score", 15),
+                                "patient_name": row.get("patient_name"),
+                                "relative_name": row.get("relative_name"),
+                                "xgboost_score": row.get("xgboost_score"),
+                                "vitals": {
+                                    "hr": row.get("heart_rate"),
+                                    "spo2": row.get("spo2"),
+                                    "temp_core": row.get("temperature"),
+                                    "rr": row.get("respiration_rate"),
+                                    "sys": row.get("systolic_bp"),
+                                    "dia": row.get("diastolic_bp"),
+                                },
+                                "arrival_timestamp": row.get("arrival_timestamp"),
+                            })
+            except Exception as e:
+                print(f"[BED_MANAGER][WARN] Hydration database error: {e}")
+
+            return self.beds
