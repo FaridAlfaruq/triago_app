@@ -18,8 +18,8 @@ scikit-learn>=1.3.0
 # --- Machine Learning & Deep Learning Inference ---
 xgboost>=2.0.0
 onnxruntime>=1.16.0
-# tflite-runtime disarankan untuk Raspberry Pi ARM64 (atau tensorflow di PC)
-# tflite-runtime>=2.14.0
+# Runtime resmi untuk model .tflite (tersedia untuk Linux ARM64 dan desktop).
+ai-edge-litert>=2.1.0
 
 # --- Web Backend & IoT Dashboard ---
 Flask>=3.0.0
