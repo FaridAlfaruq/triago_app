@@ -366,7 +366,7 @@ if __name__ == "__main__":
     ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
 
     dummy_results = {
-        "bed": "A1",
+        "bed": "B2",
         "patient_name": "Budi Santoso",
         "gcs": 15,
         "timestamp": "2026-07-25 10:55:00",
