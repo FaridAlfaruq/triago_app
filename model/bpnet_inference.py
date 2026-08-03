@@ -13,13 +13,22 @@ import scipy.signal as signal
 from scipy.stats import skew, kurtosis
 from scipy.signal import welch, find_peaks, correlate
 
+# Prioritaskan LiteRT resmi. Dua fallback berikut menjaga kompatibilitas
+# dengan instalasi lama di laptop maupun Raspberry Pi.
 try:
-    import tensorflow.lite as tflite
+    from ai_edge_litert.interpreter import Interpreter
+    INTERPRETER_BACKEND = "ai-edge-litert"
 except ImportError:
     try:
-        import tflite_runtime.interpreter as tflite
+        from tensorflow.lite import Interpreter
+        INTERPRETER_BACKEND = "tensorflow.lite"
     except ImportError:
-        tflite = None
+        try:
+            from tflite_runtime.interpreter import Interpreter
+            INTERPRETER_BACKEND = "tflite-runtime"
+        except ImportError:
+            Interpreter = None
+            INTERPRETER_BACKEND = None
 
 MODEL_DIR = Path(__file__).resolve().parent
 DEFAULT_TFLITE_PATH = MODEL_DIR / "triago_bpnet_v53_quant.tflite"
@@ -156,15 +165,19 @@ def extract_7channel_features(ecg_seg, ppg_seg, fs=125.0):
 # -------------------------------------------------------------------------
 class BPNetTflitePredictor:
     def __init__(self, model_path=None, scaler_path=None):
-        if tflite is None:
-            raise ImportError("Interpreter TFLite (tensorflow / tflite_runtime) tidak tersedia di environment.")
+        if Interpreter is None:
+            raise ImportError(
+                "Interpreter LiteRT/TFLite (ai-edge-litert / tensorflow / "
+                "tflite-runtime) tidak tersedia di environment."
+            )
         self.model_path = model_path or DEFAULT_TFLITE_PATH
         self.scaler_path = scaler_path or DEFAULT_SCALER_PATH
 
         if not Path(self.model_path).exists():
             raise FileNotFoundError(f"File TFLite BPNet tidak ditemukan: {self.model_path}")
 
-        self.interpreter = tflite.Interpreter(model_path=str(self.model_path))
+        self.interpreter_backend = INTERPRETER_BACKEND
+        self.interpreter = Interpreter(model_path=str(self.model_path))
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()

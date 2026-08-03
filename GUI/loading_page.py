@@ -164,10 +164,6 @@ class ProcessingWorker(QThread):
                 input_warnings.append("respiratory_rate memakai nilai fallback 16")
             if hr_ecg <= 0:
                 input_warnings.append("heart_rate memakai nilai fallback 75")
-            if patient.get('systolic') is None:
-                input_warnings.append("systolic_bp memakai nilai fallback 120")
-            if patient.get('diastolic') is None:
-                input_warnings.append("diastolic_bp memakai nilai fallback 80")
             if patient.get('gcs') is None:
                 input_warnings.append("gcs_total memakai nilai fallback 15")
 
@@ -181,12 +177,22 @@ class ProcessingWorker(QThread):
             # -----------------------------------------------------------------
             # TAHAP 3.5: SQA 10s Window (Stride 2s) & Deep Learning BPNet Inference
             # -----------------------------------------------------------------
-            sqa_passed = True
+            sqa_passed = False
             sqa_error = None
             passed_segments = 0
             total_segments = 0
+            bp_res = {}
+            bp_model_succeeded = False
             
-            if self.bpnet_predictor is not None and len(ecg_smooth) >= 1250 and len(ir_clean) >= 1250:
+            if self.bpnet_predictor is None:
+                sqa_error = "Model BPNet/LiteRT tidak tersedia; SQA dan estimasi tekanan darah tidak dijalankan."
+                bp_res = {"rejections": {"BPNet tidak tersedia": 1}}
+                print(f"[ERROR BPNET UNAVAILABLE] {sqa_error}")
+            elif len(ecg_smooth) < 1250 or len(ir_clean) < 1250:
+                sqa_error = "Sinyal ECG/PPG kurang dari 10 detik; SQA dan BPNet tidak dapat dijalankan."
+                bp_res = {"rejections": {"Sinyal kurang dari 10 detik": 1}}
+                print(f"[WARN SQA INPUT] {sqa_error}")
+            else:
                 try:
                     bp_res = self.bpnet_predictor.predict_recording(
                         ecg_125=ecg_smooth,
@@ -202,12 +208,27 @@ class ProcessingWorker(QThread):
                     if sqa_passed:
                         sys_val = float(bp_res["sbp"])
                         dia_val = float(bp_res["dbp"])
+                        bp_model_succeeded = True
                         print(f"[BPNET DL SUCCESS] SBP={sys_val:.1f} mmHg, DBP={dia_val:.1f} mmHg (dari {passed_segments}/{total_segments} segmen 10s lolos SQA)")
                     else:
-                        sqa_error = "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi). Silakan lakukan pengambilan data ulang."
+                        sqa_error = bp_res.get(
+                            "sqa_error",
+                            "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi). Silakan lakukan pengambilan data ulang.",
+                        )
                         print(f"[WARN SQA FAILED] {sqa_error}")
                 except Exception as exc:
-                    print(f"[ERROR BPNET] Gagal inferensi BPNet: {exc}")
+                    sqa_passed = False
+                    sqa_error = f"Gagal inferensi BPNet: {exc}"
+                    bp_res = {"rejections": {"Kesalahan inferensi BPNet": 1}}
+                    print(f"[ERROR BPNET] {sqa_error}")
+
+            # BP 120/80 hanya berstatus fallback jika model tidak menghasilkan
+            # prediksi dan registrasi pasien juga tidak menyediakan nilai BP.
+            if not bp_model_succeeded:
+                if patient.get('systolic') is None:
+                    input_warnings.append("systolic_bp memakai nilai fallback 120")
+                if patient.get('diastolic') is None:
+                    input_warnings.append("diastolic_bp memakai nilai fallback 80")
 
             # Susun tujuh tanda vital mentah untuk ONNX XGBoost Triase
             raw_data = {
@@ -228,7 +249,13 @@ class ProcessingWorker(QThread):
             triage_features = {}
             inference_ms = None
 
-            if self.triage_predictor is not None:
+            if not sqa_passed:
+                triage_error = (
+                    "Inferensi triase dibatalkan karena SQA/BPNet belum "
+                    "menghasilkan tekanan darah yang valid."
+                )
+                print(f"[WARN ONNX SKIPPED] {triage_error}")
+            elif self.triage_predictor is not None:
                 try:
                     label, conf, proba = self.triage_predictor.predict(raw_data)
                     triage_label = label
@@ -281,7 +308,7 @@ class ProcessingWorker(QThread):
                 "sqa_passed_segments": passed_segments,
                 "sqa_rejected_segments": total_segments - passed_segments,
                 "sqa_total_segments": total_segments,
-                "sqa_rejections": bp_res.get("rejections", {}) if 'bp_res' in locals() else {},
+                "sqa_rejections": bp_res.get("rejections", {}),
 
                 # Output model triase ONNX
                 "triage_status": triage_label,
@@ -411,7 +438,10 @@ class LoadingPage(QWidget):
 
         try:
             self.bpnet_predictor = BPNetTflitePredictor()
-            print("[SUCCESS BPNET] Model Deep Learning BPNet TFLite & SQA Pipeline berhasil dimuat.")
+            print(
+                "[SUCCESS BPNET] Model Deep Learning BPNet & SQA Pipeline "
+                f"berhasil dimuat via {self.bpnet_predictor.interpreter_backend}."
+            )
         except Exception as exc:
             print(f"[WARN BPNET] Model BPNet TFLite belum siap ({exc}). Memakai fallback BP.")
 
