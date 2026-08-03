@@ -32,12 +32,19 @@ CORS(
 # Inisialisasi SocketIO untuk komunikasi dua arah (Real-time)
 socketio = SocketIO(
     app,
-    cors_allowed_origins=CORS_ORIGINS,
-    async_mode="threading",
+    cors_allowed_origins="*",
+    async_mode="eventlet",
+    transports=["websocket", "polling"],
 )
 
 # Inisialisasi BedManager untuk mengelola status bed IGD
 bed_manager = BedManager()
+
+
+@socketio.on("connect")
+def handle_socket_connect():
+    print("[SOCKET LOG] Client Web Dashboard terhubung secara real-time.", flush=True)
+    socketio.emit("beds_matrix_update", bed_manager.get_all_beds_status())
 
 
 # =========================================================================

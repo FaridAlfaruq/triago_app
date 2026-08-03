@@ -1,4 +1,8 @@
-const socket = typeof io === 'function' ? io() : null;
+const socket = typeof io === 'function' ? io({
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionDelay: 1000
+}) : null;
 
 const catLabel = {
   red: 'Resusitasi',
