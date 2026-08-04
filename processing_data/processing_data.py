@@ -367,7 +367,7 @@ class ECGProcessor:
         sig_lpf, window_size=savgol_win, poly_order=savgol_poly
     )
 
-    # Step 3: Deteksi R-Peaks (menggunakan data 125 Hz)
+    # Step 3: Deteksi R-Peaks (menggunakan data lpf)
     r_peaks, noise_peaks = self.detect_r_peaks(ecg_125, fs=self.target_fs)
 
     # Step 4: Hitung Heart Rate
@@ -498,7 +498,8 @@ class PPGProcessor:
             return 0.0, round(pi_red, 2), round(pi_ir, 2)
 
         R = (ac_red / mean_dc_red) / (ac_ir / mean_dc_ir)
-        spo2 = -17.8327 * (R**2) + 15.6006 * R + 94.6457
+        # spo2 = -17.8327 * (R**2) + 15.6006 * R + 94.6457
+        spo2 = 3.069398* (R**2) + -5.149127 * R + 99.79428
         spo2 = np.clip(spo2, 0.0, 100.0)
 
         return float(np.round(spo2, 2)), float(np.round(pi_red, 2)), float(np.round(pi_ir, 2))
