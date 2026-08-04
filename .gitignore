@@ -6,7 +6,7 @@ venv/
 # Mengabaikan Cache Python
 **/__pycache__/
 *.pyc
-*.csv
+# *.csv
 *.json
 
 # Mengabaikan file log data pasien sementara
