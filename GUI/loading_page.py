@@ -81,7 +81,7 @@ class ProcessingWorker(QThread):
             r_peaks, noise_peaks = self.ecg_processor.detect_r_peaks(ecg_125, fs=125)
             hr_ecg = self.ecg_processor.calculate_heart_rate(r_peaks, fs=125)
             resp_rate, resp_signal, resp_peaks = (
-                self.ecg_processor.calculate_respiration_rate(ecg_125, r_peaks, fs=125)
+                self.ecg_processor.calculate_respiration_rate(ecg_smooth, r_peaks, fs=125)
             )
             rr_details = self.ecg_processor.last_respiration_details or {}
             rr_quality = float(rr_details.get("quality", 0.0))
