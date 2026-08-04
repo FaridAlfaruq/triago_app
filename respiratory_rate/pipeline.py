@@ -1,8 +1,9 @@
 """Pipeline Respiratory Rate dari ECG.
 
 Alur singkat:
-ECG -> rapikan R-peak -> buat 5 sinyal EDR -> cek kualitas
-    -> gabungkan spektrum terbaik -> Respiratory Rate.
+ECG -> rapikan R-peak -> ekstraksi 7 fitur EDR + supresi ekstopik
+    -> interpolasi PCHIP & sub-bin parabolic PSD -> quality-weighted spectral fusion
+    -> temporal consistency filtering -> Respiratory Rate.
 """
 
 import numpy as np
@@ -11,7 +12,7 @@ from scipy.signal import butter, detrend, find_peaks, sosfiltfilt, welch
 
 
 class ECGRespirationEstimator:
-  """Estimator RR ECG-only dengan multi-EDR spectral fusion."""
+  """Estimator RR ECG-only dengan multi-EDR spectral fusion & parabolic peak precision."""
 
   def __init__(
       self,
@@ -19,7 +20,7 @@ class ECGRespirationEstimator:
       window_seconds=60.0,
       step_seconds=15.0,
       min_duration=20.0,
-      min_rr=6.0,
+      min_rr=10.0,
       max_rr=42.0,
   ):
     self.edr_fs = edr_fs
@@ -30,7 +31,7 @@ class ECGRespirationEstimator:
     self.high_hz = max_rr / 60.0
 
   # -----------------------------------------------------------------------
-  # 1. FUNGSI DASAR
+  # 1. FUNGSI DASAR & PREKISI SUB-BIN
   # -----------------------------------------------------------------------
 
   @staticmethod
@@ -76,8 +77,26 @@ class ECGRespirationEstimator:
     middle = 0.5 * np.sum(weights)
     return float(values[np.searchsorted(np.cumsum(weights), middle)])
 
+  @staticmethod
+  def _parabolic_peak_hz(frequencies, power, peak_idx):
+    """Interpolasi parabolik untuk estimasi puncak frekuensi kontinu (sub-bin precision)."""
+    if peak_idx <= 0 or peak_idx >= len(power) - 1:
+      return float(frequencies[peak_idx])
+
+    alpha = power[peak_idx - 1]
+    beta = power[peak_idx]
+    gamma = power[peak_idx + 1]
+
+    denom = alpha - 2 * beta + gamma
+    if abs(denom) < 1e-12:
+      return float(frequencies[peak_idx])
+
+    delta = 0.5 * (alpha - gamma) / denom
+    df = frequencies[1] - frequencies[0]
+    return float(frequencies[peak_idx] + delta * df)
+
   # -----------------------------------------------------------------------
-  # 2. R-PEAK DAN EKSTRAKSI LIMA SINYAL EDR
+  # 2. R-PEAK DAN EKSTRAKSI FITUR EDR ENHANCED
   # -----------------------------------------------------------------------
 
   def _refine_r_peaks(self, ecg, r_peaks, fs):
@@ -103,7 +122,7 @@ class ECGRespirationEstimator:
     return np.asarray(refined, dtype=int)
 
   def _extract_edr_features(self, ecg, r_peaks, fs):
-    """Ambil amplitudo, area, slope QRS, dan interval RR per denyut."""
+    """Ambil amplitudo R, area QRS, slope QRS, amplitudo RS, amplitudo S, dan RR-interval (dengan supresi detak prematur)."""
     peaks = self._refine_r_peaks(ecg, r_peaks, fs)
     if len(peaks) < 12:
       return peaks, np.array([]), {}
@@ -111,7 +130,7 @@ class ECGRespirationEstimator:
     clean_ecg = self._bandpass(ecg, 0.5, min(40.0, 0.45 * fs), fs)
     radius = int(round(0.10 * fs))
     good_peaks = []
-    amplitude, area, slope = [], [], []
+    amplitude, area, slope, rs_amp, s_amp = [], [], [], [], []
 
     for peak in peaks:
       segment = clean_ecg[
@@ -121,25 +140,33 @@ class ECGRespirationEstimator:
         continue
       segment = segment - np.median(segment)
       good_peaks.append(peak)
+      r_val = np.max(segment)
+      s_val = np.min(segment)
       amplitude.append(np.ptp(segment))
       area.append(np.sum(np.abs(segment)) / fs)
       slope.append(np.max(np.abs(np.diff(segment))) * fs)
+      rs_amp.append(r_val - s_val)
+      s_amp.append(s_val)
 
     peaks = np.asarray(good_peaks, dtype=int)
     beat_times = peaks / float(fs)
     if len(peaks) < 12:
       return peaks, beat_times, {}
 
+    # Supresi outlier/ekstopik pada RR interval
     rr_intervals = np.r_[1.0, np.diff(beat_times)]
-    valid_rr = rr_intervals[(rr_intervals >= 0.30) & (rr_intervals <= 2.0)]
-    rr_fill = np.median(valid_rr) if len(valid_rr) else 1.0
-    rr_intervals[(rr_intervals < 0.30) | (rr_intervals > 2.0)] = rr_fill
-    rr_intervals[0] = rr_fill
+    valid_mask = (rr_intervals >= 0.30) & (rr_intervals <= 2.0)
+    rr_median = np.median(rr_intervals[valid_mask]) if np.any(valid_mask) else 1.0
+    bad_rr = (rr_intervals < 0.35) | (rr_intervals > 1.8) | (np.abs(rr_intervals - rr_median) > 0.35 * rr_median)
+    rr_intervals[bad_rr] = rr_median
+    rr_intervals[0] = rr_median
 
     features = {
         "r_amplitude": self._normalize(amplitude),
         "qrs_area": self._normalize(area),
         "qrs_slope": self._normalize(slope),
+        "rs_amplitude": self._normalize(rs_amp),
+        "s_amplitude": self._normalize(s_amp),
         "rr_interval": self._normalize(rr_intervals),
     }
     return peaks, beat_times, features
@@ -185,7 +212,7 @@ class ECGRespirationEstimator:
         window="hann",
         nperseg=nperseg,
         noverlap=nperseg // 2,
-        nfft=max(1024, 2 ** int(np.ceil(np.log2(nperseg)))),
+        nfft=max(2048, 2 ** int(np.ceil(np.log2(nperseg)))),
         detrend="linear",
     )
     respiratory_band = (
@@ -198,16 +225,16 @@ class ECGRespirationEstimator:
 
     power = power / np.sum(power)
     peak_index = int(np.argmax(power))
-    peak_hz = float(frequencies[peak_index])
+    peak_hz = self._parabolic_peak_hz(frequencies, power, peak_index)
 
     # Cegah harmonik kedua terbaca sebagai dua kali RR sebenarnya.
     half = np.abs(frequencies - peak_hz / 2.0) <= 0.025
     if peak_hz >= 2 * self.low_hz and np.any(half):
       half_indices = np.flatnonzero(half)
       half_index = int(half_indices[np.argmax(power[half_indices])])
-      if power[half_index] >= 0.50 * power[peak_index]:
+      if power[half_index] >= 0.45 * power[peak_index]:
         peak_index = half_index
-        peak_hz = float(frequencies[peak_index])
+        peak_hz = self._parabolic_peak_hz(frequencies, power, peak_index)
 
     # RQI = gabungan ketajaman peak dan periodisitas sinyal.
     near_peak = np.abs(frequencies - peak_hz) <= 0.03
@@ -254,7 +281,8 @@ class ECGRespirationEstimator:
     spectra = np.vstack([result["power"] for _, result in accepted])
     fused_power = np.average(spectra, axis=0, weights=weights)
     frequencies = accepted[0][1]["frequencies"]
-    fused_hz = float(frequencies[np.argmax(fused_power)])
+    fused_peak_idx = int(np.argmax(fused_power))
+    fused_hz = self._parabolic_peak_hz(frequencies, fused_power, fused_peak_idx)
 
     individual_hz = np.asarray([result["peak_hz"] for _, result in accepted])
     consensus_hz = self._weighted_median(individual_hz, weights)
@@ -335,6 +363,16 @@ class ECGRespirationEstimator:
 
     if not windows:
       return empty
+
+    # Konsistensi temporal (Rolling Median filter 3-window untuk menahan lonjakan artefak sesaat)
+    raw_rates = np.array([window["rr"] for window in windows], dtype=float)
+    if len(raw_rates) >= 3:
+      smoothed_rates = np.array([
+          np.median(raw_rates[max(0, idx - 1) : min(len(raw_rates), idx + 2)])
+          for idx in range(len(raw_rates))
+      ])
+      for idx, w in enumerate(windows):
+        w["rr"] = float(smoothed_rates[idx])
 
     rates = [window["rr"] for window in windows]
     qualities = [window["quality"] for window in windows]

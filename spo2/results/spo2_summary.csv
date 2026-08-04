@@ -1,0 +1,2 @@
+n_windows,coverage_percent,mae_spo2_percent,rmse_spo2_percent,bias_spo2_percent,mape_percent,accuracy_percent,within_2_percent,within_3_percent
+1046,100.0,1.0802390057361375,1.231340849158706,1.0041969407265774,1.1166581928623867,98.88334180713761,92.73422562141491,100.0

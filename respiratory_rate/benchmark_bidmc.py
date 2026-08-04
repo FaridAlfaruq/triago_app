@@ -15,7 +15,9 @@ from processing_data.processing_data import ECGProcessor
 
 
 FS = 125.0
-DEFAULT_DATA = PROJECT_ROOT / "draft_filter" / "bidmc"
+DEFAULT_DATA = PROJECT_ROOT / "respiratory_rate" / "data" / "bidmc"
+if not DEFAULT_DATA.exists() or not list(DEFAULT_DATA.glob("*")):
+  DEFAULT_DATA = PROJECT_ROOT / "bidmc"
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "results"
 
 
