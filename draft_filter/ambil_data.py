@@ -438,11 +438,14 @@ class MainWindow(QMainWindow):
         self.input_gt_spo2.setFocus()
 
     def generate_next_filename(self):
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        output_dir = os.path.join(project_root, "data_primer")
+        os.makedirs(output_dir, exist_ok=True)
         index = 1
         while True:
-            filename = f"Data{index}.csv"
-            if not os.path.exists(filename):
-                return filename
+            filepath = os.path.join(output_dir, f"Data{index}.csv")
+            if not os.path.exists(filepath):
+                return filepath
             index += 1
 
     def _read_ground_truth(self):
