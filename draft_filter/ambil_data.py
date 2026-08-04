@@ -67,7 +67,7 @@ class STM32Worker(QThread):
 
 class MainWindow(QMainWindow):
     SAMPLE_RATE_HZ = 400
-    WARMUP_DURATION_SEC = 5.0
+    WARMUP_DURATION_SEC = 3.0
     RECORD_DURATION_SEC = 60.0
     PLOT_WINDOW_SEC = 5.0
 
@@ -536,7 +536,10 @@ class MainWindow(QMainWindow):
                     ]
                 )
 
-                for index, packet in enumerate(self.recorded_data):
+                warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
+                clean_recording = self.recorded_data[warmup_samples:] if len(self.recorded_data) > warmup_samples else self.recorded_data
+
+                for index, packet in enumerate(clean_recording):
                     relative_time_s = index * sampling_interval
                     writer.writerow(
                         [
