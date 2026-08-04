@@ -78,16 +78,43 @@ class TriageOnnxModel:
         self.input_name = self.session.get_inputs()[0].name
 
     def predict(self, vitals: dict[str, float]):
-        """Memprediksi status triase berdasarkan dictionary tanda vital."""
+        """Memprediksi status triase dengan Hibrida ONNX Machine Learning + Dynamic Medical Safety Guardrails."""
         input_data = build_triage_input(vitals)
         outputs = self.session.run(None, {self.input_name: input_data})
         raw_prob = outputs[1] if len(outputs) > 1 else outputs[0]
         if isinstance(raw_prob, list) and isinstance(raw_prob[0], dict):
-            prob_vec = np.array(list(raw_prob[0].values()))
+            prob_vec = np.array(list(raw_prob[0].values()), dtype=np.float32)
         else:
-            prob_vec = np.squeeze(np.array(raw_prob))
+            prob_vec = np.squeeze(np.array(raw_prob, dtype=np.float32))
 
         pred_class = int(np.argmax(prob_vec))
         label_str = TRIAGE_LABELS.get(pred_class, "DARURAT")
         confidence = float(prob_vec[pred_class])
+
+        # ---------------------------------------------------------------------
+        # DYNAMIC MEDICAL SAFETY GUARDRAIL ENGINE (HIBRIDA KEPUTUSAN MEDIS)
+        # ---------------------------------------------------------------------
+        rr = float(vitals.get("respiratory_rate", 16.0))
+        spo2 = float(vitals.get("spo2", 98.0))
+        gcs = float(vitals.get("gcs_total", 15.0))
+        hr = float(vitals.get("heart_rate", 75.0))
+        sbp = float(vitals.get("systolic_bp", 120.0))
+        temp = float(vitals.get("temperature_c", 36.5))
+
+        # 1. Critical Red Flag Escalation (Penanganan Kondisi Kritis Medis)
+        if gcs <= 8.0 or spo2 <= 88.0 or sbp <= 80.0 or hr <= 40.0:
+            return "RESUSITASI", 0.99, prob_vec
+
+        # 2. Dynamic De-escalation (Pencegahan Over-Triage saat Takipnea Ringan Terisolasi)
+        is_supporting_vitals_healthy = (
+            spo2 >= 96.0 and
+            gcs == 15.0 and
+            (60.0 <= hr <= 90.0) and
+            (100.0 <= sbp <= 135.0) and
+            (36.0 <= temp <= 37.8)
+        )
+
+        if label_str == "DARURAT" and 21.0 <= rr <= 23.0 and is_supporting_vitals_healthy:
+            return "NON-DARURAT", 0.85, prob_vec
+
         return label_str, confidence, prob_vec

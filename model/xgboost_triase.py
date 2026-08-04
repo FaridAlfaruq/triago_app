@@ -65,15 +65,15 @@ def load_triage_dataset():
     acuity = []
     for i in range(n_samples):
         if gcs[i] <= 8 or spo2[i] < 90.0 or sbp[i] < 85.0:
-            acuity.append(1)
+            acuity.append(1)  # Resusitasi (Level 1)
         elif gcs[i] in [13, 14] or rr[i] > 26.0 or spo2[i] <= 93.0 or sbp[i] > 160.0:
-            acuity.append(2)
-        elif hr[i] > 100.0 or temp[i] > 38.5 or rr[i] > 20.0:
-            acuity.append(3)
-        elif hr[i] > 85.0:
-            acuity.append(4)
+            acuity.append(2)  # Darurat (Level 2)
+        elif hr[i] > 110.0 or temp[i] > 38.5 or (rr[i] > 24.0) or (rr[i] > 20.0 and (hr[i] > 90.0 or spo2[i] < 96.0)):
+            acuity.append(3)  # Darurat (Level 3)
+        elif hr[i] > 85.0 or rr[i] > 20.0:
+            acuity.append(4)  # Non-Darurat (Level 4)
         else:
-            acuity.append(5)
+            acuity.append(5)  # Non-Darurat (Level 5)
 
     return pd.DataFrame({
         'temperature_c': temp, 'spo2': spo2, 'respiratory_rate': rr,
@@ -109,7 +109,7 @@ y = df['target'].copy()
 # -------------------------------------------------------------------------
 def calculate_news_subscore(df_in):
     rr = df_in['respiratory_rate']
-    rr_score = np.select([rr <= 8, (rr >= 9) & (rr <= 11), (rr >= 12) & (rr <= 20), (rr >= 21) & (rr <= 24), rr >= 25], [3, 1, 0, 2, 3], default=0)
+    rr_score = np.select([rr <= 8, (rr >= 9) & (rr <= 11), (rr >= 12) & (rr <= 20), (rr >= 21) & (rr <= 24), rr >= 25], [3, 1, 0, 1, 3], default=0)
 
     spo2 = df_in['spo2']
     spo2_score = np.select([spo2 <= 91, (spo2 >= 92) & (spo2 <= 93), (spo2 >= 94) & (spo2 <= 95), spo2 >= 96], [3, 2, 1, 0], default=0)
