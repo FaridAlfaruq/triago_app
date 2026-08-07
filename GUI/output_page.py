@@ -376,7 +376,7 @@ class OutputPage(QWidget):
         self.home_requested.emit()
 
 # =========================================================================
-# UJI MANDIRI LOCAL (MEMBACA DATASET TERBAIK: 20260802_234631_Bed01.csv)
+# UJI MANDIRI LOCAL (MEMBACA FILE TERBARU DARI FOLDER data_pengukuran)
 # =========================================================================
 if __name__ == "__main__":
     import pandas as pd
@@ -386,12 +386,28 @@ if __name__ == "__main__":
     test_window = OutputPage()
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    best_csv = os.path.join(base_dir, "data_pengukuran", "20260802_234631_Bed01.csv")
-    best_json = os.path.join(base_dir, "data_pengukuran", "20260802_234631_Bed01.json")
+    data_dir = os.path.join(base_dir, "data_pengukuran")
     
-    if os.path.exists(best_csv):
-        print(f"[TEST OUTPUT] Loading Best Morphology Dataset: {best_csv}")
-        test_window.setWindowTitle("TriaGO - Output Pengecekan (Visualisasi Morfologi Terbaik)")
+    # Mencari file .csv terbaru di folder data_pengukuran (mengabaikan file data_pendaftaran_pasien.csv)
+    csv_files = []
+    if os.path.exists(data_dir):
+        csv_files = [
+            os.path.join(data_dir, f)
+            for f in os.listdir(data_dir)
+            if f.endswith(".csv") and f != "data_pendaftaran_pasien.csv"
+        ]
+        
+    best_csv = None
+    best_json = None
+    if csv_files:
+        # Urutkan file CSV berdasarkan waktu modifikasi (mtime) & nama file terbaru
+        csv_files.sort(key=lambda x: (os.path.getmtime(x), os.path.basename(x)), reverse=True)
+        best_csv = csv_files[0]
+        best_json = os.path.splitext(best_csv)[0] + ".json"
+    
+    if best_csv and os.path.exists(best_csv):
+        print(f"[TEST OUTPUT] Loading Latest Measurement Dataset: {best_csv}")
+        test_window.setWindowTitle(f"TriaGO - Output Pengecekan ({os.path.basename(best_csv)})")
         df = pd.read_csv(best_csv)
         
         json_data = {}
@@ -415,46 +431,47 @@ if __name__ == "__main__":
         
         t_125 = ecg_res['time_125']
         ecg_125 = ecg_res['ecg_smooth']
+        ppg_125 = ppg_res.get('ir_clean', ppg_res.get('ir_ac', []))
         
-        # Sintesis Gelombang PPG Fisiologis Sempurna (Synced to ECG R-peaks for Screenshot)
-        r_peaks = ecg_res.get('r_peaks', [])
-        num_samples = len(ecg_125)
-        ppg_synth = np.zeros(num_samples)
-        fs_t = 125
-        dt = 1.0 / fs_t
-        pat_samples = 27 # ~0.216s PAT delay
-        
-        for r in r_peaks:
-            onset = r + pat_samples
-            if onset >= num_samples:
-                continue
-            pulse_len = min(87, num_samples - onset)
-            t_pulse = np.arange(pulse_len) * dt
-            # Gelombang Puncak Sistolik & Dicrotic Notch
-            sys_w = 55.0 * np.exp(-((t_pulse - 0.12)**2) / (2 * (0.045**2)))
-            dia_w = 22.0 * np.exp(-((t_pulse - 0.26)**2) / (2 * (0.065**2)))
-            pulse = sys_w + dia_w
-            ppg_synth[onset : onset + pulse_len] += pulse
+        # Jika sinyal ppg sintetis diperlukan untuk visualisasi yang lebih jelas
+        if len(ppg_125) == 0 or np.all(ppg_125 == 0):
+            r_peaks = ecg_res.get('r_peaks', [])
+            num_samples = len(ecg_125)
+            ppg_synth = np.zeros(num_samples)
+            fs_t = 125
+            dt = 1.0 / fs_t
+            pat_samples = 27 # ~0.216s PAT delay
             
-        b_p, a_p = signal.butter(3, [0.5 / (fs_t / 2), 8.0 / (fs_t / 2)], btype='bandpass')
-        ppg_clean_final = signal.filtfilt(b_p, a_p, ppg_synth)
+            for r in r_peaks:
+                onset = r + pat_samples
+                if onset >= num_samples:
+                    continue
+                pulse_len = min(87, num_samples - onset)
+                t_pulse = np.arange(pulse_len) * dt
+                sys_w = 55.0 * np.exp(-((t_pulse - 0.12)**2) / (2 * (0.045**2)))
+                dia_w = 22.0 * np.exp(-((t_pulse - 0.26)**2) / (2 * (0.065**2)))
+                pulse = sys_w + dia_w
+                ppg_synth[onset : onset + pulse_len] += pulse
+                
+            b_p, a_p = signal.butter(3, [0.5 / (fs_t / 2), 8.0 / (fs_t / 2)], btype='bandpass')
+            ppg_125 = signal.filtfilt(b_p, a_p, ppg_synth)
 
         test_results = {
             "bed": str(json_data.get("Bed", "01")),
-            "patient_name": "Pasien Bed 01 (Visualisasi Ideal)",
+            "patient_name": f"Pasien ({os.path.basename(best_csv)})",
             "gcs": float(json_data.get("GCS Score", 15)),
             "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
-            "temperature": 36.4,  # Diubah ke 36.4 °C sesuai permintaan
-            "temp_skin": 34.1,
-            "temp_ambient": 28.5,
-            "hr": float(json_data.get("HR", 75.5)),
-            "rr": float(json_data.get("RR", 23.7)),
-            "spo2": float(json_data.get("SpO2", 98.1)),
+            "temperature": float(json_data.get("Temperature Core", json_data.get("Temp", 36.4))),
+            "temp_skin": float(json_data.get("Temperature Skin", 34.1)),
+            "temp_ambient": float(json_data.get("Temperature Ambient", 28.5)),
+            "hr": float(json_data.get("HR", ecg_res.get('hr', 75.5))),
+            "rr": float(json_data.get("RR", ecg_res.get('rr', 23.7))),
+            "spo2": float(json_data.get("SpO2", ppg_res.get('spo2', 98.1))),
             "systolic": float(json_data.get("SBP", 108.0)),
             "diastolic": float(json_data.get("DBP", 68.5)),
             "time_125": t_125,
             "ecg_smooth": ecg_125,
-            "ir_clean": ppg_clean_final,  # PPG Morfologi Sempurna
+            "ir_clean": ppg_125,
             "triage_status": str(json_data.get("Triage Status", "NON-DARURAT")),
             "triage_valid": True,
             "xgboost_score": float(json_data.get("Triage Confidence", 0.99))
@@ -465,8 +482,8 @@ if __name__ == "__main__":
         df = pd.read_csv(csv_path)
         df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
         test_results = {
-            "bed": "01",
-            "patient_name": "Pasien Uji",
+            "bed": "011",
+            "patient_name": "Pasien Uji Fallback",
             "gcs": 15.0,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "temperature": 36.5,
@@ -488,3 +505,4 @@ if __name__ == "__main__":
     test_window.update_results(test_results)
     test_window.show()
     sys.exit(app.exec())
+
