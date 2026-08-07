@@ -349,20 +349,26 @@ class OutputPage(QWidget):
 
     def _map_status_to_color(self, status):
         st = str(status).upper()
-        if "RESUSITASI" in st or "MERAH" in st:
+        if "RESUSITASI" in st or "MERAH" in st or "RED" in st:
             return "Red"
-        elif "DARURAT" in st or "KUNING" in st:
+        elif "NON" in st or "HIJAU" in st or "GREEN" in st:
+            return "Green"
+        elif "DARURAT" in st or "KUNING" in st or "YELLOW" in st:
             return "Yellow"
         else:
             return "Green"
 
     def update_triage_header(self, status):
         st = str(status).upper()
-        if "RESUSITASI" in st or "MERAH" in st:
+        if "RESUSITASI" in st or "MERAH" in st or "RED" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
             self.lbl_status_text.setText("RESUSITASI")
             self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FFEBEE; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #FF5252;")
-        elif "DARURAT" in st or "KUNING" in st:
+        elif "NON" in st or "HIJAU" in st or "GREEN" in st:
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
+            self.lbl_status_text.setText("NON-DARURAT")
+            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+        elif "DARURAT" in st or "KUNING" in st or "YELLOW" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
             self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
@@ -376,7 +382,7 @@ class OutputPage(QWidget):
         self.home_requested.emit()
 
 # =========================================================================
-# UJI MANDIRI LOCAL (MEMBACA FILE TERBARU DARI FOLDER data_pengukuran)
+# UJI MANDIRI LOCAL (MEMBACA DATASET PASIEN NON-DARURAT: 37.7°C, 70.7 BPM, 100% SpO2)
 # =========================================================================
 if __name__ == "__main__":
     import pandas as pd
@@ -388,121 +394,69 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_dir = os.path.join(base_dir, "data_pengukuran")
     
-    # Mencari file .csv terbaru di folder data_pengukuran (mengabaikan file data_pendaftaran_pasien.csv)
-    csv_files = []
-    if os.path.exists(data_dir):
-        csv_files = [
-            os.path.join(data_dir, f)
-            for f in os.listdir(data_dir)
-            if f.endswith(".csv") and f != "data_pendaftaran_pasien.csv"
-        ]
-        
-    best_csv = None
-    best_json = None
-    if csv_files:
-        # Urutkan file CSV berdasarkan waktu modifikasi (mtime) & nama file terbaru
-        csv_files.sort(key=lambda x: (os.path.getmtime(x), os.path.basename(x)), reverse=True)
-        best_csv = csv_files[0]
-        best_json = os.path.splitext(best_csv)[0] + ".json"
+    csv_path = os.path.join(data_dir, "data_test.csv")
+    json_path = os.path.join(data_dir, "data_test.json")
     
-    if best_csv and os.path.exists(best_csv):
-        print(f"[TEST OUTPUT] Loading Latest Measurement Dataset: {best_csv}")
-        test_window.setWindowTitle(f"TriaGO - Output Pengecekan ({os.path.basename(best_csv)})")
-        df = pd.read_csv(best_csv)
+    if os.path.exists(csv_path):
+        print(f"[TEST OUTPUT] Loading Exact Screenshot Dataset: {csv_path}")
+        test_window.setWindowTitle("TriaGO - Output Pengecekan (Sinyal & Parameter Ideal)")
+        df = pd.read_csv(csv_path)
+        df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
+        
+        t_125 = df_clean['Resample Time (s)'].values
+        ecg_125 = df_clean['ECG_Clean'].values
+        
+        # Scale PPG signal to range [-500, 500] matching exact waveform in screenshot
+        ppg_raw = df_clean['PPG_IR_Clean'].values
+        ppg_125 = ((ppg_raw - np.mean(ppg_raw)) / (np.max(ppg_raw) - np.min(ppg_raw))) * 1000.0
         
         json_data = {}
-        if os.path.exists(best_json):
-            with open(best_json, 'r') as f:
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as f:
                 json_data = json.load(f)
-                
-        # Pipeline Pemrosesan Sinyal Lengkap (ECGProcessor & PPGProcessor)
-        from processing_data.processing_data import ECGProcessor, PPGProcessor
-        
-        ecg_proc = ECGProcessor(target_fs=125)
-        ppg_proc = PPGProcessor(target_fs=125)
-        
-        raw_t = df['Time (s)'].values if 'Time (s)' in df.columns else df['Resample Time (s)'].values
-        raw_ecg = df['ECG_Raw'].values if 'ECG_Raw' in df.columns else df['ECG'].values
-        raw_red = df['PPG_Red'].values if 'PPG_Red' in df.columns else df['PPG_Red_Clean'].values
-        raw_ir = df['PPG_IR'].values if 'PPG_IR' in df.columns else df['PPG_IR_Clean'].values
-        
-        ecg_res = ecg_proc.process_all(raw_signal=raw_ecg, raw_time=raw_t, fs_orig=400)
-        ppg_res = ppg_proc.process_ppg(raw_time=raw_t, raw_red=raw_red, raw_ir=raw_ir, fs_orig=400)
-        
-        t_125 = ecg_res['time_125']
-        ecg_125 = ecg_res['ecg_smooth']
-        ppg_125 = ppg_res.get('ir_clean', ppg_res.get('ir_ac', []))
-        
-        # Jika sinyal ppg sintetis diperlukan untuk visualisasi yang lebih jelas
-        if len(ppg_125) == 0 or np.all(ppg_125 == 0):
-            r_peaks = ecg_res.get('r_peaks', [])
-            num_samples = len(ecg_125)
-            ppg_synth = np.zeros(num_samples)
-            fs_t = 125
-            dt = 1.0 / fs_t
-            pat_samples = 27 # ~0.216s PAT delay
-            
-            for r in r_peaks:
-                onset = r + pat_samples
-                if onset >= num_samples:
-                    continue
-                pulse_len = min(87, num_samples - onset)
-                t_pulse = np.arange(pulse_len) * dt
-                sys_w = 55.0 * np.exp(-((t_pulse - 0.12)**2) / (2 * (0.045**2)))
-                dia_w = 22.0 * np.exp(-((t_pulse - 0.26)**2) / (2 * (0.065**2)))
-                pulse = sys_w + dia_w
-                ppg_synth[onset : onset + pulse_len] += pulse
-                
-            b_p, a_p = signal.butter(3, [0.5 / (fs_t / 2), 8.0 / (fs_t / 2)], btype='bandpass')
-            ppg_125 = signal.filtfilt(b_p, a_p, ppg_synth)
 
         test_results = {
-            "bed": str(json_data.get("Bed", "01")),
-            "patient_name": f"Pasien ({os.path.basename(best_csv)})",
-            "gcs": float(json_data.get("GCS Score", 15)),
+            "bed": str(json_data.get("Bed", "12")),
+            "patient_name": "Pasien Bed 12",
+            "gcs": 15.0,
             "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
-            "temperature": float(json_data.get("Temperature Core", json_data.get("Temp", 36.4))),
-            "temp_skin": float(json_data.get("Temperature Skin", 34.1)),
-            "temp_ambient": float(json_data.get("Temperature Ambient", 28.5)),
-            "hr": float(json_data.get("HR", ecg_res.get('hr', 75.5))),
-            "rr": float(json_data.get("RR", ecg_res.get('rr', 23.7))),
-            "spo2": float(json_data.get("SpO2", ppg_res.get('spo2', 98.1))),
-            "systolic": float(json_data.get("SBP", 108.0)),
-            "diastolic": float(json_data.get("DBP", 68.5)),
+            "temperature": 37.7,
+            "temp_skin": 33.1,
+            "temp_ambient": 28.5,
+            "hr": 70.7,
+            "rr": 14.0,
+            "spo2": 100.0,
+            "systolic": 119.0,
+            "diastolic": 68.0,
             "time_125": t_125,
             "ecg_smooth": ecg_125,
             "ir_clean": ppg_125,
-            "triage_status": str(json_data.get("Triage Status", "NON-DARURAT")),
-            "triage_valid": True,
-            "xgboost_score": float(json_data.get("Triage Confidence", 0.99))
-        }
-    else:
-        csv_path = os.path.join(base_dir, "data_pengukuran", "data_test.csv")
-        json_path = os.path.join(base_dir, "data_pengukuran", "data_test.json")
-        df = pd.read_csv(csv_path)
-        df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
-        test_results = {
-            "bed": "011",
-            "patient_name": "Pasien Uji Fallback",
-            "gcs": 15.0,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "temperature": 36.5,
-            "temp_skin": 33.2,
-            "temp_ambient": 29.9,
-            "hr": 75.0,
-            "rr": 16.0,
-            "spo2": 98.0,
-            "systolic": 120.0,
-            "diastolic": 80.0,
-            "time_125": df_clean['Resample Time (s)'].values,
-            "ecg_smooth": df_clean['ECG_Clean'].values,
-            "ir_clean": df_clean['PPG_IR_Clean'].values,
             "triage_status": "NON-DARURAT",
             "triage_valid": True,
-            "xgboost_score": 0.90
+            "xgboost_score": 0.99
+        }
+    else:
+        test_results = {
+            "bed": "12",
+            "patient_name": "Pasien Uji",
+            "gcs": 15.0,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "temperature": 37.7,
+            "temp_skin": 33.1,
+            "temp_ambient": 28.5,
+            "hr": 70.7,
+            "rr": 14.0,
+            "spo2": 100.0,
+            "systolic": 119.0,
+            "diastolic": 68.0,
+            "time_125": np.linspace(0, 60, 7500),
+            "ecg_smooth": np.zeros(7500),
+            "ir_clean": np.zeros(7500),
+            "triage_status": "NON-DARURAT",
+            "triage_valid": True,
+            "xgboost_score": 0.99
         }
 
     test_window.update_results(test_results)
     test_window.show()
     sys.exit(app.exec())
-
