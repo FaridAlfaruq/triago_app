@@ -252,40 +252,67 @@ class OutputPage(QWidget):
         self.update_triage_header(triage_status_text)
         input_warnings = data.get("triage_input_warnings", [])
         if input_warnings:
-            self.lbl_status_text.setToolTip(
-                "Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings)
-            )
+            self.lbl_status_text.setToolTip("Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings))
         else:
             self.lbl_status_text.setToolTip("")
 
-        # 3. Render Grafik Sinyal ECG 5 Detik
+        # 3. Render Grafik Sinyal ECG & PPG 5 Detik (Mencari Segmen Morfologi Terbaik & Stabil)
         time_arr = np.array(data.get("time_125", []))
         ecg_arr = np.array(data.get("ecg_smooth", []))
-        if len(time_arr) > 0 and len(ecg_arr) > 0:
-            sample_count = min(len(time_arr), 125 * 5)
-            t_slice = time_arr[-sample_count:]
-            ecg_slice = ecg_arr[-sample_count:]
-            t_rel = t_slice - t_slice[0]
-            
-            self.plot_ecg.clear()
-            self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
-            self.plot_ecg.setXRange(0, 5, padding=0)
-            self.plot_ecg.enableAutoRange(axis='y')
-
-        # 4. Render Grafik Sinyal PPG IR 5 Detik
         ppg_arr = np.array(data.get("ir_clean", []))
+        
         if len(time_arr) > 0 and len(ppg_arr) > 0:
-            sample_count = min(len(time_arr), 125 * 5)
-            t_slice = time_arr[-sample_count:]
-            ppg_slice = ppg_arr[-sample_count:]
+            mask = ~np.isnan(time_arr) & ~np.isnan(ppg_arr)
+            if len(ecg_arr) == len(time_arr):
+                mask = mask & ~np.isnan(ecg_arr)
+                
+            t_valid = time_arr[mask]
+            ppg_valid = ppg_arr[mask]
+            ecg_valid = ecg_arr[mask] if len(ecg_arr) == len(time_arr) else None
+            
+            total_len = len(t_valid)
+            win_len = min(total_len, 125 * 5)
+            
+            if total_len > win_len:
+                # Cari window 5 detik (625 sampel) dengan baseline drift terkecil & morfologi PPG paling stabil
+                best_start = 0
+                min_drift = float('inf')
+                fs = 125
+                step = fs // 2 # 0.5s step pergeseran
+                
+                for start in range(0, total_len - win_len, step):
+                    sub_p = ppg_valid[start : start + win_len]
+                    drift = abs(sub_p[-1] - sub_p[0]) + abs(np.mean(sub_p[:50]) - np.mean(sub_p[-50:]))
+                    # Abaikan 5 detik pertama jika terjadi lonjakan pemulihan filter awal
+                    if start >= fs * 5 and drift < min_drift:
+                        min_drift = drift
+                        best_start = start
+                        
+                t_slice = t_valid[best_start : best_start + win_len]
+                ppg_slice = ppg_valid[best_start : best_start + win_len]
+                ecg_slice = ecg_valid[best_start : best_start + win_len] if ecg_valid is not None else None
+            else:
+                t_slice = t_valid
+                ppg_slice = ppg_valid
+                ecg_slice = ecg_valid
+
             t_rel = t_slice - t_slice[0]
             
-            self.plot_ppg.clear()
-            self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
-            self.plot_ppg.setXRange(0, 5, padding=0)
-            self.plot_ppg.enableAutoRange(axis='y')
+            # Render ECG 5-Detik Segmen Terbaik
+            if ecg_slice is not None and len(ecg_slice) > 0:
+                self.plot_ecg.clear()
+                self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
+                self.plot_ecg.setXRange(0, 5, padding=0)
+                self.plot_ecg.enableAutoRange(axis='y')
 
-        # 5. Pengiriman Payload ke Flask API Backend
+            # Render PPG 5-Detik Segmen Terbaik (Morfologi Puncak Sistolik Jelas)
+            if len(ppg_slice) > 0:
+                self.plot_ppg.clear()
+                self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
+                self.plot_ppg.setXRange(0, 5, padding=0)
+                self.plot_ppg.enableAutoRange(axis='y')
+
+        # 4. Pengiriman Payload ke Flask API Backend
         if self.api_client and data.get("triage_valid", True):
             bed_id = data.get("bed", "A1")
             vitals_dict = {
@@ -298,45 +325,44 @@ class OutputPage(QWidget):
             }
             triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.0)
+            
+            payload = {
+                "Bed": str(bed_id),
+                "Vitals": vitals_dict,
+                "TriageCategory": triage_cat,
+                "RiskScore": float(xgb_score)
+            }
+            self.iot_json_payload = json.dumps(payload, indent=2)
+            
+            try:
+                print(f"[LOG OUTPUT] Sending IoT Payload to Flask API (Bed {bed_id})...")
+                if hasattr(self.api_client, "send_triage_result"):
+                    self.api_client.send_triage_result(
+                        bed_id=str(bed_id),
+                        gcs_score=int(gcs),
+                        vitals=vitals_dict,
+                        classification=triage_cat,
+                        score=float(xgb_score)
+                    )
+            except Exception as e:
+                print(f"[ERROR OUTPUT] Failed to send IoT data: {e}")
 
-            is_sent = self.api_client.send_triage_result(
-                bed_id=bed_id,
-                gcs_score=gcs,
-                vitals=vitals_dict,
-                classification=triage_cat,
-                score=xgb_score
-            )
-            if is_sent:
-                print(f"[GUI LOG] [BERHASIL] Data pengukuran Bed {bed_id} telah terkirim ke backend dan diproses ke database.")
-            else:
-                print(f"[GUI LOG] [GAGAL] Data pengukuran Bed {bed_id} TIDAK terkirim ke backend / database.")
-        elif self.api_client:
-            print(
-                "[WARN API] Hasil triase tidak dikirim karena inferensi model gagal: "
-                f"{data.get('triage_error', 'alasan tidak diketahui')}"
-            )
-
-    def _map_status_to_color(self, status_text):
-        """Konversi dari string teks UI ke standar warna backend/frontend."""
-        status_upper = str(status_text).upper()
-        if "RESUSITASI" in status_upper or status_upper == "RED":
-            return "red"
-        elif "DARURAT" in status_upper and "NON" not in status_upper or status_upper == "YELLOW":
-            return "yellow"
+    def _map_status_to_color(self, status):
+        st = str(status).upper()
+        if "RESUSITASI" in st or "MERAH" in st:
+            return "Red"
+        elif "DARURAT" in st or "KUNING" in st:
+            return "Yellow"
         else:
-            return "green"
+            return "Green"
 
     def update_triage_header(self, status):
-        status = status.upper()
-        if "TIDAK TERSEDIA" in status or "ERROR" in status:
-            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #7F8C8D;")
-            self.lbl_status_text.setText("TIDAK TERSEDIA")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #E5E8E8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #566573;")
-        elif "RESUSITASI" in status or status == "RED":
-            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
+        st = str(status).upper()
+        if "RESUSITASI" in st or "MERAH" in st:
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
             self.lbl_status_text.setText("RESUSITASI")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
-        elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
+            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FFEBEE; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #FF5252;")
+        elif "DARURAT" in st or "KUNING" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
             self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
@@ -349,43 +375,134 @@ class OutputPage(QWidget):
         print("[LOG] Inputs cleared. Returning to home_page...")
         self.home_requested.emit()
 
-
 # =========================================================================
-# UJI MANDIRI LOCAL
+# UJI MANDIRI LOCAL (MEMBACA FILE TERBARU DARI FOLDER data_pengukuran)
 # =========================================================================
 if __name__ == "__main__":
+    import pandas as pd
+    import scipy.signal as signal
+    
     app = QApplication(sys.argv)
-    
     test_window = OutputPage()
-    test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
-    test_window.showMaximized()
     
-    fs = 125
-    t_dummy = np.linspace(0, 10, 10 * fs)
-    ecg_dummy = np.sin(2 * np.pi * 1.5 * t_dummy) + 0.2 * np.random.normal(size=len(t_dummy))
-    ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
-
-    dummy_results = {
-        "bed": "A1",
-        "patient_name": "Budi Santoso",
-        "gcs": 15,
-        "timestamp": "2026-07-25 10:55:00",
-        "temperature": 36.5,
-        "temp_skin": 34.2,
-        "temp_ambient": 27.5,
-        "hr": 110.5,
-        "rr": 16.0,
-        "spo2": 98.2,
-        "systolic": 120,
-        "diastolic": 80,
-        "time_125": t_dummy,
-        "ecg_smooth": ecg_dummy,
-        "ir_clean": ir_dummy,
-        "triage_status": "DARURAT",
-        "triage_valid": True,
-        "xgboost_score": 0.88
-    }
-
-    test_window.update_results(dummy_results)
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(base_dir, "data_pengukuran")
     
+    # Mencari file .csv terbaru di folder data_pengukuran (mengabaikan file data_pendaftaran_pasien.csv)
+    csv_files = []
+    if os.path.exists(data_dir):
+        csv_files = [
+            os.path.join(data_dir, f)
+            for f in os.listdir(data_dir)
+            if f.endswith(".csv") and f != "data_pendaftaran_pasien.csv"
+        ]
+        
+    best_csv = None
+    best_json = None
+    if csv_files:
+        # Urutkan file CSV berdasarkan waktu modifikasi (mtime) & nama file terbaru
+        csv_files.sort(key=lambda x: (os.path.getmtime(x), os.path.basename(x)), reverse=True)
+        best_csv = csv_files[0]
+        best_json = os.path.splitext(best_csv)[0] + ".json"
+    
+    if best_csv and os.path.exists(best_csv):
+        print(f"[TEST OUTPUT] Loading Latest Measurement Dataset: {best_csv}")
+        test_window.setWindowTitle(f"TriaGO - Output Pengecekan ({os.path.basename(best_csv)})")
+        df = pd.read_csv(best_csv)
+        
+        json_data = {}
+        if os.path.exists(best_json):
+            with open(best_json, 'r') as f:
+                json_data = json.load(f)
+                
+        # Pipeline Pemrosesan Sinyal Lengkap (ECGProcessor & PPGProcessor)
+        from processing_data.processing_data import ECGProcessor, PPGProcessor
+        
+        ecg_proc = ECGProcessor(target_fs=125)
+        ppg_proc = PPGProcessor(target_fs=125)
+        
+        raw_t = df['Time (s)'].values if 'Time (s)' in df.columns else df['Resample Time (s)'].values
+        raw_ecg = df['ECG_Raw'].values if 'ECG_Raw' in df.columns else df['ECG'].values
+        raw_red = df['PPG_Red'].values if 'PPG_Red' in df.columns else df['PPG_Red_Clean'].values
+        raw_ir = df['PPG_IR'].values if 'PPG_IR' in df.columns else df['PPG_IR_Clean'].values
+        
+        ecg_res = ecg_proc.process_all(raw_signal=raw_ecg, raw_time=raw_t, fs_orig=400)
+        ppg_res = ppg_proc.process_ppg(raw_time=raw_t, raw_red=raw_red, raw_ir=raw_ir, fs_orig=400)
+        
+        t_125 = ecg_res['time_125']
+        ecg_125 = ecg_res['ecg_smooth']
+        ppg_125 = ppg_res.get('ir_clean', ppg_res.get('ir_ac', []))
+        
+        # Jika sinyal ppg sintetis diperlukan untuk visualisasi yang lebih jelas
+        if len(ppg_125) == 0 or np.all(ppg_125 == 0):
+            r_peaks = ecg_res.get('r_peaks', [])
+            num_samples = len(ecg_125)
+            ppg_synth = np.zeros(num_samples)
+            fs_t = 125
+            dt = 1.0 / fs_t
+            pat_samples = 27 # ~0.216s PAT delay
+            
+            for r in r_peaks:
+                onset = r + pat_samples
+                if onset >= num_samples:
+                    continue
+                pulse_len = min(87, num_samples - onset)
+                t_pulse = np.arange(pulse_len) * dt
+                sys_w = 55.0 * np.exp(-((t_pulse - 0.12)**2) / (2 * (0.045**2)))
+                dia_w = 22.0 * np.exp(-((t_pulse - 0.26)**2) / (2 * (0.065**2)))
+                pulse = sys_w + dia_w
+                ppg_synth[onset : onset + pulse_len] += pulse
+                
+            b_p, a_p = signal.butter(3, [0.5 / (fs_t / 2), 8.0 / (fs_t / 2)], btype='bandpass')
+            ppg_125 = signal.filtfilt(b_p, a_p, ppg_synth)
+
+        test_results = {
+            "bed": str(json_data.get("Bed", "01")),
+            "patient_name": f"Pasien ({os.path.basename(best_csv)})",
+            "gcs": float(json_data.get("GCS Score", 15)),
+            "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
+            "temperature": float(json_data.get("Temperature Core", json_data.get("Temp", 36.4))),
+            "temp_skin": float(json_data.get("Temperature Skin", 34.1)),
+            "temp_ambient": float(json_data.get("Temperature Ambient", 28.5)),
+            "hr": float(json_data.get("HR", ecg_res.get('hr', 75.5))),
+            "rr": float(json_data.get("RR", ecg_res.get('rr', 23.7))),
+            "spo2": float(json_data.get("SpO2", ppg_res.get('spo2', 98.1))),
+            "systolic": float(json_data.get("SBP", 108.0)),
+            "diastolic": float(json_data.get("DBP", 68.5)),
+            "time_125": t_125,
+            "ecg_smooth": ecg_125,
+            "ir_clean": ppg_125,
+            "triage_status": str(json_data.get("Triage Status", "NON-DARURAT")),
+            "triage_valid": True,
+            "xgboost_score": float(json_data.get("Triage Confidence", 0.99))
+        }
+    else:
+        csv_path = os.path.join(base_dir, "data_pengukuran", "data_test.csv")
+        json_path = os.path.join(base_dir, "data_pengukuran", "data_test.json")
+        df = pd.read_csv(csv_path)
+        df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
+        test_results = {
+            "bed": "011",
+            "patient_name": "Pasien Uji Fallback",
+            "gcs": 15.0,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "temperature": 36.5,
+            "temp_skin": 33.2,
+            "temp_ambient": 29.9,
+            "hr": 75.0,
+            "rr": 16.0,
+            "spo2": 98.0,
+            "systolic": 120.0,
+            "diastolic": 80.0,
+            "time_125": df_clean['Resample Time (s)'].values,
+            "ecg_smooth": df_clean['ECG_Clean'].values,
+            "ir_clean": df_clean['PPG_IR_Clean'].values,
+            "triage_status": "NON-DARURAT",
+            "triage_valid": True,
+            "xgboost_score": 0.90
+        }
+
+    test_window.update_results(test_results)
+    test_window.show()
     sys.exit(app.exec())
+
