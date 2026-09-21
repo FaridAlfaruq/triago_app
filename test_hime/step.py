@@ -13,7 +13,6 @@ DIR_PIN = 20
 STEPS_PER_REV = 200
 MICROSTEP = 1
 
-<<<<<<< HEAD
 # Kecepatan
 START_DELAY = 0.008
 MIN_DELAY = 0.0025
@@ -21,8 +20,8 @@ MIN_DELAY = 0.0025
 # Acceleration
 ACCEL_STEPS = 300
 
-# Jumlah putaran
-TOTAL_REVOLUTIONS = 5
+# Jumlah putaran diubah menjadi 1
+TOTAL_REVOLUTIONS = 1
 
 
 # =========================
@@ -39,14 +38,14 @@ direction = DigitalOutputDevice(
 )
 
 
-def move_motor_cw(steps, revolution_number):
+def move_motor_ccw(steps, revolution_number):
 
     total = abs(steps)
 
-    # Set arah CW
-    direction.on()
+    # Set arah CCW (membalik logika dari CW)
+    direction.off()
 
-    direction_name = "CW (Clockwise / searah jarum jam)"
+    direction_name = "CCW (Counter-Clockwise / berlawanan arah jarum jam)"
 
     degrees = total * 360 / (STEPS_PER_REV * MICROSTEP)
 
@@ -114,7 +113,7 @@ def move_motor_cw(steps, revolution_number):
             percent = ((i + 1) / total) * 100
 
             print(
-                f"[MOTOR] CW | "
+                f"[MOTOR] CCW | "
                 f"Putaran: {revolution_number}/{TOTAL_REVOLUTIONS} | "
                 f"Step: {i + 1}/{total} | "
                 f"Angle: {current_degree:.1f}° | "
@@ -123,7 +122,7 @@ def move_motor_cw(steps, revolution_number):
 
     print(
         f"[MOTOR] Putaran {revolution_number} "
-        f"SELESAI - CW 360°"
+        f"SELESAI - CCW 360°"
     )
 
 
@@ -131,33 +130,25 @@ try:
 
     print()
     print("=" * 55)
-    print("       STEPPER MOTOR - CW 5X")
+    print("       STEPPER MOTOR - CCW 1X")
     print("=" * 55)
 
     total_steps = STEPS_PER_REV * MICROSTEP
 
     # =========================
-    # CW 360° × 5
+    # CCW 360° × 1
     # =========================
     for revolution in range(1, TOTAL_REVOLUTIONS + 1):
 
-        move_motor_cw(
+        move_motor_ccw(
             total_steps,
             revolution
         )
 
-        # Jeda antar putaran
-        if revolution < TOTAL_REVOLUTIONS:
-            print(
-                f"[MOTOR] Menunggu 1 detik "
-                f"sebelum putaran berikutnya..."
-            )
-            sleep(1)
-
     print()
     print("=" * 55)
     print("[MOTOR] SEMUA GERAKAN SELESAI")
-    print("[MOTOR] Total: 5x CW 360°")
+    print("[MOTOR] Total: 1x CCW 360°")
     print("=" * 55)
 
 
@@ -173,36 +164,3 @@ finally:
     direction.off()
 
     print("[MOTOR] GPIO dimatikan.")
-=======
-direction.on()
-
-def move_smooth(total_steps=200, min_delay=0.002, start_delay=0.008, ramp_ratio=0.25):
-    """
-    total_steps: Jumlah langkah motor
-    min_delay  : Jeda saat mencapai kecepatan penuh (kecepatan puncak)
-    start_delay: Jeda saat mulai/berhenti (kecepatan lambat)
-    ramp_ratio : Porsi langkah yang digunakan untuk akselerasi/deselerasi
-    """
-    ramp_steps = int(total_steps * ramp_ratio)
-    
-    for i in range(total_steps):
-        # Fase Akselerasi (awal)
-        if i < ramp_steps:
-            progress = i / ramp_steps
-            delay = start_delay - (start_delay - min_delay) * progress
-        # Fase Deselerasi (akhir)
-        elif i >= (total_steps - ramp_steps):
-            progress = (total_steps - 1 - i) / ramp_steps
-            delay = start_delay - (start_delay - min_delay) * progress
-        # Fase Kecepatan Konstan
-        else:
-            delay = min_delay
-            
-        step.on()
-        sleep(delay)
-        step.off()
-        sleep(delay)
-
-# Jalankan 1 putaran dengan akselerasi halus
-move_smooth(total_steps=200, min_delay=0.002, start_delay=0.006)
->>>>>>> 6e9ac769e5352b9d8bc562099f0d552301ab20f1
