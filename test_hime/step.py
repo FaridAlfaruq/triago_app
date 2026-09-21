@@ -1,19 +1,22 @@
-from time import sleep
 import RPi.GPIO as GPIO
+import time
 
-# Setup GPIO
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(21, GPIO.OUT) # 21 Direction pin
-GPIO.setup(20, GPIO.OUT)# 20 Step pin
 
-# Set direction
-GPIO.output(20, 1) # 1 or a 0 to change the direction
+DIR_PIN = 21
+STEP_PIN = 20
 
-# Step the motor
-for _ in range(20):
-    GPIO.output(21, GPIO.HIGH)
-    sleep(.0025)
-    GPIO.output(21, GPIO.LOW)
-    sleep(.0025)
+GPIO.setup(DIR_PIN, GPIO.OUT)
+GPIO.setup(STEP_PIN, GPIO.OUT)
+
+# Atur arah
+GPIO.output(DIR_PIN, GPIO.HIGH)
+
+# Gerakkan motor
+for i in range(200):
+    GPIO.output(STEP_PIN, GPIO.HIGH)
+    time.sleep(0.001)
+    GPIO.output(STEP_PIN, GPIO.LOW)
+    time.sleep(0.001)
 
 GPIO.cleanup()
