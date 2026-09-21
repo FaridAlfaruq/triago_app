@@ -11,7 +11,7 @@ step = DigitalOutputDevice(STEP_PIN)
 direction.on()
 
 # 200 step
-for i in range(50):
+for i in range(200):
     step.on()
     sleep(0.001)
     step.off()
