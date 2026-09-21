@@ -299,6 +299,14 @@ class OutputPage(QWidget):
             triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.0)
 
+            sent_payload = {
+                "bed_id": bed_id,
+                "gcs_score": gcs,
+                "triage_category": triage_cat,
+                "xgboost_score": round(float(xgb_score), 2),
+                "vitals": vitals_dict
+            }
+
             is_sent = self.api_client.send_triage_result(
                 bed_id=bed_id,
                 gcs_score=gcs,
@@ -307,9 +315,9 @@ class OutputPage(QWidget):
                 score=xgb_score
             )
             if is_sent:
-                print(f"[GUI LOG] [BERHASIL] Data pengukuran Bed {bed_id} telah terkirim ke backend dan diproses ke database.")
+                print(f"[GUI LOG] [BERHASIL] Data Bed {bed_id} diproses ke DB | Payload: {json.dumps(sent_payload)}")
             else:
-                print(f"[GUI LOG] [GAGAL] Data pengukuran Bed {bed_id} TIDAK terkirim ke backend / database.")
+                print(f"[GUI LOG] [GAGAL] Data Bed {bed_id} TIDAK terkirim ke DB | Payload: {json.dumps(sent_payload)}")
         elif self.api_client:
             print(
                 "[WARN API] Hasil triase tidak dikirim karena inferensi model gagal: "
@@ -366,8 +374,7 @@ if __name__ == "__main__":
     ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
 
     dummy_results = {
-        "bed": "B2",
-        "patient_name": "Budi Santoso",
+        "bed": "C1",
         "gcs": 15,
         "timestamp": "2026-07-25 10:55:00",
         "temperature": 36.5,
@@ -381,7 +388,7 @@ if __name__ == "__main__":
         "time_125": t_dummy,
         "ecg_smooth": ecg_dummy,
         "ir_clean": ir_dummy,
-        "triage_status": "DARURAT",
+        "triage_status": "NON-DARURAT",
         "triage_valid": True,
         "xgboost_score": 0.88
     }
