@@ -2,27 +2,30 @@ from gpiozero import DigitalOutputDevice
 from time import sleep
 
 # Setup Pin
-step = DigitalOutputDevice(21)
-direction = DigitalOutputDevice(20)
+step = DigitalOutputDevice(20)
+direction = DigitalOutputDevice(21)
 
 # Konfigurasi
-STEPS = 200      # 1 putaran penuh (360°)
-DELAY = 0.0025   # Semakin kecil angka, semakin cepat putaran
+STEPS_PER_REVOLUTION = 200
+REVOLUTIONS = 5
+DELAY = 0.0025
 
 try:
-    # Set arah berlawanan jarum jam (CCW)
+    # Set arah CCW
     direction.off()
 
-    # Jalankan 1 putaran
-    for _ in range(STEPS):
+    # Jalankan 5 putaran
+    total_steps = STEPS_PER_REVOLUTION * REVOLUTIONS
+
+    for _ in range(total_steps):
         step.on()
         sleep(DELAY)
         step.off()
         sleep(DELAY)
 
-    print("Motor selesai berputar 1x CCW.")
+    print(f"Motor selesai berputar {REVOLUTIONS}x CCW.")
 
 finally:
-    # Pastikan pin mati saat program selesai atau dihentikan
+    # Pastikan pin mati
     step.close()
     direction.close()
