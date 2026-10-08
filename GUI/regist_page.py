@@ -16,8 +16,10 @@ class RegistrationPage(QWidget):
         super().__init__()
         self.selected_bed = None
         self.selected_gcs = None
+        self.selected_pain = None
         self.bed_buttons = {}
         self.gcs_buttons = {}
+        self.pain_buttons = {}
         self.setup_ui()
 
     def setup_ui(self):
@@ -44,11 +46,11 @@ class RegistrationPage(QWidget):
         header_layout = QHBoxLayout()
         
         title_vbox = QVBoxLayout()
-        lbl_title = QLabel("LOKASI KASUR & GCS")
+        lbl_title = QLabel("LOKASI KASUR, GCS & PAIN SCORE")
         # Ukuran font judul diperbesar menjadi 40px
         lbl_title.setStyleSheet("font-size: 34px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;")
         
-        lbl_subtitle = QLabel("Manajemen tata letak kasur dan input Glasgow Coma Score")
+        lbl_subtitle = QLabel("Manajemen tata letak kasur, Glasgow Coma Score, dan skala tingkat nyeri")
         # Ukuran font subtitle diperbesar menjadi 20px
         lbl_subtitle.setStyleSheet("font-size: 18px; font-weight: normal; color: #556B85;")
         
@@ -151,8 +153,39 @@ class RegistrationPage(QWidget):
         gcs_vbox.addLayout(hbox_gcs)
         center_layout.addLayout(gcs_vbox)
         
+        center_layout.addSpacing(5) # Ruang antara GCS dan Pain Score
+
+        # --- Input Pain Score (Skala 1 - 10) ---
+        pain_vbox = QVBoxLayout()
+        pain_vbox.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        lbl_pain_title = QLabel("Input Pain Score")
+        lbl_pain_title.setStyleSheet("font-size: 23px; font-weight: bold; color: #214889;")
+        pain_vbox.addWidget(lbl_pain_title, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        hbox_pain = QHBoxLayout()
+        hbox_pain.setSpacing(10)
+        hbox_pain.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        for p_score in range(1, 11):
+            btn_pain = QPushButton(str(p_score))
+            btn_pain.setCheckable(True)
+            btn_pain.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn_pain.setMinimumSize(54, 54)
+            btn_pain.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            btn_pain.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #C2D5BB; border-radius: 10px; font-size: 19px; font-weight: bold; color: #A0B09C; }
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
+            btn_pain.clicked.connect(lambda checked, s=p_score: self.handle_pain_selection(s))
+            hbox_pain.addWidget(btn_pain)
+            self.pain_buttons[p_score] = btn_pain
+
+        pain_vbox.addLayout(hbox_pain)
+        center_layout.addLayout(pain_vbox)
+
         center_layout.addSpacing(10)
-        
+
         # --- Tombol Start Measurement ---
         self.btn_start = QPushButton("Mulai")
         self.btn_start.setFixedSize(380, 56)
@@ -208,17 +241,44 @@ class RegistrationPage(QWidget):
         """)
         self.validate_form()
 
+    def handle_pain_selection(self, score):
+        self.selected_pain = score
+        for s, btn in self.pain_buttons.items():
+            btn.setStyleSheet("""
+                QPushButton { background-color: #FFFFFF; border: 2px solid #C2D5BB; border-radius: 10px; font-size: 19px; font-weight: bold; color: #A0B09C; }
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
+
+        if 1 <= score <= 3:
+            pain_color = "#34D980"  # Ringan: Hijau
+        elif 4 <= score <= 6:
+            pain_color = "#F09C00"  # Sedang: Jingga
+        else:
+            pain_color = "#F12A2A"  # Berat: Merah
+
+        self.pain_buttons[score].setStyleSheet(f"""
+            QPushButton {{
+                background-color: {pain_color};
+                border: none;
+                border-radius: 10px;
+                font-size: 20px;
+                font-weight: bold;
+                color: #FFFFFF;
+            }}
+        """)
+        self.validate_form()
+
     def validate_form(self):
-        if self.selected_bed and self.selected_gcs:
+        if self.selected_bed and self.selected_gcs and (self.selected_pain is not None):
             self.btn_start.setEnabled(True)
             self.btn_start.setStyleSheet("""
                 QPushButton { 
                     background-color: #214889; 
                     color: #FFFFFF; 
-                    font-size: 21px;
+                    font-size: 21px; 
                     font-weight: bold; 
-                    border-radius: 10px;
-                    border: none;
+                    border-radius: 10px; 
+                    border: none; 
                     letter-spacing: 1.5px;
                 }
                 QPushButton:hover { background-color: #163264; }
@@ -233,7 +293,8 @@ class RegistrationPage(QWidget):
         measurement_data = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "bed": self.selected_bed,
-            "gcs": self.selected_gcs
+            "gcs": self.selected_gcs,
+            "pain_score": self.selected_pain if self.selected_pain is not None else 0
         }
 
         # 1. Tentukan folder penyimpanan 'data_pengukuran'
