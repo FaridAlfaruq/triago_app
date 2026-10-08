@@ -73,24 +73,18 @@ class ProcessingWorker(QThread):
             ecg_smooth = self.ecg_processor.savgol(sig_lpf, window_size=11, poly_order=2)
 
             # -----------------------------------------------------------------
-            # TAHAP 2: Ekstraksi Fitur ECG (R-Peak, HR, & RR) (25% - 50%)
+            # TAHAP 2: Ekstraksi Fitur ECG (R-Peak & Heart Rate) (25% - 50%)
             # -----------------------------------------------------------------
-            self.status_updated.emit("Mendeteksi R-Peak, HR & Respiratory Rate...", 40)
+            self.status_updated.emit("Mendeteksi R-Peak & Heart Rate ECG...", 40)
             self.msleep(100)
 
             r_peaks, noise_peaks = self.ecg_processor.detect_r_peaks(ecg_125, fs=125)
             hr_ecg = self.ecg_processor.calculate_heart_rate(r_peaks, fs=125)
-            resp_rate, resp_signal, resp_peaks = (
-                self.ecg_processor.calculate_respiration_rate(ecg_smooth, r_peaks, fs=125)
-            )
-            rr_details = self.ecg_processor.last_respiration_details or {}
-            rr_quality = float(rr_details.get("quality", 0.0))
-            rr_measured = bool(resp_rate > 0)
 
             # -----------------------------------------------------------------
-            # TAHAP 3: Pemrosesan Sinyal PPG 7 Tahap (50% - 75%)
+            # TAHAP 3: Pemrosesan Sinyal PPG & Multimodal RR Fusion (50% - 75%)
             # -----------------------------------------------------------------
-            self.status_updated.emit("Menjalankan Pemrosesan Sinyal PPG (SpO2 & PI)...", 65)
+            self.status_updated.emit("Menjalankan Pemrosesan Sinyal PPG (SpO2 & PI)...", 60)
             self.msleep(100)
 
             if self.raw_red is not None and self.raw_ir is not None and len(self.raw_red) > 0:
@@ -106,11 +100,28 @@ class ProcessingWorker(QThread):
                 pi_ir = ppg_results['pi_ir']
                 red_clean = ppg_results['red_clean']
                 ir_clean = ppg_results['ir_clean']
+                ir_peaks = ppg_results.get('ir_peaks')
                 ppg_hr = ppg_results['ppg_hr']
             else:
                 spo2 = 98.0
                 pi_red, pi_ir, ppg_hr = 0.0, 0.0, 0.0
                 red_clean, ir_clean = np.array([]), np.array([])
+                ir_peaks = None
+
+            # Estimasi Multimodal Respiratory Rate Smart Fusion (ECG + PPG, Birrenkott 2018)
+            self.status_updated.emit("Estimasi Multimodal Respiratory Rate (ECG + PPG)...", 70)
+            resp_rate, resp_signal, resp_peaks = (
+                self.ecg_processor.calculate_respiration_rate(
+                    ecg_smooth, r_peaks, fs=125,
+                    ppg=ir_clean if len(ir_clean) > 0 else None,
+                    ppg_peaks=ir_peaks
+                )
+            )
+            rr_details = self.ecg_processor.last_respiration_details or {}
+            rr_quality = float(rr_details.get("quality", 0.0))
+            rr_mode = str(rr_details.get("mode", "UNKNOWN"))
+            rr_measured = bool(resp_rate > 0)
+            print(f"[LOG RR MULTIMODAL] Mode={rr_mode}, RR={resp_rate:.2f} bpm, Quality={rr_quality:.3f}")
 
             # -----------------------------------------------------------------
             # TAHAP 4: Machine Learning Triage & SHAP Analysis (75% - 95%)
@@ -300,6 +311,7 @@ class ProcessingWorker(QThread):
                 "rr": rr_val,
                 "rr_measured": rr_measured,
                 "rr_quality": rr_quality,
+                "rr_mode": rr_mode,
                 "spo2": spo2_val,
                 "systolic": sys_val,
                 "diastolic": dia_val,
