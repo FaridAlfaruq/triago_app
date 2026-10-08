@@ -4,6 +4,9 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QApplication, QLabel, QPushBut
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 
+# Import RegistrationPage agar halaman registrasi dengan Kasur, GCS & Pain Score dapat diakses juga dari home_page
+from regist_page import RegistrationPage
+
 class HomePage(QWidget):
     # Sinyal untuk memberi tahu Main Window bahwa user menekan tombol MULAI
     start_requested = pyqtSignal()
@@ -70,6 +73,9 @@ class HomePage(QWidget):
         main_layout.addWidget(self.btn_start, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setLayout(main_layout)
+
+# Alias untuk kompatibilitas jika modul menganggap registration page bagian dari home_page
+HomePageRegistration = RegistrationPage
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

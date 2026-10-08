@@ -167,6 +167,8 @@ class ProcessingWorker(QThread):
                 input_warnings.append("heart_rate memakai nilai fallback 75")
             if patient.get('gcs') is None:
                 input_warnings.append("gcs_total memakai nilai fallback 15")
+            if patient.get('pain_score') is None:
+                input_warnings.append("pain_score memakai nilai fallback 0")
 
             spo2_val = float(spo2 if spo2 > 0 else 98.0)
             rr_val = float(resp_rate if resp_rate > 0 else 16.0)
@@ -174,6 +176,7 @@ class ProcessingWorker(QThread):
             sys_val = float(patient.get('systolic') if patient.get('systolic') is not None else 120)
             dia_val = float(patient.get('diastolic') if patient.get('diastolic') is not None else 80)
             gcs_val = float(patient.get('gcs') if patient.get('gcs') is not None else 15)
+            pain_val = float(patient.get('pain_score') if patient.get('pain_score') is not None else 0)
 
             # -----------------------------------------------------------------
             # TAHAP 3.5: SQA 10s Window (Stride 2s) & Deep Learning BPNet Inference
@@ -231,7 +234,7 @@ class ProcessingWorker(QThread):
                 if patient.get('diastolic') is None:
                     input_warnings.append("diastolic_bp memakai nilai fallback 80")
 
-            # Susun tujuh tanda vital mentah untuk ONNX XGBoost Triase
+            # Susun tanda vital mentah untuk ONNX XGBoost Triase (11 fitur)
             raw_data = {
                 'temperature_c': temp_val,
                 'spo2': spo2_val,
@@ -240,6 +243,7 @@ class ProcessingWorker(QThread):
                 'systolic_bp': sys_val,
                 'diastolic_bp': dia_val,
                 'gcs_total': gcs_val,
+                'pain_score': pain_val,
             }
 
             triage_label = "TIDAK TERSEDIA"
@@ -283,6 +287,7 @@ class ProcessingWorker(QThread):
                 # Metadata & Registrasi
                 "bed": patient.get("bed", "00"),
                 "gcs": gcs_val,
+                "pain_score": pain_val,
                 "timestamp": patient.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
 
                 # Parameter Medis Suhu (Estimasi Suhu Inti CBT)
@@ -654,6 +659,7 @@ if __name__ == "__main__":
     dummy_patient = {
         "bed": "03",
         "gcs": 14,
+        "pain_score": 2,
         "temperature": 36.8,
         "systolic": 125,
         "diastolic": 82

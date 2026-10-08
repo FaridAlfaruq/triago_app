@@ -221,6 +221,7 @@ class TriaGoApplication(QMainWindow):
                 "Timestamp": results.get("timestamp", timestamp_str),
                 "Bed": str(results.get("bed", bed_id)),
                 "GCS Score": int(results.get("gcs", 15)),
+                "Pain Score": int(results.get("pain_score", 0)),
                 "HR": float(results.get("hr", 0.0)),
                 "RR": float(results.get("rr", 0.0)),
                 "SpO2": float(results.get("spo2", 0.0)),
@@ -247,6 +248,7 @@ class TriaGoApplication(QMainWindow):
             
         self.page_registration.selected_bed = None
         self.page_registration.selected_gcs = None
+        self.page_registration.selected_pain = None
         
         for btn in self.page_registration.bed_buttons.values():
             btn.setChecked(False)
@@ -270,6 +272,20 @@ class TriaGoApplication(QMainWindow):
                     border: 2px solid #C2D5BB; 
                     border-radius: 12px; 
                     font-size: 28px; 
+                    font-weight: bold; 
+                    color: #A0B09C; 
+                } 
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
+
+        for btn in self.page_registration.pain_buttons.values():
+            btn.setChecked(False)
+            btn.setStyleSheet("""
+                QPushButton { 
+                    background-color: #FFFFFF; 
+                    border: 2px solid #C2D5BB; 
+                    border-radius: 10px; 
+                    font-size: 19px; 
                     font-weight: bold; 
                     color: #A0B09C; 
                 } 
