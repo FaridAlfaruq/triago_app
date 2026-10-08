@@ -3,7 +3,7 @@ from scipy.interpolate import CubicSpline
 from scipy.ndimage import median_filter
 from scipy.signal import butter, filtfilt, find_peaks, iirnotch, resample, savgol_filter
 
-from respiratory_rate.pipeline import ECGRespirationEstimator
+from respiratory_rate.pipeline import ECGRespirationEstimator, MultimodalRespirationEstimator
 
 
 class ECGProcessor:
@@ -20,7 +20,7 @@ class ECGProcessor:
         Sampling rate target setelah downsampling (default: 125 Hz).
     """
     self.target_fs = target_fs
-    self.respiration_estimator = ECGRespirationEstimator()
+    self.respiration_estimator = MultimodalRespirationEstimator(min_duration=10.0)
     self.last_respiration_details = None
 
   # =========================================================================
@@ -316,14 +316,16 @@ class ECGProcessor:
     )
     return float(np.round(resp_rate, 2)), resp_signal_full, resp_peaks
 
-  def calculate_respiration_rate(self, ecg, r_peaks, fs=125):
-    """Estimasi RR ECG-only dengan quality-weighted multi-EDR spectral fusion.
+  def calculate_respiration_rate(self, ecg, r_peaks, fs=125, ppg=None, ppg_peaks=None):
+    """Estimasi RR multimodal (ECG + PPG) atau single-modal dengan smart quality-weighted spectral fusion.
 
-    Bentuk nilai balik tetap kompatibel dengan pipeline lama. Diagnostik
-    tambahan (RQI, bobot fitur, dan hasil per window) disimpan pada
+    Bentuk nilai balik tetap kompatibel dengan pipeline lama: (rr, resp_signal, resp_peaks).
+    Diagnostik tambahan (RQI, mode, bobot fitur, dan hasil per window) disimpan pada
     ``last_respiration_details``.
     """
-    details = self.respiration_estimator.estimate(ecg, r_peaks, fs=fs)
+    details = self.respiration_estimator.estimate(
+        ecg=ecg, r_peaks=r_peaks, ppg=ppg, ppg_peaks=ppg_peaks, fs=fs
+    )
     self.last_respiration_details = details
     return details["rr"], details["resp_signal"], details["resp_peaks"]
 
@@ -566,3 +568,9 @@ class PPGProcessor:
             'pi_ir': pi_ir,
             'ppg_hr': ppg_hr,
         }
+
+    def calculate_respiration_rate(self, ppg, ppg_peaks=None, fs=125):
+        """Estimasi Respiration Rate (RR) mandiri dari sinyal PPG."""
+        estimator = MultimodalRespirationEstimator(min_duration=10.0)
+        details = estimator.estimate(ecg=None, r_peaks=None, ppg=ppg, ppg_peaks=ppg_peaks, fs=fs)
+        return details["rr"], details["resp_signal"], details["resp_peaks"]
