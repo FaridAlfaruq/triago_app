@@ -35,8 +35,8 @@ class OutputPage(QWidget):
         self.calculation_results = {}
         self.iot_json_payload = ""
         
-        # Inisialisasi API Client (Menghubungkan ke IP Server Laptop B)
-        self.api_client = TriageApiClient(base_url="http://10.85.145.98:5000") if TriageApiClient else None
+        # HTTP/MQTT dipilih dari .env, termasuk URL backend bila memakai HTTP.
+        self.api_client = TriageApiClient() if TriageApiClient else None
         
         self.setup_ui()
 
@@ -312,7 +312,7 @@ class OutputPage(QWidget):
                 self.plot_ppg.setXRange(0, 5, padding=0)
                 self.plot_ppg.enableAutoRange(axis='y')
 
-        # 4. Pengiriman Payload ke Flask API Backend
+        # 4. Pengiriman payload melalui transport HTTP/MQTT yang dikonfigurasi
         if self.api_client and data.get("triage_valid", True):
             bed_id = data.get("bed", "A1")
             vitals_dict = {
@@ -335,15 +335,19 @@ class OutputPage(QWidget):
             self.iot_json_payload = json.dumps(payload, indent=2)
             
             try:
-                print(f"[LOG OUTPUT] Sending IoT Payload to Flask API (Bed {bed_id})...")
+                print(f"[LOG OUTPUT] Mengirim hasil triage Bed {bed_id}...")
                 if hasattr(self.api_client, "send_triage_result"):
-                    self.api_client.send_triage_result(
+                    accepted = self.api_client.send_triage_result(
                         bed_id=str(bed_id),
                         gcs_score=int(gcs),
                         vitals=vitals_dict,
                         classification=triage_cat,
-                        score=float(xgb_score)
+                        score=float(xgb_score),
+                        patient_name=data.get("patient_name"),
+                        relative_name=data.get("relative_name")
                     )
+                    if not accepted:
+                        print("[ERROR OUTPUT] Hasil belum terkirim/tersimpan di antrean. Periksa konfigurasi.")
             except Exception as e:
                 print(f"[ERROR OUTPUT] Failed to send IoT data: {e}")
 

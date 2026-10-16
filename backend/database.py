@@ -1,5 +1,7 @@
 import os
 import time
+import threading
+from pathlib import Path
 import mysql.connector
 from mysql.connector import Error
 
@@ -8,20 +10,32 @@ from mysql.connector import Error
 # =========================================================================
 DB_HOST = os.environ.get("TRIAGO_DB_HOST", "localhost")
 DB_USER = os.environ.get("TRIAGO_DB_USER", "root")
-DB_PASSWORD = os.environ.get("TRIAGO_DB_PASSWORD", "parapencariberkah")
+DB_PASSWORD = os.environ.get("TRIAGO_DB_PASSWORD", "")
 DB_NAME = os.environ.get("TRIAGO_DB_NAME", "triago")
+DB_BACKEND = os.environ.get("TRIAGO_DB_BACKEND", "mysql").lower()
+if DB_BACKEND not in {"mysql", "sqlite"}:
+    raise ValueError("TRIAGO_DB_BACKEND harus mysql atau sqlite")
 
-_db = None
+_sqlite_store = None
+if DB_BACKEND == "sqlite":
+    try:
+        from .sqlite_store import SQLiteStore
+    except ImportError:
+        from sqlite_store import SQLiteStore
+    _sqlite_store = SQLiteStore(os.environ.get("TRIAGO_SQLITE_PATH")
+                                or Path(__file__).resolve().parent.parent / "runtime" / "triago-laptop.sqlite3")
+
+_connections = threading.local()
 
 
 def _connect():
     """Membuat koneksi baru ke MySQL."""
-    global _db
-    _db = mysql.connector.connect(
+    _connections.db = mysql.connector.connect(
         host=DB_HOST,
         user=DB_USER,
         password=DB_PASSWORD,
         database=DB_NAME,
+        connection_timeout=5,
     )
     print(f"[DATABASE] Berhasil terkoneksi ke MySQL ({DB_HOST}/{DB_NAME})")
 
@@ -29,29 +43,24 @@ def _connect():
 def get_connection():
     """Mengembalikan koneksi aktif. Reconnect otomatis bila koneksi terputus
     (mengatasi error 'MySQL server has gone away' pada server yang jalan lama)."""
-    global _db
     try:
-        if _db is None or not _db.is_connected():
+        db = getattr(_connections, "db", None)
+        if db is None or not db.is_connected():
             _connect()
     except Error as err:
         print(f"[DATABASE][ERROR] Gagal konek ke MySQL: {err}")
         raise
-    return _db
+    return _connections.db
 
 
-# Percobaan koneksi pertama saat modul di-import.
-# Dibuat try/except supaya Flask TIDAK crash total kalau MySQL belum
-# menyala saat backend pertama kali dijalankan (misal urutan boot Raspberry Pi).
-try:
-    _connect()
-except Error as err:
-    print(f"[DATABASE][WARN] MySQL belum siap saat startup: {err}")
-    print("[DATABASE][WARN] Server tetap berjalan, akan mencoba reconnect otomatis saat ada data masuk.")
+# Koneksi dibuat lazily per thread: HTTP dan MQTT tidak berbagi koneksi MySQL.
 
 
 def save_patient(data: dict) -> bool:
     """Simpan satu baris hasil pengukuran/klasifikasi pasien ke tabel patient_data.
     Mengembalikan True bila berhasil, False bila gagal (server tidak akan ikut crash)."""
+    if _sqlite_store is not None:
+        return _sqlite_store.save_patient(data)
     try:
         conn = get_connection()
     except Error:
@@ -107,7 +116,6 @@ def save_patient(data: dict) -> bool:
     )
 
     try:
-        print(f"[DATABASE DEBUG] Values tuple inserted to MySQL: {values}", flush=True)
         cursor.execute(sql, values)
         conn.commit()
         print("[DATABASE] Data pasien berhasil disimpan ke MySQL.", flush=True)
@@ -122,6 +130,8 @@ def save_patient(data: dict) -> bool:
 
 def get_patient_history(limit: int = 50):
     """Ambil riwayat pengukuran terbaru dari MySQL (opsional, untuk laporan/riwayat)."""
+    if _sqlite_store is not None:
+        return _sqlite_store.get_patient_history(limit)
     try:
         conn = get_connection()
     except Error:
@@ -143,6 +153,8 @@ def get_patient_history(limit: int = 50):
 
 def update_patient_info(bed_id: str, patient_name: str, relative_name: str) -> bool:
     """Memperbarui nama pasien dan penanggung jawab pada baris terbaru di MySQL untuk bed tertentu."""
+    if _sqlite_store is not None:
+        return _sqlite_store.update_patient_info(bed_id, patient_name, relative_name)
     try:
         conn = get_connection()
     except Error:

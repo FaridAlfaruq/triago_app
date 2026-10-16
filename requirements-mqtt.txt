@@ -1,0 +1,4 @@
+# MQTT-only test/publisher; no GUI, sensor, model, or MySQL installation needed.
+paho-mqtt>=2.1.0,<3
+python-dotenv>=1.0.0,<2
+requests>=2.31.0,<3

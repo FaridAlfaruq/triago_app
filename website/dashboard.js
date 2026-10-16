@@ -9,6 +9,11 @@ const catLabel = {
 let bedsData = {};
 let selectedBedId = null;
 
+function escapeHTML(value) {
+  const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(value).replace(/[&<>"']/g, character => entities[character]);
+}
+
 async function fetchInitialBeds() {
   try {
     const response = await fetch('/api/beds');
@@ -98,8 +103,8 @@ function displayBedDetail(bedId) {
     <div class="modal-row" style="border-color:var(--border)"><span>Suhu Tubuh Inti</span><span class="mono" style="color:var(--accent);">${vitals.temp_core || '—'} °C</span></div>
 
     <div style="margin-top: 12px; font-size: 11px; color: var(--text-secondary); font-weight: bold; text-transform: uppercase;">Identitas Pasien</div>
-    <div class="modal-row" style="border-color:var(--border)"><span>Nama Pasien</span><span class="mono">${bedInfo.patient_name || '<i>Belum Diisi</i>'}</span></div>
-    <div class="modal-row" style="border-color:var(--border)"><span>Penanggung Jawab</span><span class="mono">${bedInfo.relative_name || '<i>Belum Diisi</i>'}</span></div>
+    <div class="modal-row" style="border-color:var(--border)"><span>Nama Pasien</span><span class="mono">${bedInfo.patient_name ? escapeHTML(bedInfo.patient_name) : '<i>Belum Diisi</i>'}</span></div>
+    <div class="modal-row" style="border-color:var(--border)"><span>Penanggung Jawab</span><span class="mono">${bedInfo.relative_name ? escapeHTML(bedInfo.relative_name) : '<i>Belum Diisi</i>'}</span></div>
 
     <button onclick="openFormModal('${bedId}')" style="width:100%; margin-top:15px; padding:8px; background:var(--accent); color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
       + Lengkapi Data Pasien

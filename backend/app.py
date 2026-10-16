@@ -1,15 +1,28 @@
 import os
+import sys
+import logging
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from service.config import load_config
+from backend.access_control import DashboardLogin, dashboard_credentials
+
+load_config()
+
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
 try:
     from .bed_manager import BedManager
-    from .database import save_patient, get_patient_history, update_patient_info
+    from .database import save_patient, get_patient_history, update_patient_info, DB_BACKEND
+    from .triage_service import TriageService
 except ImportError:
     # Tetap mendukung eksekusi langsung: python backend/app.py
     from bed_manager import BedManager
-    from database import save_patient, get_patient_history, update_patient_info
+    from database import save_patient, get_patient_history, update_patient_info, DB_BACKEND
+    from triage_service import TriageService
 
 # Inisialisasi Flask App & Arahkan static folder ke folder 'website'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,13 +30,12 @@ WEBSITE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "website"))
 SERVER_HOST = os.environ.get("TRIAGO_HOST", "0.0.0.0")
 SERVER_PORT = int(os.environ.get("PORT", os.environ.get("TRIAGO_PORT", "5000")))
 DEBUG_MODE = os.environ.get("TRIAGO_DEBUG", "0").lower() in {"1", "true", "yes"}
-CORS_ORIGINS = os.environ.get("TRIAGO_CORS_ORIGINS", "*")
+CORS_ORIGINS = os.environ.get("TRIAGO_CORS_ORIGINS") or None
+LOGIN_CREDENTIALS = dashboard_credentials()
 
 app = Flask(__name__, static_folder=WEBSITE_DIR, static_url_path="")
-CORS(
-    app,
-    resources={r"/api/*": {"origins": CORS_ORIGINS}},
-)
+if CORS_ORIGINS:
+    CORS(app, resources={r"/api/*": {"origins": CORS_ORIGINS}})
 
 # Inisialisasi SocketIO untuk komunikasi dua arah (Real-time)
 socketio = SocketIO(
@@ -31,9 +43,19 @@ socketio = SocketIO(
     cors_allowed_origins=CORS_ORIGINS,
     async_mode="threading",
 )
+if LOGIN_CREDENTIALS:
+    # Wrap outside SocketIO so /socket.io polling and upgrades require login too.
+    app.wsgi_app = DashboardLogin(app.wsgi_app, *LOGIN_CREDENTIALS)
 
 # Inisialisasi BedManager untuk mengelola status bed IGD
 bed_manager = BedManager()
+triage_service = TriageService(bed_manager, save_patient, socketio.emit)
+mqtt_receiver = None
+if os.environ.get("TRIAGO_MQTT_ENABLED", "0").lower() in {"1", "true", "yes"}:
+    from backend.mqtt_receiver import MqttReceiver
+    logging.basicConfig(level=logging.INFO)
+    mqtt_receiver = MqttReceiver(triage_service.process)
+    mqtt_receiver.start()
 
 
 # =========================================================================
@@ -52,6 +74,9 @@ def health_check():
         "status": "ok",
         "service": "triago-backend",
         "port": SERVER_PORT,
+        "mqtt": mqtt_receiver.status() if mqtt_receiver else {"enabled": False},
+        "database": {"engine": DB_BACKEND},
+        "access": {"login_required": LOGIN_CREDENTIALS is not None},
     })
 
 
@@ -67,54 +92,9 @@ def update_triage():
     """
     try:
         data = request.get_json(silent=True)
-        if not data:
-            return jsonify({"status": "error", "message": "Payload JSON tidak ditemukan"}), 400
-
-        print("\n[SERVER LOG] Menerima data baru dari hardware/GUI:", flush=True)
-        print(f" -> Bed ID Target : {data.get('bed_id')}", flush=True)
-        print(f" -> Kategori Triase: {data.get('triage_category')}", flush=True)
-        print(f" -> Pasien         : {data.get('patient_name')}", flush=True)
-
-        # 1. Masukkan/Update status pasien pada BedManager (in-memory, untuk dashboard real-time)
-        assigned_bed_id = bed_manager.assign_patient_to_bed(data)
-
-        if not assigned_bed_id:
-            # Semua bed di semua zona penuh. JANGAN buang data pasien --
-            # tetap simpan ke MySQL (ditandai bed_id "WAITING") supaya
-            # data pengukuran tidak hilang, lalu beri tahu operator.
-            print(f"[SERVER LOG][WARN] Semua bed penuh untuk kategori '{data.get('triage_category')}'. "
-                  f"Data disimpan sebagai antrian, tidak ditempatkan di bed manapun.", flush=True)
-
-            db_payload = {**data, "bed_id": "WAITING", "zone": "-"}
-            saved_to_db = save_patient(db_payload)
-
-            return jsonify({
-                "status": "warning",
-                "message": "Semua bed penuh — pasien masuk daftar tunggu, data tetap dicatat.",
-                "assigned_bed": None,
-                "saved_to_database": saved_to_db,
-            }), 200
-
-        updated_bed_info = bed_manager.get_all_beds_status()[assigned_bed_id]
-
-        # 2. SIMPAN KE MYSQL
-        db_payload = {**data, "bed_id": assigned_bed_id, "zone": updated_bed_info["zone"]}
-        saved_to_db = save_patient(db_payload)
-        if not saved_to_db:
-            print(f"[SERVER LOG][WARN] Data bed {assigned_bed_id} GAGAL disimpan ke MySQL.", flush=True)
-
-        # 3. PANCARKAN EVENT WEBSOCKET KE FRONTEND WEB SECARA INSTAN
-        socketio.emit("bed_updated", updated_bed_info)
-
-        print(f"[SERVER LOG] Berhasil memperbarui {assigned_bed_id} dan memancarkan data via WebSocket.\n", flush=True)
-
-        return jsonify({
-            "status": "success",
-            "message": f"Data berhasil diupdate pada bed {assigned_bed_id}",
-            "assigned_bed": assigned_bed_id,
-            "saved_to_database": saved_to_db,
-            "data": updated_bed_info,
-        }), 200
+        return jsonify(triage_service.process(data)), 200
+    except ValueError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 400
     except Exception as e:
         import traceback
         print(f"[SERVER ERROR] Terjadi kesalahan saat memproses data triage: {e}", flush=True)

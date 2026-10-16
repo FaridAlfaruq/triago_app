@@ -1,5 +1,12 @@
 # Menjalankan Backend TriaGO di Raspberry Pi
 
+Untuk menjadikan laptop server sementara yang bisa diakses dari internet,
+lihat [mode laptop + HTTPS](../docs/LAPTOP_SERVER.md).
+
+Untuk mode **Raspi → HiveMQ Cloud → backend server**, lihat
+[panduan MQTT](../docs/MQTT.md) dan contoh konfigurasi di `config/`.
+Mode HTTP berikut tetap didukung bila MQTT dinonaktifkan.
+
 Backend Flask melayani dashboard dan API pada port `5000`. Secara default
 server bind ke `0.0.0.0`, sehingga perangkat lain di jaringan lokal dapat
 mengaksesnya menggunakan alamat IP Raspberry Pi.

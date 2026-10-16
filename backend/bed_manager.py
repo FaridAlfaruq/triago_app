@@ -46,7 +46,7 @@ class BedManager:
         "green":  ["C", "B", "A"],
     }
 
-    def assign_patient_to_bed(self, data: dict):
+    def assign_patient_to_bed(self, data: dict, persist=None):
         category = data.get("triage_category")
         zone_order = self._ZONE_FALLBACK.get(category, ["C", "B", "A"])
 
@@ -64,6 +64,13 @@ class BedManager:
                         break
 
             if assigned_bed_id:
+                arrival_timestamp = int(time.time() * 1000)
+                if persist is not None:
+                    # Persist before occupying a bed. A failed MQTT database write
+                    # can then be retried without allocating an extra bed.
+                    persist({**data, "bed_id": assigned_bed_id,
+                             "zone": self.beds[assigned_bed_id]["zone"],
+                             "arrival_timestamp": arrival_timestamp})
                 self.beds[assigned_bed_id].update({
                     "status": category,
                     "gcs_score": data.get("gcs_score", 15),
@@ -71,7 +78,7 @@ class BedManager:
                     "relative_name": data.get("relative_name"),
                     "xgboost_score": data.get("xgboost_score"),
                     "vitals": data.get("vitals", {}),
-                    "arrival_timestamp": int(time.time() * 1000),
+                    "arrival_timestamp": arrival_timestamp,
                 })
                 return assigned_bed_id
         return None

@@ -6,3 +6,5 @@ requests>=2.31.0,<3
 simple-websocket>=1.0.0,<2
 gunicorn>=21.2.0
 mysql-connector-python>=8.0.30
+paho-mqtt>=2.1.0,<3
+python-dotenv>=1.0.0,<2

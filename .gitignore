@@ -14,3 +14,10 @@ venv/
 
 # Mengabaikan dataset BIDMC lokal
 /draft_filter/bidmc/
+
+# MQTT credentials and persistent local queues
+.env
+.env.*
+!.env.example
+/runtime/
+.venv/
