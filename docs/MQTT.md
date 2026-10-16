@@ -1,5 +1,8 @@
 # TriaGO: Raspberry Pi dan backend dengan HiveMQ Cloud
 
+Pain score dan model XGBoost dari branch `test` sudah terintegrasi; lihat
+[kontrak data dan langkah pembaruan pain score](PAIN_SCORE.md).
+
 Untuk **laptop sebagai server dengan link HTTPS**, mulai dari
 [panduan laptop](LAPTOP_SERVER.md). Profil itu memakai SQLite untuk uji;
 panduan di bawah tetap menjelaskan konfigurasi backend MySQL.
@@ -71,8 +74,9 @@ cp config/backend.env.example .env
 ```
 
 Isi kredensial subscriber HiveMQ dan konfigurasi MySQL yang sudah dipakai TriaGO.
-Tabel `patient_data` menggunakan struktur yang sama dengan backend lama;
-tidak ada migrasi tabel untuk MQTT ini.
+Tabel `patient_data` memakai struktur backend lama dengan tambahan nullable
+`pain_score`. Untuk MySQL lama, jalankan migrasi pain score satu kali seperti
+[panduan pain score](PAIN_SCORE.md). SQLite mode laptop bermigrasi otomatis.
 Password database sekarang harus diisi lewat environment, tanpa password bawaan dalam kode.
 
 ```bash
@@ -113,6 +117,7 @@ QoS `1`, `retain=False`.
   "data": {
     "bed_id": "A1",
     "gcs_score": 15,
+    "pain_score": 3,
     "triage_category": "green",
     "xgboost_score": 0.2,
     "vitals": {"hr": 75, "spo2": 98, "rr": 16, "temp_core": 36.5, "sys": 120, "dia": 80}

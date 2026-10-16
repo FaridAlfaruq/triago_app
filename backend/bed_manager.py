@@ -32,6 +32,7 @@ class BedManager:
             "patient_name": None,
             "relative_name": None,
             "gcs_score": None,
+            "pain_score": None,
             "xgboost_score": None,
             "vitals": {},
             "arrival_timestamp": None,
@@ -74,6 +75,7 @@ class BedManager:
                 self.beds[assigned_bed_id].update({
                     "status": category,
                     "gcs_score": data.get("gcs_score", 15),
+                    "pain_score": data.get("pain_score"),
                     "patient_name": data.get("patient_name"),
                     "relative_name": data.get("relative_name"),
                     "xgboost_score": data.get("xgboost_score"),

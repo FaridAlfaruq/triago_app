@@ -21,6 +21,7 @@ def main():
     try:
         event_id = publisher.enqueue({
             "bed_id": "A1", "gcs_score": 15, "triage_category": "green",
+            "pain_score": 3,
             "xgboost_score": 0.2, "patient_name": "SIMULASI MQTT",
             "relative_name": "DATA DUMMY",
             "vitals": {"hr": 75, "spo2": 98, "rr": 16, "temp_core": 36.5,

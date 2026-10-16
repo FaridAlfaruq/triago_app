@@ -93,6 +93,7 @@ function displayBedDetail(bedId) {
     <div class="modal-row" style="border-color:var(--border)"><span>Status Triase</span><span style="font-weight:bold; color:var(--${bedInfo.status})">${catLabel[bedInfo.status]}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Skor XGBoost</span><span class="mono">${bedInfo.xgboost_score || '—'}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Skor GCS (Hardware)</span><span class="mono" style="font-weight:bold;">${bedInfo.gcs_score || 15} / 15</span></div>
+    <div class="modal-row" style="border-color:var(--border)"><span>Pain Score</span><span class="mono">${bedInfo.pain_score == null ? '—' : escapeHTML(bedInfo.pain_score) + ' / 10'}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Waktu Masuk</span><span class="mono">${arrivalTime}</span></div>
     
     <div style="margin-top: 12px; font-size: 11px; color: var(--accent); font-weight: bold; text-transform: uppercase;">Tanda Vital (Hasil Cek Hardware)</div>

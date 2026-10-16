@@ -76,6 +76,7 @@ def save_patient(data: dict) -> bool:
         patient_name,
         relative_name,
         gcs_score,
+        pain_score,
         xgboost_score,
         heart_rate,
         spo2,
@@ -85,7 +86,7 @@ def save_patient(data: dict) -> bool:
         diastolic_bp,
         arrival_timestamp
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
     vitals = data.get("vitals", {})
     if not isinstance(vitals, dict):
@@ -105,6 +106,7 @@ def save_patient(data: dict) -> bool:
         data.get("patient_name"),
         data.get("relative_name"),
         data.get("gcs_score"),
+        data.get("pain_score"),
         data.get("xgboost_score"),
         _get_vital(["hr", "heart_rate"]),
         _get_vital(["spo2"]),
@@ -122,6 +124,8 @@ def save_patient(data: dict) -> bool:
         return True
     except Error as err:
         print(f"[DATABASE][ERROR] Gagal insert data pasien: {err}", flush=True)
+        if getattr(err, "errno", None) == 1054:
+            print("[DATABASE] Periksa migrasi backend/migrations/001_add_pain_score.sql", flush=True)
         conn.rollback()
         return False
     finally:

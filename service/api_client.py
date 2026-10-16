@@ -36,11 +36,12 @@ class TriageApiClient:
         return self.mqtt_publisher
 
     def send_triage_result(self, bed_id: str, gcs_score: int, vitals: dict, classification: str, score: float,
-                           patient_name=None, relative_name=None) -> bool:
+                           patient_name=None, relative_name=None, pain_score=None) -> bool:
         """Mengirimkan payload triage dengan Suhu Inti dan Skor GCS."""
         payload = {
             "bed_id": bed_id,
             "gcs_score": gcs_score,
+            "pain_score": pain_score,
             "triage_category": classification.lower(),  # 'red', 'yellow', 'green'
             "xgboost_score": round(float(score), 2),
             "vitals": {

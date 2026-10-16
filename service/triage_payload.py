@@ -22,6 +22,12 @@ def validate_payload(data):
     if not isinstance(category, str) or category.lower() not in {"red", "yellow", "green"}:
         raise ValueError("triage_category harus red, yellow, atau green")
     data["triage_category"] = category.lower()
+    # Legacy messages remain valid; absent means unknown, not a measured zero.
+    pain = data.get("pain_score")
+    if pain is not None:
+        if not is_finite_number(pain) or not 0 <= pain <= 10 or int(pain) != pain:
+            raise ValueError("pain_score harus integer 0 sampai 10, atau null")
+        data["pain_score"] = int(pain)
     vitals = data.get("vitals")
     if not isinstance(vitals, dict):
         raise ValueError("vitals harus berupa object JSON")

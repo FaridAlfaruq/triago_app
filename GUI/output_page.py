@@ -107,11 +107,12 @@ class OutputPage(QWidget):
         body_layout = QVBoxLayout()
         body_layout.setSpacing(10)
 
-        # --- BARIS 1: 6 KOLOM PARAMETER ---
+        # --- BARIS 1: 7 KOLOM PARAMETER ---
         param_layout = QHBoxLayout()
         param_layout.setSpacing(8)
 
         self.lbl_gcs_val, self.lbl_gcs_sub = self._create_param_card(param_layout, "GCS Score", "-- / 15")
+        self.lbl_pain_val, self.lbl_pain_sub = self._create_param_card(param_layout, "Pain Score", "-- / 10")
         self.lbl_hr_val, self.lbl_hr_sub = self._create_param_card(param_layout, "Denyut Jantung", "-- BPM")
         self.lbl_rr_val, self.lbl_rr_sub = self._create_param_card(param_layout, "Laju Pernapasan", "-- RPM")
         self.lbl_spo2_val, self.lbl_spo2_sub = self._create_param_card(param_layout, "SpO2", "-- %")
@@ -226,10 +227,13 @@ class OutputPage(QWidget):
         sys_bp = data.get("systolic", 120)
         dia_bp = data.get("diastolic", 80)
         gcs = data.get("gcs", 15)
+        pain = data.get("pain_score")
 
-        # 1. Update Teks 6 Kartu Parameter Medis
+        # 1. Update Teks 7 Kartu Parameter Medis
         self.lbl_gcs_val.setText(f"{int(gcs)} / 15")
         self.lbl_gcs_sub.setText("Skor Kesadaran")
+        self.lbl_pain_val.setText(f"{int(pain)} / 10" if pain is not None else "-- / 10")
+        self.lbl_pain_sub.setText("Skor Nyeri")
         
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
         
@@ -330,7 +334,8 @@ class OutputPage(QWidget):
                 "Bed": str(bed_id),
                 "Vitals": vitals_dict,
                 "TriageCategory": triage_cat,
-                "RiskScore": float(xgb_score)
+                "RiskScore": float(xgb_score),
+                "PainScore": pain
             }
             self.iot_json_payload = json.dumps(payload, indent=2)
             
@@ -344,7 +349,8 @@ class OutputPage(QWidget):
                         classification=triage_cat,
                         score=float(xgb_score),
                         patient_name=data.get("patient_name"),
-                        relative_name=data.get("relative_name")
+                        relative_name=data.get("relative_name"),
+                        pain_score=pain
                     )
                     if not accepted:
                         print("[ERROR OUTPUT] Hasil belum terkirim/tersimpan di antrean. Periksa konfigurasi.")

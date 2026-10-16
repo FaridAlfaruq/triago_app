@@ -10,7 +10,7 @@ const context = vm.createContext({
 });
 vm.runInContext(fs.readFileSync(path.join(__dirname, '../website/dashboard.js'), 'utf8'), context);
 vm.runInContext(`
-  bedsData.A1 = {status: 'green', vitals: {},
+  bedsData.A1 = {status: 'green', vitals: {}, pain_score: 0,
     patient_name: '<img src=x onerror=alert(1)>', relative_name: 'A & B'};
   displayBedDetail('A1');
 `, context);
@@ -18,5 +18,9 @@ const html = elements.bedDetailContent.innerHTML;
 assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'));
 assert.ok(!html.includes('<img src=x'));
 assert.ok(html.includes('A &amp; B'));
+assert.ok(html.includes('0 / 10'));
+vm.runInContext('bedsData.A1.pain_score = null; displayBedDetail("A1");', context);
+assert.ok(!elements.bedDetailContent.innerHTML.includes('null / 10'));
+assert.ok(!elements.bedDetailContent.innerHTML.includes('undefined / 10'));
 assert.equal(elements.panelBedTitle.textContent, 'DETAIL BED — A1');
-console.log('Dashboard displays patient input as text, not executable HTML.');
+console.log('Dashboard escapes patient input and distinguishes measured zero pain from unknown.');

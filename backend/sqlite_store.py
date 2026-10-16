@@ -15,10 +15,14 @@ class SQLiteStore:
                 bed_id TEXT, zone TEXT, status TEXT,
                 patient_name TEXT, relative_name TEXT,
                 gcs_score INTEGER, xgboost_score REAL,
+                pain_score INTEGER,
                 heart_rate REAL, spo2 REAL, temperature REAL,
                 respiration_rate REAL, systolic_bp INTEGER,
                 diastolic_bp INTEGER, arrival_timestamp INTEGER
             )""")
+            columns = {row["name"] for row in conn.execute("PRAGMA table_info(patient_data)")}
+            if "pain_score" not in columns:
+                conn.execute("ALTER TABLE patient_data ADD COLUMN pain_score INTEGER")
 
     @contextmanager
     def connection(self):
@@ -40,6 +44,7 @@ class SQLiteStore:
             data.get("bed_id"), data.get("zone"), data.get("triage_category"),
             data.get("patient_name"), data.get("relative_name"),
             data.get("gcs_score"), data.get("xgboost_score"),
+            data.get("pain_score"),
             vital("hr", "heart_rate"), vital("spo2"),
             vital("temp_core", "temperature", "temp", "temp_skin"),
             vital("rr", "respiration_rate"), vital("sys", "systolic_bp", "systolic"),
@@ -49,9 +54,9 @@ class SQLiteStore:
         with self.connection() as conn:
             conn.execute("""INSERT INTO patient_data (
                 bed_id, zone, status, patient_name, relative_name,
-                gcs_score, xgboost_score, heart_rate, spo2, temperature,
+                gcs_score, xgboost_score, pain_score, heart_rate, spo2, temperature,
                 respiration_rate, systolic_bp, diastolic_bp, arrival_timestamp
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", values)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", values)
         return True
 
     def get_patient_history(self, limit=50):
