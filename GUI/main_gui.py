@@ -252,17 +252,6 @@ class TriaGoApplication(QMainWindow):
         
         for btn in self.page_registration.bed_buttons.values():
             btn.setChecked(False)
-            btn.setStyleSheet("""
-                QPushButton { 
-                    background-color: #FFFFFF; 
-                    border: 2px solid #214889; 
-                    border-radius: 12px; 
-                    font-size: 48px; 
-                    font-weight: bold; 
-                    color: #214889; 
-                } 
-                QPushButton:hover { background-color: #F0F4FF; }
-            """)
             
         for btn in self.page_registration.gcs_buttons.values():
             btn.setChecked(False)

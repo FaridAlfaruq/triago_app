@@ -3,12 +3,18 @@ import sys
 import csv
 from datetime import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QGridLayout, QFrame, QApplication,
+                             QPushButton, QGridLayout, QFrame, QLayout, QApplication,
                              QSizePolicy)
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 
 class RegistrationPage(QWidget):
+    BED_BUTTON_STYLE = """
+        QPushButton { background-color: #FFFFFF; border: 2px solid #214889; border-radius: 10px; font-size: 28px; font-weight: bold; color: #214889; }
+        QPushButton:hover { background-color: #F0F4FF; }
+        QPushButton:checked { background-color: #CEF9B6; border: 3px solid #214889; }
+    """
+
     # Signal untuk mengirim data (hanya bed dan gcs) saat tombol start diklik
     measurement_started = pyqtSignal(dict)
 
@@ -37,7 +43,7 @@ class RegistrationPage(QWidget):
         """)
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(32, 16, 32, 16)
+        main_layout.setContentsMargins(32, 12, 32, 12)
         main_layout.setSpacing(14)
         
         # =====================================================================
@@ -79,6 +85,7 @@ class RegistrationPage(QWidget):
         # =====================================================================
         center_layout = QVBoxLayout()
         center_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        center_layout.setSpacing(4)
         
         # --- Tata Letak Kasur ---
         bed_frame = QFrame()
@@ -86,8 +93,10 @@ class RegistrationPage(QWidget):
         bed_frame.setStyleSheet("QFrame { border: 2px solid #C2D5BB; border-radius: 12px; background-color: #FFFFFF; }")
         
         bed_layout = QVBoxLayout(bed_frame)
-        bed_layout.setContentsMargins(24, 16, 24, 20)
-        bed_layout.setSpacing(10)
+        bed_layout.setContentsMargins(20, 8, 20, 10)
+        bed_layout.setSpacing(6)
+        # Keep both touch rows inside the panel, including on short displays.
+        bed_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
         
         lbl_bed_title = QLabel("Tata Letak Kasur")
         lbl_bed_title.setStyleSheet("QLabel { font-size: 18px; font-weight: 600; color: #556B85; border: none; background: transparent; }")
@@ -95,7 +104,7 @@ class RegistrationPage(QWidget):
         
         grid_bed = QGridLayout()
         grid_bed.setContentsMargins(0, 0, 0, 0)
-        grid_bed.setVerticalSpacing(12)
+        grid_bed.setVerticalSpacing(10)
         grid_bed.setHorizontalSpacing(14)
         for column in range(6):
             grid_bed.setColumnStretch(column, 1)
@@ -107,15 +116,11 @@ class RegistrationPage(QWidget):
             
             btn_bed = QPushButton(bed_str)
             btn_bed.setCheckable(True)
-            btn_bed.setMinimumHeight(66)
-            btn_bed.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            btn_bed.setFixedSize(128, 56)
             btn_bed.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn_bed.setStyleSheet("""
-                QPushButton { background-color: #FFFFFF; border: 2px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
-                QPushButton:hover { background-color: #F0F4FF; }
-            """)
+            btn_bed.setStyleSheet(self.BED_BUTTON_STYLE)
             btn_bed.clicked.connect(lambda checked, b=bed_str: self.handle_bed_selection(b))
-            grid_bed.addWidget(btn_bed, row, col)
+            grid_bed.addWidget(btn_bed, row, col, Qt.AlignmentFlag.AlignCenter)
             self.bed_buttons[bed_str] = btn_bed
             
         bed_layout.addLayout(grid_bed)
@@ -203,15 +208,7 @@ class RegistrationPage(QWidget):
     def handle_bed_selection(self, bed_id):
         self.selected_bed = bed_id
         for bid, btn in self.bed_buttons.items():
-            # Update style mereset ke ukuran dan font baru
-            btn.setStyleSheet("""
-                QPushButton { background-color: #FFFFFF; border: 2px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
-                QPushButton:hover { background-color: #CEF9B6; }
-            """)
-            
-        self.bed_buttons[bed_id].setStyleSheet("""
-            QPushButton { background-color: #CEF9B6; border: 3px solid #214889; border-radius: 10px; font-size: 36px; font-weight: bold; color: #214889; }
-        """)
+            btn.setChecked(bid == bed_id)
         self.validate_form()
 
     def handle_gcs_selection(self, score):
