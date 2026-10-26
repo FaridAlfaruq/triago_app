@@ -359,18 +359,36 @@ class OutputPage(QWidget):
 # UJI MANDIRI LOCAL
 # =========================================================================
 if __name__ == "__main__":
+    import pandas as pd
+
     app = QApplication(sys.argv)
     
     test_window = OutputPage()
-    test_window.setWindowTitle("TriaGO - Test Output Pengecekan")
+    test_window.setWindowTitle("TriaGO - Test Sinyal Asli (ECG Real & PPG BIDMC)")
     test_window.showMaximized()
     
-    fs = 125
-    t_dummy = np.linspace(0, 10, 10 * fs)
-    ecg_dummy = np.sin(2 * np.pi * 1.5 * t_dummy) + 0.2 * np.random.normal(size=len(t_dummy))
-    ir_dummy = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_dummy)
+    # 1. Load ECG dari data pengukuran
+    csv_file = os.path.join(project_root, "data_pengukuran", "data_test.csv")
+    if os.path.exists(csv_file):
+        df_ecg = pd.read_csv(csv_file).dropna(subset=["Resample Time (s)", "ECG_Clean"])
+        t_arr = df_ecg["Resample Time (s)"].values
+        ecg_arr = df_ecg["ECG_Clean"].values
+    else:
+        fs = 125
+        t_arr = np.linspace(0, 10, 10 * fs)
+        ecg_arr = np.sin(2 * np.pi * 1.5 * t_arr) + 0.2 * np.random.normal(size=len(t_arr))
 
-    dummy_results = {
+    # 2. Load PPG bersih dari dataset BIDMC lokal
+    bidmc_path = os.path.join(project_root, "bidmc", "bidmc_01_Signals.csv")
+    if os.path.exists(bidmc_path):
+        df_bidmc = pd.read_csv(bidmc_path, nrows=len(t_arr) + 2000)
+        df_bidmc.columns = [c.strip() for c in df_bidmc.columns]
+        ir_arr = df_bidmc["PLETH"].iloc[1000:1000 + len(t_arr)].values
+    else:
+        fs = 125
+        ir_arr = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_arr)
+
+    sample_results = {
         "bed": "A1",
         "patient_name": "Budi Santoso",
         "gcs": 15,
@@ -379,19 +397,19 @@ if __name__ == "__main__":
         "temperature": 36.5,
         "temp_skin": 34.2,
         "temp_ambient": 27.5,
-        "hr": 110.5,
+        "hr": 78.0,
         "rr": 16.0,
         "spo2": 98.2,
         "systolic": 120,
         "diastolic": 80,
-        "time_125": t_dummy,
-        "ecg_smooth": ecg_dummy,
-        "ir_clean": ir_dummy,
-        "triage_status": "DARURAT",
-        "triage_valid": True,
+        "time_125": t_arr,
+        "ecg_smooth": ecg_arr,
+        "ir_clean": ir_arr,
+        "triage_status": "NON-DARURAT",
+        "triage_valid": False,
         "xgboost_score": 0.88
     }
 
-    test_window.update_results(dummy_results)
+    test_window.update_results(sample_results)
     
     sys.exit(app.exec())
