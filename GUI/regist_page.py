@@ -273,10 +273,10 @@ class RegistrationPage(QWidget):
                 QPushButton { 
                     background-color: #214889; 
                     color: #FFFFFF; 
-                    font-size: 21px;
+                    font-size: 21px; 
                     font-weight: bold; 
-                    border-radius: 10px;
-                    border: none;
+                    border-radius: 10px; 
+                    border: none; 
                     letter-spacing: 1.5px;
                 }
                 QPushButton:hover { background-color: #163264; }

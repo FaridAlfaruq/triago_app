@@ -396,77 +396,56 @@ class OutputPage(QWidget):
 # =========================================================================
 if __name__ == "__main__":
     import pandas as pd
-    import scipy.signal as signal
-    
+
     app = QApplication(sys.argv)
+    
     test_window = OutputPage()
+    test_window.setWindowTitle("TriaGO - Test Sinyal Asli (ECG Real & PPG BIDMC)")
+    test_window.showMaximized()
     
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_dir = os.path.join(base_dir, "data_pengukuran")
-    
-    csv_path = os.path.join(data_dir, "data_test.csv")
-    json_path = os.path.join(data_dir, "data_test.json")
-    
-    if os.path.exists(csv_path):
-        print(f"[TEST OUTPUT] Loading Exact Screenshot Dataset: {csv_path}")
-        test_window.setWindowTitle("TriaGO - Output Pengecekan (Sinyal & Parameter Ideal)")
-        df = pd.read_csv(csv_path)
-        df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
-        
-        t_125 = df_clean['Resample Time (s)'].values
-        ecg_125 = df_clean['ECG_Clean'].values
-        
-        # Scale PPG signal to range [-500, 500] matching exact waveform in screenshot
-        ppg_raw = df_clean['PPG_IR_Clean'].values
-        ppg_125 = ((ppg_raw - np.mean(ppg_raw)) / (np.max(ppg_raw) - np.min(ppg_raw))) * 1000.0
-        
-        json_data = {}
-        if os.path.exists(json_path):
-            with open(json_path, 'r') as f:
-                json_data = json.load(f)
-
-        test_results = {
-            "bed": str(json_data.get("Bed", "12")),
-            "patient_name": "Pasien Bed 12",
-            "gcs": 15.0,
-            "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
-            "temperature": 37.7,
-            "temp_skin": 33.1,
-            "temp_ambient": 28.5,
-            "hr": 70.7,
-            "rr": 14.0,
-            "spo2": 100.0,
-            "systolic": 119.0,
-            "diastolic": 68.0,
-            "time_125": t_125,
-            "ecg_smooth": ecg_125,
-            "ir_clean": ppg_125,
-            "triage_status": "NON-DARURAT",
-            "triage_valid": True,
-            "xgboost_score": 0.99
-        }
+    # 1. Load ECG dari data pengukuran
+    csv_file = os.path.join(project_root, "data_pengukuran", "data_test.csv")
+    if os.path.exists(csv_file):
+        df_ecg = pd.read_csv(csv_file).dropna(subset=["Resample Time (s)", "ECG_Clean"])
+        t_arr = df_ecg["Resample Time (s)"].values
+        ecg_arr = df_ecg["ECG_Clean"].values
     else:
-        test_results = {
-            "bed": "12",
-            "patient_name": "Pasien Uji",
-            "gcs": 15.0,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "temperature": 37.7,
-            "temp_skin": 33.1,
-            "temp_ambient": 28.5,
-            "hr": 70.7,
-            "rr": 14.0,
-            "spo2": 100.0,
-            "systolic": 119.0,
-            "diastolic": 68.0,
-            "time_125": np.linspace(0, 60, 7500),
-            "ecg_smooth": np.zeros(7500),
-            "ir_clean": np.zeros(7500),
-            "triage_status": "NON-DARURAT",
-            "triage_valid": True,
-            "xgboost_score": 0.99
-        }
+        fs = 125
+        t_arr = np.linspace(0, 10, 10 * fs)
+        ecg_arr = np.sin(2 * np.pi * 1.5 * t_arr) + 0.2 * np.random.normal(size=len(t_arr))
 
-    test_window.update_results(test_results)
-    test_window.show()
+    # 2. Load PPG bersih dari dataset BIDMC lokal
+    bidmc_path = os.path.join(project_root, "bidmc", "bidmc_01_Signals.csv")
+    if os.path.exists(bidmc_path):
+        df_bidmc = pd.read_csv(bidmc_path, nrows=len(t_arr) + 2000)
+        df_bidmc.columns = [c.strip() for c in df_bidmc.columns]
+        ir_arr = df_bidmc["PLETH"].iloc[1000:1000 + len(t_arr)].values
+    else:
+        fs = 125
+        ir_arr = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_arr)
+
+    sample_results = {
+        "bed": "A1",
+        "patient_name": "Budi Santoso",
+        "gcs": 15,
+        "pain_score": 3,
+        "timestamp": "2026-07-25 10:55:00",
+        "temperature": 36.5,
+        "temp_skin": 34.2,
+        "temp_ambient": 27.5,
+        "hr": 78.0,
+        "rr": 16.0,
+        "spo2": 98.2,
+        "systolic": 120,
+        "diastolic": 80,
+        "time_125": t_arr,
+        "ecg_smooth": ecg_arr,
+        "ir_clean": ir_arr,
+        "triage_status": "NON-DARURAT",
+        "triage_valid": False,
+        "xgboost_score": 0.88
+    }
+
+    test_window.update_results(sample_results)
+    
     sys.exit(app.exec())

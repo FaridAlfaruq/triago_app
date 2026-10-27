@@ -266,6 +266,20 @@ class TriaGoApplication(QMainWindow):
                 } 
                 QPushButton:hover { border-color: #214889; color: #214889; }
             """)
+
+        for btn in self.page_registration.pain_buttons.values():
+            btn.setChecked(False)
+            btn.setStyleSheet("""
+                QPushButton { 
+                    background-color: #FFFFFF; 
+                    border: 2px solid #C2D5BB; 
+                    border-radius: 10px; 
+                    font-size: 19px; 
+                    font-weight: bold; 
+                    color: #A0B09C; 
+                } 
+                QPushButton:hover { border-color: #214889; color: #214889; }
+            """)
             
         for btn in self.page_registration.pain_buttons.values():
             btn.setChecked(False)
