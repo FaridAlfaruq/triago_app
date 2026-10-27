@@ -488,20 +488,80 @@ class PPGProcessor:
 
         return float(np.mean(p2p_values)), peaks
 
-    def calculate_spo2_and_pi(self, ac_ir, dc_ir, ac_red, dc_red):
-        """Step 7: Menghitung SpO2, PI Red, dan PI IR."""
+    def ratio_of_ratios_per_beat(self, raw_red, raw_ir, fs):
+        """Hitung R = (AC_red/DC_red)/(AC_ir/DC_ir) per denyut, lalu ambil median.
+
+        Dihitung pada sinyal mentah (sebelum downsample) agar DC tidak terdistorsi.
+        Denyut dengan rasio outlier (> 3 MAD, biasanya artefak gerak) dibuang.
+        Mengembalikan np.nan jika denyut valid kurang dari 5.
+        """
+        raw_red = np.asarray(raw_red, dtype=float)
+        raw_ir = np.asarray(raw_ir, dtype=float)
+        nyq = 0.5 * fs
+        if len(raw_ir) < int(3 * fs):
+            return np.nan
+
+        b_dc, a_dc = butter(2, 0.3 / nyq, btype='lowpass')
+        b_ac, a_ac = butter(3, [0.5 / nyq, min(5.0, 0.45 * fs) / nyq], btype='bandpass')
+        dc_red, dc_ir = filtfilt(b_dc, a_dc, raw_red), filtfilt(b_dc, a_dc, raw_ir)
+        ac_red, ac_ir = filtfilt(b_ac, a_ac, raw_red), filtfilt(b_ac, a_ac, raw_ir)
+
+        # Intensitas turun saat sistolik, jadi puncak denyut = puncak dari -AC IR
+        pulse = -ac_ir
+        distance = int(0.33 * fs)
+        prominence = 0.3 * np.std(pulse)
+        peaks, _ = find_peaks(pulse, distance=distance, prominence=prominence)
+        troughs, _ = find_peaks(-pulse, distance=distance, prominence=prominence)
+
+        ratios = []
+        for p in peaks:
+            previous = troughs[troughs < p]
+            if len(previous) == 0 or p - previous[-1] > int(0.6 * fs):
+                continue
+            q = previous[-1]
+            if dc_red[p] == 0 or dc_ir[p] == 0:
+                continue
+            norm_red = abs(ac_red[q] - ac_red[p]) / abs(dc_red[p])
+            norm_ir = abs(ac_ir[q] - ac_ir[p]) / abs(dc_ir[p])
+            if norm_ir > 0:
+                ratios.append(norm_red / norm_ir)
+
+        ratios = np.asarray(ratios)
+        if len(ratios) < 5:
+            return np.nan
+        median = np.median(ratios)
+        mad = np.median(np.abs(ratios - median)) + 1e-9
+        keep = np.abs(ratios - median) < 3 * 1.4826 * mad
+        return float(np.median(ratios[keep]))
+
+    # Kalibrasi linear SpO2 = C - K * R.
+    # K = 25 mengikuti bentuk kurva empiris standar (110 - 25R) agar desaturasi
+    # tetap terdeteksi; C dikalibrasi ulang (rata-rata per subjek) pada PhysioNet
+    # Pulse Transit Time PPG (22 subjek, SpO2 96-98.5%).
+    # Catatan: range < 95% BELUM tervalidasi; perlu data alat + oksimeter referensi.
+    SPO2_CAL_K = 25.0
+    SPO2_CAL_C = 107.83
+
+    def calculate_spo2_and_pi(self, ac_ir, dc_ir, ac_red, dc_red, r_value=None):
+        """Step 7: Menghitung SpO2, PI Red, dan PI IR.
+
+        ``r_value`` (opsional) adalah R per-beat dari ``ratio_of_ratios_per_beat``;
+        jika tidak ada/NaN, R dihitung dari rata-rata AC peak-to-peak dan DC.
+        """
         mean_dc_ir = np.mean(np.abs(dc_ir))
         mean_dc_red = np.mean(np.abs(dc_red))
 
         pi_red = (ac_red / mean_dc_red) * 100 if mean_dc_red != 0 else 0.0
         pi_ir = (ac_ir / mean_dc_ir) * 100 if mean_dc_ir != 0 else 0.0
 
-        if pi_ir == 0:
+        if r_value is not None and np.isfinite(r_value) and r_value > 0:
+            R = r_value
+        elif pi_ir == 0 or mean_dc_red == 0:
             return 0.0, round(pi_red, 2), round(pi_ir, 2)
+        else:
+            R = (ac_red / mean_dc_red) / (ac_ir / mean_dc_ir)
 
-        R = (ac_red / mean_dc_red) / (ac_ir / mean_dc_ir)
-        # spo2 = -17.8327 * (R**2) + 15.6006 * R + 94.6457
-        spo2 = 3.069398* (R**2) + -5.149127 * R + 99.79428
+        spo2 = self.SPO2_CAL_C - self.SPO2_CAL_K * R
         spo2 = np.clip(spo2, 0.0, 100.0)
 
         return float(np.round(spo2, 2)), float(np.round(pi_red, 2)), float(np.round(pi_ir, 2))
@@ -545,9 +605,11 @@ class PPGProcessor:
         ac_red_val, red_peaks = self.ac_p2p(red_clean)
         ac_ir_val, ir_peaks = self.ac_p2p(ir_clean)
 
-        # Step 7: Hitung SpO2, PI Red, PI IR
+        # Step 7: Hitung SpO2 (R per-beat median pada sinyal mentah), PI Red, PI IR
+        r_value = self.ratio_of_ratios_per_beat(raw_red, raw_ir, fs_orig)
         spo2_val, pi_red, pi_ir = self.calculate_spo2_and_pi(
-            ac_ir=ac_ir_val, dc_ir=ir_dc, ac_red=ac_red_val, dc_red=red_dc
+            ac_ir=ac_ir_val, dc_ir=ir_dc, ac_red=ac_red_val, dc_red=red_dc,
+            r_value=r_value,
         )
 
         # Tambahan: Hitung Heart Rate dari Puncak PPG IR
