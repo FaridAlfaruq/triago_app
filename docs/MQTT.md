@@ -74,9 +74,14 @@ cp config/backend.env.example .env
 ```
 
 Isi kredensial subscriber HiveMQ dan konfigurasi MySQL yang sudah dipakai TriaGO.
-Tabel `patient_data` memakai struktur backend lama dengan tambahan nullable
-`pain_score`. Untuk MySQL lama, jalankan migrasi pain score satu kali seperti
-[panduan pain score](PAIN_SCORE.md). SQLite mode laptop bermigrasi otomatis.
+Untuk MySQL **baru**, buat tabel `patient_data` dengan
+[`000_create_patient_data.sql`](../backend/migrations/000_create_patient_data.sql)
+(sudah mencakup `pain_score` dan `patient_details`). Untuk tabel MySQL **lama**,
+jalankan satu kali migrasi yang belum pernah dijalankan:
+[`001_add_pain_score.sql`](../backend/migrations/001_add_pain_score.sql) (lihat
+[panduan pain score](PAIN_SCORE.md)) dan
+[`002_add_patient_details.sql`](../backend/migrations/002_add_patient_details.sql)
+untuk form data pasien. SQLite mode laptop bermigrasi otomatis.
 Password database sekarang harus diisi lewat environment, tanpa password bawaan dalam kode.
 
 ```bash
@@ -115,7 +120,7 @@ QoS `1`, `retain=False`.
   "event_id": "9c34353a-c2f1-4a67-b55a-3f0074e633d8",
   "device_id": "raspi-01",
   "data": {
-    "bed_id": "A1",
+    "bed_id": "01",
     "gcs_score": 15,
     "pain_score": 3,
     "triage_category": "green",
