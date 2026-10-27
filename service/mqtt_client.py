@@ -1,5 +1,6 @@
 """HiveMQ TLS connection and durable Raspberry Pi publisher."""
 import atexit
+from collections import OrderedDict
 from dataclasses import dataclass
 import json
 import logging
@@ -61,6 +62,23 @@ class MqttConfig:
     def subscribe_topic(self):
         return f"{self.topic_prefix}/devices/+/triage"
 
+    def assignment_topic(self, device_id=None):
+        """Balasan backend ke Raspi: bed yang dialokasikan untuk sebuah event."""
+        return f"{self.topic_prefix}/devices/{device_id or self.device_id}/assignment"
+
+
+def validate_assignment(message):
+    if not isinstance(message, dict) or message.get("schema_version") != 1:
+        raise ValueError("Format assignment MQTT tidak didukung")
+    if not isinstance(message.get("event_id"), str):
+        raise ValueError("event_id assignment tidak valid")
+    if message.get("status") not in {"success", "warning"}:
+        raise ValueError("status assignment tidak valid")
+    for key in ("assigned_bed", "zone"):
+        if message.get(key) is not None and not isinstance(message[key], str):
+            raise ValueError(f"{key} assignment harus string atau null")
+    return message
+
 
 def create_client(config, *, subscriber=False):
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
@@ -80,6 +98,11 @@ class MqttPublisher:
         self.queue = MessageQueue(queue_path or os.environ.get("TRIAGO_MQTT_OUTBOX")
                                   or PROJECT_ROOT / "runtime" / "mqtt-outbox.sqlite3")
         self.client = create_client(self.config)
+        self.client.on_connect = self._on_connect
+        self.client.on_message = self._on_message
+        # event_id -> balasan alokasi bed dari backend (hanya untuk tampilan GUI).
+        self.assignments = OrderedDict()
+        self.assignments_lock = threading.Lock()
         self.stop_event = threading.Event()
         self.worker = threading.Thread(target=self._run, name="mqtt-outbox", daemon=True)
         self.client.connect_async(self.config.host, self.config.port, keepalive=60)
@@ -92,6 +115,27 @@ class MqttPublisher:
                     "device_id": self.config.device_id, "data": validate_payload(data)}
         self.queue.put(validate_envelope(envelope))
         return envelope["event_id"]
+
+    def _on_connect(self, client, userdata, flags, reason_code, properties):
+        if not reason_code.is_failure:
+            client.subscribe(self.config.assignment_topic(), qos=1)
+
+    def _on_message(self, client, userdata, message):
+        try:
+            if message.topic != self.config.assignment_topic() or len(message.payload) > 4096:
+                raise ValueError("Topic/ukuran assignment tidak sesuai")
+            assignment = validate_assignment(json.loads(message.payload))
+        except (ValueError, TypeError, UnicodeError, RecursionError):
+            log.warning("Balasan assignment MQTT ditolak: format tidak valid")
+            return
+        with self.assignments_lock:
+            self.assignments[assignment["event_id"]] = assignment
+            while len(self.assignments) > 256:
+                self.assignments.popitem(last=False)
+
+    def get_assignment(self, event_id):
+        with self.assignments_lock:
+            return self.assignments.get(event_id)
 
     def publish_once(self):
         if not self.client.is_connected():

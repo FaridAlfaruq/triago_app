@@ -167,12 +167,12 @@ class TriaGoApplication(QMainWindow):
         """Menyimpan 2 file per pengukuran: CSV (10 kolom sinyal) dan JSON (metadata & fitur)."""
         import json
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        bed_id = results.get("bed", "00")
-        
+
         folder_path = os.path.join(project_root, "data_pengukuran")
         os.makedirs(folder_path, exist_ok=True)
         
-        base_name = f"{timestamp_str}_Bed{bed_id}"
+        # Bed baru diketahui setelah backend mengalokasikannya, jadi tidak masuk nama file.
+        base_name = f"{timestamp_str}_Triase"
         csv_filename = os.path.join(folder_path, f"{base_name}.csv")
         json_filename = os.path.join(folder_path, f"{base_name}.json")
         
@@ -219,7 +219,6 @@ class TriaGoApplication(QMainWindow):
             # 2. Simpan JSON (Hasil Ekstraksi Fitur & Metadata)
             metadata_json = {
                 "Timestamp": results.get("timestamp", timestamp_str),
-                "Bed": str(results.get("bed", bed_id)),
                 "GCS Score": int(results.get("gcs", 15)),
                 "Pain Score": results.get("pain_score"),
                 "HR": float(results.get("hr", 0.0)),
@@ -246,41 +245,7 @@ class TriaGoApplication(QMainWindow):
         """Reset seluruh input data pasien dan kembalikan tampilan ke Halaman Registrasi"""
         self.current_patient_info.clear()
             
-        self.page_registration.selected_bed = None
-        self.page_registration.selected_gcs = None
-        self.page_registration.selected_pain = None
-        
-        for btn in self.page_registration.bed_buttons.values():
-            btn.setChecked(False)
-            
-        for btn in self.page_registration.gcs_buttons.values():
-            btn.setChecked(False)
-            btn.setStyleSheet("""
-                QPushButton { 
-                    background-color: #FFFFFF; 
-                    border: 2px solid #C2D5BB; 
-                    border-radius: 12px; 
-                    font-size: 28px; 
-                    font-weight: bold; 
-                    color: #A0B09C; 
-                } 
-                QPushButton:hover { border-color: #214889; color: #214889; }
-            """)
-            
-        for btn in self.page_registration.pain_buttons.values():
-            btn.setChecked(False)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #FFFFFF;
-                    border: 2px solid #C2D5BB;
-                    border-radius: 10px;
-                    font-size: 19px;
-                    font-weight: bold;
-                    color: #A0B09C;
-                }
-                QPushButton:hover { border-color: #214889; color: #214889; }
-            """)
-        self.page_registration.validate_form()
+        self.page_registration.reset_inputs()
         self.stacked_widget.setCurrentIndex(1)
 
     def closeEvent(self, event):

@@ -15,13 +15,13 @@ from backend.bed_manager import BedManager
 from backend.mqtt_receiver import MqttReceiver
 from backend.triage_service import DatabaseUnavailable, TriageService
 from service.api_client import TriageApiClient
-from service.mqtt_client import MqttConfig, MqttPublisher, create_client
+from service.mqtt_client import MqttConfig, MqttPublisher, create_client, validate_assignment
 from service.mqtt_queue import MessageQueue
 from service.triage_payload import validate_envelope, validate_payload
 
 
 def payload():
-    return {"bed_id": "01", "gcs_score": 15, "triage_category": "green",
+    return {"gcs_score": 15, "triage_category": "green",
             "xgboost_score": 0.2,
             "vitals": {"hr": 75, "spo2": 98, "rr": 16, "temp_core": 36.5, "sys": 120, "dia": 80}}
 
@@ -46,6 +46,7 @@ class MqttFlowTests(unittest.TestCase):
         self.beds = BedManager()
         self.service = TriageService(self.beds, self.save, self.emit)
         self.client = Mock()
+        self.client.publish.return_value = Mock(rc=mqtt.MQTT_ERR_SUCCESS)
 
     def receiver(self):
         with patch("backend.mqtt_receiver.create_client", return_value=self.client):
@@ -123,14 +124,69 @@ class MqttFlowTests(unittest.TestCase):
         self.assertEqual(self.client.ack.call_count, 3)
 
     def test_full_beds_preserve_waiting_patient(self):
-        for _ in range(12):
+        # Zona Non-Darurat (3 bed) penuh: pasien hijau menunggu, tidak memakai bed zona lain.
+        for _ in range(3):
             self.service.process(payload())
         self.save.reset_mock()
         receiver = self.receiver()
-        self.deliver(receiver, envelope())
+        event = envelope()
+        self.deliver(receiver, event)
         self.assertTrue(receiver.process_once())
         self.assertEqual(self.save.call_args.args[0]["bed_id"], "WAITING")
-        self.assertEqual(self.occupied_count(), 12)
+        self.assertEqual(self.occupied_count(), 3)
+        reply = json.loads(self.client.publish.call_args.args[1])
+        self.assertEqual(reply, {"schema_version": 1, "event_id": event["event_id"],
+                                 "status": "warning", "assigned_bed": None, "zone": None})
+
+    def test_backend_replies_assigned_bed_to_sending_device(self):
+        receiver = self.receiver()
+        event = envelope()
+        event["data"]["triage_category"] = "red"
+        self.deliver(receiver, event)
+        self.assertTrue(receiver.process_once())
+        topic, body = self.client.publish.call_args.args
+        self.assertEqual(topic, "triago/test/devices/raspi-01/assignment")
+        self.assertEqual(self.client.publish.call_args.kwargs, {"qos": 1, "retain": False})
+        self.assertEqual(json.loads(body)["assigned_bed"], "01")
+        self.assertEqual(json.loads(body)["zone"], "red")
+
+    def test_reply_failure_does_not_retry_committed_event(self):
+        receiver = self.receiver()
+        self.client.publish.side_effect = RuntimeError("offline")
+        self.deliver(receiver, envelope())
+        self.assertTrue(receiver.process_once())
+        self.save.assert_called_once()
+        self.assertEqual(receiver.queue.pending_count(), 0)
+
+    def test_publisher_keeps_only_valid_assignment_for_its_own_topic(self):
+        with (patch("service.mqtt_client.create_client", return_value=self.client),
+              patch("service.mqtt_client.threading.Thread")):
+            publisher = MqttPublisher(config(), self.path)
+            self.addCleanup(publisher.close)
+        publisher._on_connect(self.client, None, None, SimpleNamespace(is_failure=False), None)
+        self.client.subscribe.assert_called_once_with("triago/test/devices/raspi-01/assignment", qos=1)
+        reply = {"schema_version": 1, "event_id": "e1", "status": "success",
+                 "assigned_bed": "05", "zone": "yellow"}
+
+        def receive(body, topic="triago/test/devices/raspi-01/assignment"):
+            publisher._on_message(self.client, None, SimpleNamespace(topic=topic, payload=body))
+
+        receive(json.dumps(reply).encode(), topic="triago/test/devices/raspi-02/assignment")
+        receive(b"not json")
+        receive(json.dumps({**reply, "assigned_bed": 5}).encode())
+        self.assertIsNone(publisher.get_assignment("e1"))
+        receive(json.dumps(reply).encode())
+        self.assertEqual(publisher.get_assignment("e1"), reply)
+
+    def test_assignment_message_validation(self):
+        for invalid in (None, {}, {"schema_version": 1, "event_id": "e", "status": "done"}):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                validate_assignment(invalid)
+
+    def test_legacy_bed_id_from_old_outbox_is_ignored(self):
+        result = self.service.process({**payload(), "bed_id": "01"})
+        self.assertEqual(result["assigned_bed"], "10")
+        self.assertEqual(result["zone"], "green")
 
     def test_retry_after_inbox_completion_failure_does_not_insert_twice(self):
         receiver = self.receiver()
@@ -196,9 +252,16 @@ class MqttFlowTests(unittest.TestCase):
               patch("service.mqtt_client.MqttPublisher") as publisher,
               patch("service.api_client.requests.post") as post):
             api = TriageApiClient()
-            self.assertTrue(api.send_triage_result("A1", 15, payload()["vitals"], "Green", 0.2,
+            publisher.return_value.enqueue.return_value = "event-1"
+            publisher.return_value.get_assignment.return_value = None
+            self.assertTrue(api.send_triage_result(15, payload()["vitals"], "Green", 0.2,
                                                    patient_name="Pasien Uji"))
             self.assertEqual(api.last_delivery_status, "queued")
+            self.assertIsNone(api.get_assignment())
+            reply = {"status": "success", "assigned_bed": "10", "zone": "green"}
+            publisher.return_value.get_assignment.return_value = reply
+            self.assertEqual(api.get_assignment(), reply)
+            publisher.return_value.get_assignment.assert_called_with("event-1")
             post.assert_not_called()
             sent = publisher.return_value.enqueue.call_args.args[0]
             self.assertEqual(sent["patient_name"], "Pasien Uji")
@@ -236,7 +299,7 @@ class MqttFlowTests(unittest.TestCase):
               patch("service.mqtt_client.MqttPublisher") as publisher):
             publisher.return_value.enqueue.side_effect = sqlite3.OperationalError("read only")
             api = TriageApiClient()
-            self.assertFalse(api.send_triage_result("A1", 15, payload()["vitals"], "green", 0.2))
+            self.assertFalse(api.send_triage_result(15, payload()["vitals"], "green", 0.2))
             self.assertEqual(api.last_delivery_status, "not_sent")
 
     def test_mqtt_requires_credentials_and_valid_topic(self):
@@ -250,7 +313,7 @@ class MqttFlowTests(unittest.TestCase):
                 MqttConfig.from_env("publisher")
 
     def test_malformed_payload_is_rejected(self):
-        for invalid in (None, [], "text", {"bed_id": "A1"}):
+        for invalid in (None, [], "text", {"bed_id": "A1"}, {**payload(), "bed_id": 1}):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 validate_payload(invalid)
         bad = envelope()
@@ -282,7 +345,8 @@ class HttpRegressionTests(unittest.TestCase):
     def test_http_triage_contract_still_works(self):
         response = self.client.post("/api/triage/update", json=payload())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["assigned_bed"], "01")
+        self.assertEqual(response.json["assigned_bed"], "10")
+        self.assertEqual(response.json["zone"], "green")
         self.assertTrue(response.json["saved_to_database"])
         self.service.emit.assert_called_once()
 

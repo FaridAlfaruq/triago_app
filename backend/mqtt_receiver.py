@@ -75,15 +75,31 @@ class MqttReceiver:
             return False
         envelope = json.loads(row["payload"])
         try:
-            self.process(envelope["data"], event_id=envelope["event_id"], require_database=True)
+            result = self.process(envelope["data"], event_id=envelope["event_id"], require_database=True)
             self.queue.complete(envelope["event_id"])
             log.info("MQTT event %s selesai disimpan dan diproses", envelope["event_id"])
+            self._publish_assignment(envelope, result)
             return True
         except Exception as exc:
             self.queue.retry(envelope["event_id"])
             log.warning("MQTT event %s tertunda (%s); akan dicoba ulang",
                         envelope["event_id"], type(exc).__name__)
             return False
+
+    def _publish_assignment(self, envelope, result):
+        """Kirim bed hasil alokasi ke Raspi pengirim. Gagal kirim tidak membatalkan data."""
+        message = {"schema_version": 1, "event_id": envelope["event_id"],
+                   "status": result.get("status"), "assigned_bed": result.get("assigned_bed"),
+                   "zone": result.get("zone")}
+        try:
+            info = self.client.publish(self.config.assignment_topic(envelope["device_id"]),
+                                       json.dumps(message), qos=1, retain=False)
+            if info.rc != 0:
+                raise RuntimeError(f"rc={info.rc}")
+        except Exception as exc:
+            # Raspi tetap menampilkan zona; nomor bed bisa dilihat di dashboard.
+            log.warning("Assignment event %s belum terkirim ke Raspi (%s)",
+                        envelope["event_id"], exc)
 
     def _run(self):
         while not self.stop_event.is_set():

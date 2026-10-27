@@ -109,7 +109,7 @@ def update_triage():
 # =========================================================================
 @app.route("/api/beds", methods=["GET"])
 def get_all_beds():
-    """Mengembalikan status seluruh bed (01-12) untuk inisialisasi web."""
+    """Mengembalikan status seluruh bed (beserta zonanya) untuk inisialisasi web."""
     return jsonify(bed_manager.get_all_beds_status())
 
 

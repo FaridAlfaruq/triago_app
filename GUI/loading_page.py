@@ -285,7 +285,6 @@ class ProcessingWorker(QThread):
 
             results = {
                 # Metadata & Registrasi
-                "bed": patient.get("bed", "00"),
                 "gcs": gcs_val,
                 "pain_score": pain_val,
                 "timestamp": patient.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
@@ -657,7 +656,6 @@ if __name__ == "__main__":
     ppg_ir_dummy = 30000 + 600 * np.sin(2 * np.pi * 1.25 * t_dummy) + np.random.normal(0, 20, len(t_dummy))
 
     dummy_patient = {
-        "bed": "03",
         "gcs": 14,
         "temperature": 36.8,
         "systolic": 125,

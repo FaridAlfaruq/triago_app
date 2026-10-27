@@ -33,3 +33,30 @@ assert.ok(!detailHtml.includes('<script>'));
 assert.ok(detailHtml.includes('BPJS Kesehatan'));
 assert.ok(detailHtml.includes('Perempuan'));
 console.log('Dashboard escapes patient input and distinguishes measured zero pain from unknown.');
+
+// Denah U dibentuk dari zona: kiri Resusitasi, bawah Darurat, kanan Non-Darurat.
+const layout = vm.runInContext(`
+  const beds = {};
+  ['red','red','red','yellow','yellow','yellow','yellow','yellow','yellow','green','green','green']
+    .forEach((zone, i) => { beds[String(i + 1).padStart(2, '0')] = {zone, status: 'empty'}; });
+  JSON.stringify(floorLayout(beds));
+`, context);
+const u = JSON.parse(layout);
+assert.equal(u.cols, 6);
+assert.equal(u.rows, 4);
+assert.deepEqual(u.positions['01'], [1, 1]);
+assert.deepEqual(u.positions['04'], [4, 1]);
+assert.deepEqual(u.positions['09'], [4, 6]);
+assert.deepEqual(u.positions['10'], [3, 6]);
+assert.deepEqual(u.positions['12'], [1, 6]);
+const big = JSON.parse(vm.runInContext(`
+  const more = {};
+  ['red','red','red','red','yellow','yellow','green','green','green','green','green']
+    .forEach((zone, i) => { more[String(i + 1).padStart(2, '0')] = {zone, status: 'empty'}; });
+  JSON.stringify(floorLayout(more));
+`, context));
+assert.equal(big.cols, 3);
+assert.equal(big.rows, 6);
+assert.deepEqual(big.positions['05'], [6, 1]);  // sisi bawah: 2 bed di tengah 3 kolom
+assert.deepEqual(big.positions['11'], [1, 3]);
+console.log('Dashboard builds the U floor plan from bed zones.');

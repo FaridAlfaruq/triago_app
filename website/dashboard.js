@@ -6,12 +6,22 @@ const catLabel = {
   green: 'Non-Darurat'
 };
 
-// Posisi bed pada denah bentuk U (baris, kolom grid 6x4). Sisi atas terbuka ke pintu masuk.
-const BED_POSITIONS = {
-  '01': [1, 1], '02': [2, 1], '03': [3, 1],
-  '04': [4, 1], '05': [4, 2], '06': [4, 3], '07': [4, 4], '08': [4, 5], '09': [4, 6],
-  '10': [3, 6], '11': [2, 6], '12': [1, 6]
-};
+// Denah bentuk U, sisi atas terbuka ke pintu masuk & area triase:
+// sisi kiri = zona Resusitasi, sisi bawah = Darurat, sisi kanan = Non-Darurat.
+// Ukuran denah mengikuti jumlah bed per zona yang dikirim backend.
+function floorLayout(beds) {
+  const ids = zone => Object.keys(beds).sort().filter(id => beds[id].zone === zone);
+  const [left, bottom, right] = [ids('red'), ids('yellow'), ids('green')];
+  const cols = Math.max(bottom.length, 3);
+  const rows = Math.max(left.length, right.length, 2) + 1;
+  const offset = 1 + Math.floor((cols - bottom.length) / 2);
+  const positions = {};
+  left.forEach((id, i) => { positions[id] = [i + 1, 1]; });
+  bottom.forEach((id, i) => { positions[id] = [rows, offset + i]; });
+  // Nomor berlanjut dari pojok kanan bawah ke atas, mengikuti alur huruf U.
+  right.forEach((id, i) => { positions[id] = [rows - 1 - i, cols]; });
+  return { cols, rows, positions };
+}
 
 // Field registrasi pasien: [key, label, opsi pilihan (jika select)].
 const DETAIL_SECTIONS = [
@@ -65,16 +75,26 @@ function renderFloor() {
 
   container.querySelectorAll('.bed').forEach(bed => bed.remove());
 
+  const layout = floorLayout(bedsData);
+  container.style.gridTemplateColumns = `repeat(${layout.cols},minmax(0,1fr))`;
+  container.style.gridTemplateRows = `repeat(${layout.rows},auto)`;
+  const inner = `2 / ${layout.cols}`;
+  container.querySelector('.floor-entrance').style.gridColumn = inner;
+  const station = container.querySelector('.nurse-station');
+  station.style.gridColumn = inner;
+  station.style.gridRow = `2 / ${layout.rows}`;
+
   Object.keys(bedsData).sort().forEach(id => {
     const bedInfo = bedsData[id] || { status: 'empty' };
     const cat = bedInfo.status !== 'empty' ? bedInfo.status : null;
 
     const bed = document.createElement('div');
-    bed.className = 'bed' + (cat ? ' ' + cat : ' empty') + (id === selectedBedId ? ' selected' : '');
+    bed.className = 'bed' + (cat ? ' ' + cat : ' empty') + ' zone-' + bedInfo.zone +
+      (id === selectedBedId ? ' selected' : '');
     bed.dataset.cat = cat || '';
     bed.dataset.id = id;
     bed.dataset.target = bedInfo.target_minutes ?? 0;
-    const position = BED_POSITIONS[id];
+    const position = layout.positions[id];
     if (position) {
       bed.style.gridRow = position[0];
       bed.style.gridColumn = position[1];
@@ -85,7 +105,8 @@ function renderFloor() {
     }
 
     bed.innerHTML = `<div class="bed-id mono">${escapeHTML(id)}</div>` +
-      (cat ? `<div class="bed-cat">${catLabel[cat]}</div><div class="bed-timer mono" data-timer></div>` : '');
+      (cat ? `<div class="bed-cat">${catLabel[cat]}</div><div class="bed-timer mono" data-timer></div>`
+           : `<div class="bed-zone">${catLabel[bedInfo.zone] || ''}</div>`);
 
     // KETIKA BOX BED DIKLIK: TAMPILKAN DI PANEL SISI KANAN
     bed.onclick = () => {
@@ -140,9 +161,10 @@ function displayBedDetail(bedId) {
   const contentEl = document.getElementById('bedDetailContent');
 
   titleEl.textContent = `DETAIL BED — ${bedId}`;
+  const zoneRow = `<div class="modal-row" style="border-color:var(--border)"><span>Zona Bed</span><span>${catLabel[bedInfo.zone] || '—'}</span></div>`;
 
   if (bedInfo.status === 'empty') {
-    contentEl.innerHTML = `
+    contentEl.innerHTML = zoneRow + `
       <div class="modal-row" style="border-color:var(--border)"><span>Status Bed</span><span class="mono">KOSONG / TERSEDIA</span></div>
       <p style="color: var(--text-muted); font-size: 11px; margin-top: 10px;">Bed ini siap digunakan untuk pasien baru.</p>
     `;
@@ -152,7 +174,7 @@ function displayBedDetail(bedId) {
   const vitals = bedInfo.vitals || {};
   const arrivalTime = bedInfo.arrival_timestamp ? new Date(bedInfo.arrival_timestamp).toLocaleTimeString('id-ID') : '—';
 
-  contentEl.innerHTML = `
+  contentEl.innerHTML = zoneRow + `
     <div class="modal-row" style="border-color:var(--border)"><span>Status Triase</span><span style="font-weight:bold; color:var(--${bedInfo.status})">${catLabel[bedInfo.status]}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Skor XGBoost</span><span class="mono">${bedInfo.xgboost_score || '—'}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Skor GCS</span><span class="mono" style="font-weight:bold;">${bedInfo.gcs_score || 15} / 15</span></div>

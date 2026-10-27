@@ -29,7 +29,8 @@ TRIAGO_MQTT_PASSWORD=password-mqtt-kamu
 
 HOST adalah hostname tanpa `https://`, path, atau port. Port TLS memakai `8883`.
 Untuk uji seluruh aplikasi pada satu laptop, credential tersebut perlu izin
-Publish dan Subscribe pada topic `triago/biomed/devices/raspi-01/triage`.
+Publish dan Subscribe pada topic `triago/biomed/devices/raspi-01/triage` dan
+`triago/biomed/devices/raspi-01/assignment` (balasan nomor bed ke GUI).
 Publisher dan subscriber menggunakan client ID berbeda walau credential sama.
 Password dashboard adalah `TRIAGO_DASHBOARD_PASSWORD`, berbeda dari password MQTT.
 Jangan kirim password ke chat, memasukkannya ke URL, atau commit `.env`.

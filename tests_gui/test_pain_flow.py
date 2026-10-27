@@ -36,7 +36,7 @@ class PainGuiTests(unittest.TestCase):
     def test_registration_requires_explicit_pain_and_accepts_zero(self):
         page = RegistrationPage()
         self.addCleanup(page.close)
-        page.handle_bed_selection(next(iter(page.bed_buttons)))
+        self.assertFalse(hasattr(page, "bed_buttons"))  # bed dialokasikan backend
         page.handle_gcs_selection(15)
         self.assertFalse(page.btn_start.isEnabled())
         page.handle_pain_selection(0)
@@ -70,6 +70,39 @@ class PainGuiTests(unittest.TestCase):
         destination = Path("runtime/qa")
         destination.mkdir(parents=True, exist_ok=True)
         page.grab().save(str(destination / "output-pain.png"))
+
+    def test_output_shows_zone_then_bed_assigned_by_backend(self):
+        self.client.send_triage_result.return_value = True
+        self.client.get_assignment.return_value = None
+        page = OutputPage()
+        self.addCleanup(page.close)
+        page.update_results(result())  # DARURAT
+        self.assertNotIn("bed_id", self.client.send_triage_result.call_args.kwargs)
+        self.assertEqual(page.lbl_assignment.text(), "ZONA DARURAT · BED MENUNGGU SERVER…")
+        self.assertTrue(page.assignment_timer.isActive())
+        # Zona Darurat penuh: pasien kuning dipindah ke bed Resusitasi.
+        self.client.get_assignment.return_value = {"status": "success", "assigned_bed": "02", "zone": "red"}
+        page._poll_assignment()
+        self.assertEqual(page.lbl_assignment.text(), "ZONA RESUSITASI · BED 02")
+        self.assertFalse(page.assignment_timer.isActive())
+        page.resize(1280, 800)
+        page.show()
+        self.app.processEvents()
+        destination = Path("runtime/qa")
+        destination.mkdir(parents=True, exist_ok=True)
+        page.grab().save(str(destination / "output-assignment.png"))
+
+        self.client.get_assignment.return_value = {"status": "warning", "assigned_bed": None, "zone": None}
+        page.update_results({**result(), "triage_status": "NON-DARURAT"})
+        page._poll_assignment()
+        self.assertEqual(page.lbl_assignment.text(), "ZONA NON-DARURAT · DAFTAR TUNGGU")
+
+        self.client.get_assignment.return_value = None
+        page.update_results(result())
+        page.assignment_elapsed_ms = page.ASSIGNMENT_TIMEOUT_MS
+        page._poll_assignment()
+        self.assertEqual(page.lbl_assignment.text(), "ZONA DARURAT · BED: LIHAT DASHBOARD")
+        self.assertFalse(page.assignment_timer.isActive())
 
     def test_main_gui_metadata_and_reset_include_pain(self):
         with patch("GUI.loading_page.LoadingPage._load_triage_model"):

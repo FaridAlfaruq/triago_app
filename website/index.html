@@ -27,11 +27,11 @@
     <div class="stat-card stat-red"><div class="n" id="countRed">0</div><div class="l">Pasien</div></div>
   </div>
   <div class="stat-col">
-    <div class="pill-badge pill-yellow">Urgent</div>
+    <div class="pill-badge pill-yellow">Darurat</div>
     <div class="stat-card stat-yellow"><div class="n" id="countYellow">0</div><div class="l">Pasien</div></div>
   </div>
   <div class="stat-col">
-    <div class="pill-badge pill-green">Non-urgent</div>
+    <div class="pill-badge pill-green">Non-Darurat</div>
     <div class="stat-card stat-green"><div class="n" id="countGreen">0</div><div class="l">Pasien</div></div>
   </div>
 </div>
@@ -44,12 +44,13 @@
       <div class="legend">
         <div class="legend-item"><span class="legend-box empty"></span>Kosong</div>
         <div class="legend-item"><span class="legend-box" style="background:var(--red)"></span>Resusitasi</div>
-        <div class="legend-item"><span class="legend-box" style="background:var(--yellow)"></span>Urgent</div>
-        <div class="legend-item"><span class="legend-box" style="background:var(--green)"></span>Non-urgent</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--yellow)"></span>Darurat</div>
+        <div class="legend-item"><span class="legend-box" style="background:var(--green)"></span>Non-Darurat</div>
       </div>
     </div>
 
-    <!-- Denah bentuk U: bed 01-12 mengelilingi nurse station, sisi atas terbuka ke pintu masuk. -->
+    <!-- Denah bentuk U mengelilingi nurse station, sisi atas terbuka ke pintu masuk & area triase.
+         Kiri = Resusitasi, bawah = Darurat, kanan = Non-Darurat (posisi diatur dashboard.js). -->
     <div class="igd-floor" id="igdFloor">
       <div class="floor-entrance">Pintu masuk &amp; area triase</div>
       <div class="nurse-station">Nurse station</div>

@@ -16,8 +16,9 @@ def validate_payload(data):
     if not isinstance(data, dict):
         raise ValueError("Payload triage harus berupa object JSON")
     data = dict(data)
-    if not isinstance(data.get("bed_id"), str) or not data["bed_id"].strip():
-        raise ValueError("bed_id harus berupa string yang tidak kosong")
+    # bed_id kini ditentukan backend; field lama dari outbox Raspi tetap diterima.
+    if data.get("bed_id") is not None and not isinstance(data["bed_id"], str):
+        raise ValueError("bed_id harus berupa string")
     category = data.get("triage_category")
     if not isinstance(category, str) or category.lower() not in {"red", "yellow", "green"}:
         raise ValueError("triage_category harus red, yellow, atau green")

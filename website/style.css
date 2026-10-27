@@ -329,6 +329,18 @@ header{
   color:var(--text-muted);
 }
 
+/* Warna zona pada garis atas bed kosong, agar pembagian zona tetap terlihat. */
+.bed.empty.zone-red{ border-top:4px solid var(--red); }
+.bed.empty.zone-yellow{ border-top:4px solid var(--yellow); }
+.bed.empty.zone-green{ border-top:4px solid var(--green); }
+
+.bed-zone{
+  margin-top:2px;
+  font-size:9px;
+  font-weight:600;
+  color:var(--text-muted);
+}
+
 .bed.selected{
   outline:3px solid var(--accent);
   outline-offset:2px;
@@ -664,7 +676,8 @@ border-radius:10px;
 }
 
 .bed-cat,
-.bed-timer{
+.bed-timer,
+.bed-zone{
 display:none;
 }
 

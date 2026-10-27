@@ -11,8 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS patient_data (
     id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    bed_id            VARCHAR(16)  NULL COMMENT '01-12, atau WAITING bila semua bed penuh',
-    zone              VARCHAR(8)   NULL COMMENT 'Peninggalan sistem zona lama; kini kosong',
+    bed_id            VARCHAR(16)  NULL COMMENT 'Nomor bed hasil alokasi (01, 02, ...), atau WAITING bila zona penuh',
+    zone              VARCHAR(8)   NULL COMMENT 'Zona bed: red=Resusitasi, yellow=Darurat, green=Non-Darurat; - untuk WAITING',
     status            VARCHAR(10)  NULL COMMENT 'Kategori triase: red, yellow, green',
     patient_name      VARCHAR(100) NULL,
     relative_name     VARCHAR(100) NULL COMMENT 'Nama penanggung jawab',

@@ -7,7 +7,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication, QSizePolicy
 )
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QPixmap
 
 # Impor API Client dari folder service
@@ -26,8 +26,16 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', '#214889')
 
 
+ZONE_LABELS = {"red": "RESUSITASI", "yellow": "DARURAT", "green": "NON-DARURAT"}
+ZONE_COLORS = {"red": "#FF5252", "yellow": "#F39C12", "green": "#2ECC71"}
+
+
 class OutputPage(QWidget):
     home_requested = pyqtSignal()
+
+    # Lama menunggu balasan alokasi bed dari backend sebelum menyerah ke dashboard.
+    ASSIGNMENT_TIMEOUT_MS = 20000
+    ASSIGNMENT_POLL_MS = 500
 
     def __init__(self):
         super().__init__()
@@ -37,7 +45,13 @@ class OutputPage(QWidget):
         
         # HTTP/MQTT dipilih dari .env, termasuk URL backend bila memakai HTTP.
         self.api_client = TriageApiClient() if TriageApiClient else None
-        
+
+        self.assignment_category = None
+        self.assignment_elapsed_ms = 0
+        self.assignment_timer = QTimer(self)
+        self.assignment_timer.setInterval(self.ASSIGNMENT_POLL_MS)
+        self.assignment_timer.timeout.connect(self._poll_assignment)
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -82,8 +96,15 @@ class OutputPage(QWidget):
             padding-left: 12px; padding-right: 12px;
         """)
         
+        # Tujuan pasien: zona dari kategori triase, nomor bed dari backend.
+        self.lbl_assignment = QLabel("")
+        self.lbl_assignment.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_assignment.setFixedHeight(40)
+        self.lbl_assignment.setMinimumWidth(280)
+
         self.triage_container.addWidget(self.badge_color)
         self.triage_container.addWidget(self.lbl_status_text, stretch=1)
+        self.triage_container.addWidget(self.lbl_assignment, stretch=1)
         header_layout.addLayout(self.triage_container, stretch=1)
 
         lbl_logo = QLabel()
@@ -127,7 +148,9 @@ class OutputPage(QWidget):
 
         self.box_ecg = QFrame()
         self.box_ecg.setMinimumHeight(150)
-        self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
+        # Selector #id agar border tidak ikut menempel ke PlotWidget (turunan QFrame) dan memotong label sumbu.
+        self.box_ecg.setObjectName("plotBox")
+        self.box_ecg.setStyleSheet("QFrame#plotBox { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
         ecg_layout = QVBoxLayout(self.box_ecg)
         ecg_layout.setContentsMargins(4, 4, 4, 4)
 
@@ -135,6 +158,8 @@ class OutputPage(QWidget):
         self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
         self.plot_ecg.setLabel('bottom', 'Waktu (s)', color='#555555')
         self.plot_ecg.setLabel('left', 'Amplitudo', color='#555555')
+        self.plot_ecg.getAxis('left').enableAutoSIPrefix(False)  # tanpa "(x0.001)" di label
+        self.plot_ecg.setFrameShape(QFrame.Shape.NoFrame)
         ecg_layout.addWidget(self.plot_ecg)
 
         ecg_cell = QVBoxLayout()
@@ -149,7 +174,9 @@ class OutputPage(QWidget):
 
         self.box_ppg = QFrame()
         self.box_ppg.setMinimumHeight(150)
-        self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
+        # Selector #id agar border tidak ikut menempel ke PlotWidget (turunan QFrame) dan memotong label sumbu.
+        self.box_ppg.setObjectName("plotBox")
+        self.box_ppg.setStyleSheet("QFrame#plotBox { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
         ppg_layout = QVBoxLayout(self.box_ppg)
         ppg_layout.setContentsMargins(4, 4, 4, 4)
 
@@ -157,6 +184,8 @@ class OutputPage(QWidget):
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
         self.plot_ppg.setLabel('bottom', 'Waktu (s)', color='#555555')
         self.plot_ppg.setLabel('left', 'Amplitudo', color='#555555')
+        self.plot_ppg.getAxis('left').enableAutoSIPrefix(False)  # tanpa "(x0.001)" di label
+        self.plot_ppg.setFrameShape(QFrame.Shape.NoFrame)
         ppg_layout.addWidget(self.plot_ppg)
 
         ppg_cell = QVBoxLayout()
@@ -317,8 +346,13 @@ class OutputPage(QWidget):
                 self.plot_ppg.enableAutoRange(axis='y')
 
         # 4. Pengiriman payload melalui transport HTTP/MQTT yang dikonfigurasi
-        if self.api_client and data.get("triage_valid", True):
-            bed_id = data.get("bed", "A1")
+        self.assignment_timer.stop()
+        triage_cat = self._map_status_to_color(triage_status_text)
+        if not data.get("triage_valid", True):
+            self._show_assignment(None, "Bed tidak dialokasikan")
+            return
+        self._show_assignment(triage_cat.lower(), "Bed menunggu server…")
+        if self.api_client:
             vitals_dict = {
                 "hr": hr,
                 "spo2": spo2,
@@ -327,11 +361,9 @@ class OutputPage(QWidget):
                 "sys": sys_bp,
                 "dia": dia_bp
             }
-            triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.0)
             
             payload = {
-                "Bed": str(bed_id),
                 "Vitals": vitals_dict,
                 "TriageCategory": triage_cat,
                 "RiskScore": float(xgb_score),
@@ -339,11 +371,11 @@ class OutputPage(QWidget):
             }
             self.iot_json_payload = json.dumps(payload, indent=2)
             
+            accepted = False
             try:
-                print(f"[LOG OUTPUT] Mengirim hasil triage Bed {bed_id}...")
+                print(f"[LOG OUTPUT] Mengirim hasil triage ({triage_cat})...")
                 if hasattr(self.api_client, "send_triage_result"):
                     accepted = self.api_client.send_triage_result(
-                        bed_id=str(bed_id),
                         gcs_score=int(gcs),
                         vitals=vitals_dict,
                         classification=triage_cat,
@@ -356,6 +388,51 @@ class OutputPage(QWidget):
                         print("[ERROR OUTPUT] Hasil belum terkirim/tersimpan di antrean. Periksa konfigurasi.")
             except Exception as e:
                 print(f"[ERROR OUTPUT] Failed to send IoT data: {e}")
+            if accepted is True:
+                self.assignment_elapsed_ms = 0
+                self.assignment_timer.start()
+                self._poll_assignment()
+            else:
+                self._show_assignment(self.assignment_category, "Bed belum dialokasikan")
+        else:
+            self._show_assignment(self.assignment_category, "Bed belum dialokasikan")
+
+    def _show_assignment(self, zone, bed_text):
+        """Tampilkan tujuan pasien, mis. 'ZONA DARURAT · BED 05'."""
+        self.assignment_category = zone
+        if zone is None:
+            self.lbl_assignment.setText(bed_text.upper())
+            color = "#778899"
+        else:
+            self.lbl_assignment.setText(f"ZONA {ZONE_LABELS.get(zone, zone.upper())} · {bed_text.upper()}")
+            color = ZONE_COLORS.get(zone, "#214889")
+        self.lbl_assignment.setStyleSheet(
+            f"font-size: 18px; font-weight: 900; color: {color}; background-color: #FFFFFF; "
+            f"border: 2px solid {color}; border-radius: 8px; padding-left: 12px; padding-right: 12px;")
+
+    def _poll_assignment(self):
+        assignment = None
+        if self.api_client is not None and hasattr(self.api_client, "get_assignment"):
+            try:
+                assignment = self.api_client.get_assignment()
+            except Exception as exc:
+                print(f"[ERROR OUTPUT] Gagal membaca alokasi bed: {exc}")
+        if isinstance(assignment, dict):
+            self.assignment_timer.stop()
+            if assignment.get("assigned_bed"):
+                # Zona bisa berbeda dari kategori bila zona utama penuh (pasien merah dipindah).
+                zone = assignment.get("zone") or self.assignment_category
+                self.lbl_assignment.setToolTip("")
+                self._show_assignment(zone, f"Bed {assignment['assigned_bed']}")
+            else:
+                self.lbl_assignment.setToolTip("Bed zona ini penuh. Pasien masuk daftar tunggu di dashboard.")
+                self._show_assignment(self.assignment_category, "Daftar tunggu")
+            return
+        self.assignment_elapsed_ms += self.ASSIGNMENT_POLL_MS
+        if self.assignment_elapsed_ms >= self.ASSIGNMENT_TIMEOUT_MS:
+            self.assignment_timer.stop()
+            self.lbl_assignment.setToolTip("Balasan server belum diterima. Nomor bed dapat dilihat di dashboard.")
+            self._show_assignment(self.assignment_category, "Bed: lihat dashboard")
 
     def _map_status_to_color(self, status):
         st = str(status).upper()
@@ -388,6 +465,7 @@ class OutputPage(QWidget):
             self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
+        self.assignment_timer.stop()
         print("[LOG] Inputs cleared. Returning to home_page...")
         self.home_requested.emit()
 
@@ -426,8 +504,7 @@ if __name__ == "__main__":
                 json_data = json.load(f)
 
         test_results = {
-            "bed": str(json_data.get("Bed", "12")),
-            "patient_name": "Pasien Bed 12",
+            "patient_name": "Pasien Uji",
             "gcs": 15.0,
             "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
             "temperature": 37.7,
@@ -447,7 +524,6 @@ if __name__ == "__main__":
         }
     else:
         test_results = {
-            "bed": "12",
             "patient_name": "Pasien Uji",
             "gcs": 15.0,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
