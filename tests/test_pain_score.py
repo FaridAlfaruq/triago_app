@@ -48,7 +48,7 @@ class PainReceiverTests(unittest.TestCase):
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]["pain_score"], 8)
             self.assertAlmostEqual(rows[0]["xgboost_score"], 0.91)
-            self.assertEqual(beds.beds["A1"]["pain_score"], 8)
+            self.assertEqual(beds.beds["01"]["pain_score"], 8)
             self.assertEqual(emit.call_args.args[1]["pain_score"], 8)
 
 

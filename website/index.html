@@ -37,7 +37,7 @@
 </div>
 
 <div class="layout">
-  <!-- ============ KIRI: BED LAYOUT PER ZONA ============ -->
+  <!-- ============ KIRI: DENAH BED IGD ============ -->
   <div class="panel wrapper">
     <div class="panel-title">
       <span>Bed layout</span>
@@ -49,19 +49,10 @@
       </div>
     </div>
 
-    <div class="zone-block">
-      <div class="zone-label">Zona A — Resusitasi</div>
-      <div class="bed-grid" id="zoneA"></div>
-    </div>
-
-    <div class="zone-block">
-      <div class="zone-label">Zona B — Darurat</div>
-      <div class="bed-grid" id="zoneB"></div>
-    </div>
-
-    <div class="zone-block">
-      <div class="zone-label">Zona C — Non-Darurat</div>
-      <div class="bed-grid" id="zoneC"></div>
+    <!-- Denah bentuk U: bed 01-12 mengelilingi nurse station, sisi atas terbuka ke pintu masuk. -->
+    <div class="igd-floor" id="igdFloor">
+      <div class="floor-entrance">Pintu masuk &amp; area triase</div>
+      <div class="nurse-station">Nurse station</div>
     </div>
   </div>
 
@@ -88,18 +79,106 @@
 
 <!-- ============ MODAL: LENGKAPI DATA PASIEN ============ -->
 <div class="modal-overlay fullscreen" id="patientFormModal">
-  <div class="modal">
+  <form class="modal modal-form" id="patientForm" onsubmit="savePatientData(event)">
     <h3>Lengkapi Data Pasien — Bed <span id="formBedId">—</span></h3>
 
-    <label class="form-label" for="inputPatientName">Nama Pasien</label>
-    <input type="text" id="inputPatientName" class="form-input" placeholder="Nama pasien">
+    <div class="form-section">Identitas pasien</div>
+    <div class="form-grid">
+      <div class="span-2">
+        <label class="form-label" for="inputPatientName">Nama lengkap</label>
+        <input type="text" id="inputPatientName" class="form-input" maxlength="100" placeholder="Sesuai KTP / kartu identitas">
+      </div>
+      <div>
+        <label class="form-label" for="f_medical_record_no">No. rekam medis</label>
+        <input type="text" id="f_medical_record_no" class="form-input" maxlength="30" placeholder="Jika sudah terdaftar">
+      </div>
+      <div>
+        <label class="form-label" for="f_nik">NIK</label>
+        <input type="text" id="f_nik" class="form-input" inputmode="numeric" pattern="[0-9]{16}" maxlength="16" placeholder="16 digit">
+      </div>
+      <div>
+        <label class="form-label" for="f_birth_date">Tanggal lahir</label>
+        <input type="date" id="f_birth_date" class="form-input">
+      </div>
+      <div>
+        <label class="form-label" for="f_sex">Jenis kelamin</label>
+        <select id="f_sex" class="form-input">
+          <option value="">— Pilih —</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="form-label" for="f_address">Alamat</label>
+        <input type="text" id="f_address" class="form-input" maxlength="300">
+      </div>
+      <div>
+        <label class="form-label" for="f_phone">No. HP pasien</label>
+        <input type="tel" id="f_phone" class="form-input" maxlength="20" placeholder="08xx">
+      </div>
+    </div>
 
-    <label class="form-label" for="inputRelativeName">Nama Penanggung Jawab</label>
-    <input type="text" id="inputRelativeName" class="form-input" placeholder="Nama keluarga / penanggung jawab">
+    <div class="form-section">Kedatangan &amp; penjamin</div>
+    <div class="form-grid">
+      <div>
+        <label class="form-label" for="f_arrival_mode">Cara datang</label>
+        <select id="f_arrival_mode" class="form-input">
+          <option value="">— Pilih —</option>
+          <option value="sendiri">Datang sendiri</option>
+          <option value="diantar">Diantar keluarga/orang lain</option>
+          <option value="ambulans">Ambulans</option>
+          <option value="rujukan">Rujukan faskes lain</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" for="f_payer">Penjamin biaya</label>
+        <select id="f_payer" class="form-input">
+          <option value="">— Pilih —</option>
+          <option value="umum">Umum / pribadi</option>
+          <option value="bpjs">BPJS Kesehatan</option>
+          <option value="asuransi">Asuransi lain</option>
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="form-label" for="f_insurance_no">No. kartu BPJS / asuransi</label>
+        <input type="text" id="f_insurance_no" class="form-input" maxlength="30">
+      </div>
+    </div>
 
-    <button class="modal-close" onclick="savePatientData()">Simpan</button>
-    <button class="modal-discharge" onclick="closeFormModal()">Batal</button>
-  </div>
+    <div class="form-section">Klinis</div>
+    <div class="form-grid">
+      <div class="span-2">
+        <label class="form-label" for="f_chief_complaint">Keluhan utama</label>
+        <textarea id="f_chief_complaint" class="form-input" rows="2" maxlength="500"></textarea>
+      </div>
+      <div class="span-2">
+        <label class="form-label" for="f_allergies">Riwayat alergi</label>
+        <input type="text" id="f_allergies" class="form-input" maxlength="200" placeholder="Obat / makanan, atau &quot;tidak ada&quot;">
+      </div>
+    </div>
+
+    <div class="form-section">Penanggung jawab</div>
+    <div class="form-grid">
+      <div class="span-2">
+        <label class="form-label" for="inputRelativeName">Nama penanggung jawab</label>
+        <input type="text" id="inputRelativeName" class="form-input" maxlength="100" placeholder="Nama keluarga / penanggung jawab">
+      </div>
+      <div>
+        <label class="form-label" for="f_relative_relation">Hubungan dengan pasien</label>
+        <input type="text" id="f_relative_relation" class="form-input" maxlength="50" placeholder="Suami, anak, dll.">
+      </div>
+      <div>
+        <label class="form-label" for="f_relative_phone">No. HP penanggung jawab</label>
+        <input type="tel" id="f_relative_phone" class="form-input" maxlength="20" placeholder="08xx">
+      </div>
+    </div>
+
+    <p class="form-error" id="formError" role="alert"></p>
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" onclick="closeFormModal()">Batal</button>
+      <button type="submit" class="modal-close">Simpan</button>
+    </div>
+  </form>
 </div>
 
 <script src="dashboard.js"></script>

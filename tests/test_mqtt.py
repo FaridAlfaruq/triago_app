@@ -21,7 +21,7 @@ from service.triage_payload import validate_envelope, validate_payload
 
 
 def payload():
-    return {"bed_id": "A1", "gcs_score": 15, "triage_category": "green",
+    return {"bed_id": "01", "gcs_score": 15, "triage_category": "green",
             "xgboost_score": 0.2,
             "vitals": {"hr": 75, "spo2": 98, "rr": 16, "temp_core": 36.5, "sys": 120, "dia": 80}}
 
@@ -282,7 +282,7 @@ class HttpRegressionTests(unittest.TestCase):
     def test_http_triage_contract_still_works(self):
         response = self.client.post("/api/triage/update", json=payload())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["assigned_bed"], "A1")
+        self.assertEqual(response.json["assigned_bed"], "01")
         self.assertTrue(response.json["saved_to_database"])
         self.service.emit.assert_called_once()
 

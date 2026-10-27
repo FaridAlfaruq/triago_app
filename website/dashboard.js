@@ -6,6 +6,30 @@ const catLabel = {
   green: 'Non-Darurat'
 };
 
+// Posisi bed pada denah bentuk U (baris, kolom grid 6x4). Sisi atas terbuka ke pintu masuk.
+const BED_POSITIONS = {
+  '01': [1, 1], '02': [2, 1], '03': [3, 1],
+  '04': [4, 1], '05': [4, 2], '06': [4, 3], '07': [4, 4], '08': [4, 5], '09': [4, 6],
+  '10': [3, 6], '11': [2, 6], '12': [1, 6]
+};
+
+// Field registrasi pasien: [key, label, opsi pilihan (jika select)].
+const DETAIL_SECTIONS = [
+  ['Identitas Pasien', [
+    ['medical_record_no', 'No. Rekam Medis'], ['nik', 'NIK'], ['birth_date', 'Tanggal Lahir'],
+    ['sex', 'Jenis Kelamin', { L: 'Laki-laki', P: 'Perempuan' }],
+    ['address', 'Alamat'], ['phone', 'No. HP']
+  ]],
+  ['Kedatangan & Penjamin', [
+    ['arrival_mode', 'Cara Datang', { sendiri: 'Datang sendiri', diantar: 'Diantar', ambulans: 'Ambulans', rujukan: 'Rujukan' }],
+    ['payer', 'Penjamin', { umum: 'Umum', bpjs: 'BPJS Kesehatan', asuransi: 'Asuransi lain' }],
+    ['insurance_no', 'No. Kartu']
+  ]],
+  ['Klinis', [['chief_complaint', 'Keluhan Utama'], ['allergies', 'Riwayat Alergi']]],
+  ['Penanggung Jawab', [['relative_relation', 'Hubungan'], ['relative_phone', 'No. HP']]]
+];
+const DETAIL_KEYS = DETAIL_SECTIONS.flatMap(([, fields]) => fields.map(([key]) => key));
+
 let bedsData = {};
 let selectedBedId = null;
 
@@ -27,47 +51,86 @@ async function fetchInitialBeds() {
 }
 
 function renderAllZones() {
-  renderZone('zoneA', ['A1', 'A2', 'A3', 'A4', 'A5'], 0);
-  renderZone('zoneB', ['B1', 'B2', 'B3', 'B4'], 10);
-  renderZone('zoneC', ['C1', 'C2', 'C3'], 60);
+  renderFloor();
   updateStats();
-  
+
   if (selectedBedId && bedsData[selectedBedId]) {
     displayBedDetail(selectedBedId);
   }
 }
 
-function renderZone(elementId, bedIds, targetMinutes) {
-  const container = document.getElementById(elementId);
+function renderFloor() {
+  const container = document.getElementById('igdFloor');
   if (!container) return;
-  
-  container.innerHTML = '';
 
-  bedIds.forEach(id => {
+  container.querySelectorAll('.bed').forEach(bed => bed.remove());
+
+  Object.keys(bedsData).sort().forEach(id => {
     const bedInfo = bedsData[id] || { status: 'empty' };
     const cat = bedInfo.status !== 'empty' ? bedInfo.status : null;
 
     const bed = document.createElement('div');
-    bed.className = 'bed' + (cat ? ' ' + cat : ' empty');
+    bed.className = 'bed' + (cat ? ' ' + cat : ' empty') + (id === selectedBedId ? ' selected' : '');
     bed.dataset.cat = cat || '';
     bed.dataset.id = id;
-    bed.dataset.target = targetMinutes;
+    bed.dataset.target = bedInfo.target_minutes ?? 0;
+    const position = BED_POSITIONS[id];
+    if (position) {
+      bed.style.gridRow = position[0];
+      bed.style.gridColumn = position[1];
+    }
 
     if (cat && bedInfo.arrival_timestamp) {
       bed.dataset.arrival = bedInfo.arrival_timestamp;
     }
 
-    bed.innerHTML = `<div class="bed-id mono">${id}</div>` +
+    bed.innerHTML = `<div class="bed-id mono">${escapeHTML(id)}</div>` +
       (cat ? `<div class="bed-cat">${catLabel[cat]}</div><div class="bed-timer mono" data-timer></div>` : '');
 
     // KETIKA BOX BED DIKLIK: TAMPILKAN DI PANEL SISI KANAN
     bed.onclick = () => {
       selectedBedId = id;
-      displayBedDetail(id);
+      renderAllZones();
+      tickCountdowns();
     };
-    
+
     container.appendChild(bed);
   });
+}
+
+function formatDetail(key, value, options) {
+  if (options) return options[value] || value;
+  if (key === 'birth_date') {
+    const born = new Date(value + 'T00:00:00');
+    if (isNaN(born)) return value;
+    const now = new Date();
+    let age = now.getFullYear() - born.getFullYear();
+    if (now < new Date(now.getFullYear(), born.getMonth(), born.getDate())) age--;
+    return `${born.toLocaleDateString('id-ID')} (${age} th)`;
+  }
+  return value;
+}
+
+function renderPatientDetails(bedInfo) {
+  const details = bedInfo.patient_details || {};
+  const row = (label, value) =>
+    `<div class="modal-row" style="border-color:var(--border)"><span>${label}</span><span class="mono detail-value">${value}</span></div>`;
+  const empty = '<i>Belum Diisi</i>';
+
+  return DETAIL_SECTIONS.map(([title, fields]) => {
+    const rows = [];
+    if (title === 'Identitas Pasien') {
+      rows.push(row('Nama Pasien', bedInfo.patient_name ? escapeHTML(bedInfo.patient_name) : empty));
+    }
+    if (title === 'Penanggung Jawab') {
+      rows.push(row('Nama', bedInfo.relative_name ? escapeHTML(bedInfo.relative_name) : empty));
+    }
+    fields.forEach(([key, label, options]) => {
+      if (details[key]) rows.push(row(label, escapeHTML(formatDetail(key, details[key], options))));
+    });
+    if (!rows.length) return '';
+    return `<div class="detail-section">${title}</div>` + rows.join('');
+  }).join('');
 }
 
 // FUNGSI UTAMA: MENAMPILKAN DETAIL BED DI PANEL KANAN
@@ -92,7 +155,7 @@ function displayBedDetail(bedId) {
   contentEl.innerHTML = `
     <div class="modal-row" style="border-color:var(--border)"><span>Status Triase</span><span style="font-weight:bold; color:var(--${bedInfo.status})">${catLabel[bedInfo.status]}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Skor XGBoost</span><span class="mono">${bedInfo.xgboost_score || '—'}</span></div>
-    <div class="modal-row" style="border-color:var(--border)"><span>Skor GCS (Hardware)</span><span class="mono" style="font-weight:bold;">${bedInfo.gcs_score || 15} / 15</span></div>
+    <div class="modal-row" style="border-color:var(--border)"><span>Skor GCS</span><span class="mono" style="font-weight:bold;">${bedInfo.gcs_score || 15} / 15</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Pain Score</span><span class="mono">${bedInfo.pain_score == null ? '—' : escapeHTML(bedInfo.pain_score) + ' / 10'}</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Waktu Masuk</span><span class="mono">${arrivalTime}</span></div>
     
@@ -103,9 +166,7 @@ function displayBedDetail(bedId) {
     <div class="modal-row" style="border-color:var(--border)"><span>Tekanan Darah</span><span class="mono">${(vitals.sys && vitals.dia) ? `${vitals.sys}/${vitals.dia}` : '—'} mmHg</span></div>
     <div class="modal-row" style="border-color:var(--border)"><span>Suhu Tubuh Inti</span><span class="mono" style="color:var(--accent);">${vitals.temp_core || '—'} °C</span></div>
 
-    <div style="margin-top: 12px; font-size: 11px; color: var(--text-secondary); font-weight: bold; text-transform: uppercase;">Identitas Pasien</div>
-    <div class="modal-row" style="border-color:var(--border)"><span>Nama Pasien</span><span class="mono">${bedInfo.patient_name ? escapeHTML(bedInfo.patient_name) : '<i>Belum Diisi</i>'}</span></div>
-    <div class="modal-row" style="border-color:var(--border)"><span>Penanggung Jawab</span><span class="mono">${bedInfo.relative_name ? escapeHTML(bedInfo.relative_name) : '<i>Belum Diisi</i>'}</span></div>
+    ${renderPatientDetails(bedInfo)}
 
     <button onclick="openFormModal('${bedId}')" style="width:100%; margin-top:15px; padding:8px; background:var(--accent); color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
       + Lengkapi Data Pasien
@@ -118,7 +179,8 @@ function displayBedDetail(bedId) {
 
 async function dischargeBed(bedId) {
   try {
-    const res = await fetch(`/api/beds/${bedId}/discharge`, { method: 'POST' });
+    if (!confirm(`Kosongkan Bed ${bedId}? Data pasien di bed ini akan dihapus dari dashboard.`)) return;
+    const res = await fetch(`/api/beds/${encodeURIComponent(bedId)}/discharge`, { method: 'POST' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     // Panel detail otomatis terupdate lewat event 'bed_updated' dari socket.
   } catch (error) {
@@ -131,47 +193,61 @@ async function dischargeBed(bedId) {
 function openFormModal(bedId) {
   document.getElementById('formBedId').textContent = bedId;
   const bedInfo = bedsData[bedId] || {};
+  const details = bedInfo.patient_details || {};
   document.getElementById('inputPatientName').value = bedInfo.patient_name || '';
+  document.getElementById('inputRelativeName').value =
+    bedInfo.relative_name && bedInfo.relative_name !== '—' ? bedInfo.relative_name : '';
+  DETAIL_KEYS.forEach(key => { document.getElementById('f_' + key).value = details[key] || ''; });
+  document.getElementById('f_birth_date').max = new Date().toISOString().slice(0, 10);
+  document.getElementById('formError').textContent = '';
   document.getElementById('patientFormModal').classList.add('show');
+  document.getElementById('inputPatientName').focus();
 }
 
 function closeFormModal() {
   document.getElementById('patientFormModal').classList.remove('show');
 }
 
-async function savePatientData() {
+async function savePatientData(event) {
+  if (event) event.preventDefault();
   const bedId = document.getElementById('formBedId').textContent;
-  const patientName = document.getElementById('inputPatientName').value.trim();
-  const relativeName = document.getElementById('inputRelativeName').value.trim();
+  const errorEl = document.getElementById('formError');
+  const details = {};
+  DETAIL_KEYS.forEach(key => { details[key] = document.getElementById('f_' + key).value.trim(); });
 
   try {
-    const response = await fetch(`/api/beds/${bedId}/patient`, {
+    const response = await fetch(`/api/beds/${encodeURIComponent(bedId)}/patient`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        patient_name: patientName,
-        relative_name: relativeName
+        patient_name: document.getElementById('inputPatientName').value.trim(),
+        relative_name: document.getElementById('inputRelativeName').value.trim(),
+        details
       })
     });
 
     const result = await response.json();
     if (response.ok && result.status === 'success') {
-      if (bedsData[bedId]) {
-        bedsData[bedId].patient_name = patientName || 'Pasien Tanpa Nama';
-        bedsData[bedId].relative_name = relativeName || '—';
-        displayBedDetail(bedId);
-      }
+      bedsData[bedId] = result.data;
+      renderAllZones();
+      tickCountdowns();
       closeFormModal();
+      if (!result.saved_to_database) {
+        alert('Data tampil di dashboard, tetapi belum tersimpan ke database. Periksa koneksi database.');
+      }
     } else {
-      alert('Gagal menyimpan data pasien: ' + (result.message || 'Error tidak diketahui'));
+      errorEl.textContent = 'Gagal menyimpan: ' + (result.message || 'Error tidak diketahui');
     }
   } catch (err) {
     console.error('[ERROR] Gagal menyimpan data pasien ke server:', err);
-    alert('Gagal menyimpan data pasien. Pastikan koneksi server backend terhubung!');
+    errorEl.textContent = 'Gagal menyimpan. Pastikan koneksi server backend terhubung.';
   }
 }
 
 if (socket) {
+  // Ambil ulang semua bed setiap (re)connect agar update yang terlewat saat putus tetap muncul.
+  socket.on('connect', fetchInitialBeds);
+
   socket.on('bed_updated', (updatedBed) => {
     bedsData[updatedBed.bed_id] = updatedBed;
     renderAllZones();

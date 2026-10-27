@@ -16,11 +16,13 @@ from flask_socketio import SocketIO
 
 try:
     from .bed_manager import BedManager
+    from .patient_details import validate_patient_details
     from .database import save_patient, get_patient_history, update_patient_info, DB_BACKEND
     from .triage_service import TriageService
 except ImportError:
     # Tetap mendukung eksekusi langsung: python backend/app.py
     from bed_manager import BedManager
+    from patient_details import validate_patient_details
     from database import save_patient, get_patient_history, update_patient_info, DB_BACKEND
     from triage_service import TriageService
 
@@ -107,7 +109,7 @@ def update_triage():
 # =========================================================================
 @app.route("/api/beds", methods=["GET"])
 def get_all_beds():
-    """Mengembalikan status seluruh bed (Zona A, B, C) untuk inisialisasi web."""
+    """Mengembalikan status seluruh bed (01-12) untuk inisialisasi web."""
     return jsonify(bed_manager.get_all_beds_status())
 
 
@@ -123,17 +125,21 @@ def reset_all_beds():
 
 @app.route("/api/beds/<bed_id>/patient", methods=["POST"])
 def update_bed_patient(bed_id):
-    """Memperbarui nama pasien dan penanggung jawab pada bed tertentu."""
+    """Memperbarui identitas dan data registrasi pasien pada bed tertentu."""
     data = request.get_json(silent=True) or {}
-    patient_name = data.get("patient_name", "").strip() or "Pasien Tanpa Nama"
-    relative_name = data.get("relative_name", "").strip() or "—"
+    patient_name = str(data.get("patient_name") or "").strip()[:100] or "Pasien Tanpa Nama"
+    relative_name = str(data.get("relative_name") or "").strip()[:100] or "—"
+    try:
+        details = validate_patient_details(data.get("details"))
+    except ValueError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 400
 
-    success = bed_manager.update_patient_identity(bed_id, patient_name, relative_name)
+    success = bed_manager.update_patient_identity(bed_id, patient_name, relative_name, details)
     if not success:
         return jsonify({"status": "error", "message": f"Bed {bed_id} tidak ditemukan"}), 404
 
     # Simpan/update ke MySQL database
-    saved_to_db = update_patient_info(bed_id, patient_name, relative_name)
+    saved_to_db = update_patient_info(bed_id, patient_name, relative_name, details)
 
     updated_bed_info = bed_manager.get_all_beds_status()[bed_id]
     socketio.emit("bed_updated", updated_bed_info)

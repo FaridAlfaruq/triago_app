@@ -30,7 +30,7 @@ TEST_ENV = {"TRIAGO_MQTT_HOST": "cluster.example", "TRIAGO_MQTT_USERNAME": "demo
 
 
 def measurement():
-    return {"bed_id": "A1", "triage_category": "green", "gcs_score": 15, "xgboost_score": 0.2,
+    return {"bed_id": "01", "triage_category": "green", "gcs_score": 15, "xgboost_score": 0.2,
             "patient_name": "SIMULASI", "vitals": {"hr": 75, "spo2": 98, "rr": 16,
                                                     "temp_core": 36.5, "sys": 120, "dia": 80}}
 
@@ -96,7 +96,7 @@ class LaptopDatabaseTests(unittest.TestCase):
         rows = SQLiteStore(self.path).get_patient_history()
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["heart_rate"], 75)
-        self.assertEqual(rows[0]["bed_id"], "A1")
+        self.assertEqual(rows[0]["bed_id"], "01")
         self.assertEqual(rows[0]["status"], "green")
         service.process(measurement(), event_id="test-event", require_database=True)
         self.assertEqual(len(self.store.get_patient_history()), 1)
@@ -104,7 +104,7 @@ class LaptopDatabaseTests(unittest.TestCase):
     def test_identity_edit_updates_only_latest_measurement_for_bed(self):
         self.store.save_patient({**measurement(), "arrival_timestamp": 1})
         self.store.save_patient({**measurement(), "arrival_timestamp": 2})
-        self.assertTrue(self.store.update_patient_info("A1", "Nama Baru", "Wali"))
+        self.assertTrue(self.store.update_patient_info("01", "Nama Baru", "Wali"))
         rows = self.store.get_patient_history()
         self.assertEqual(rows[0]["patient_name"], "Nama Baru")
         self.assertEqual(rows[1]["patient_name"], "SIMULASI")

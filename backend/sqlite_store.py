@@ -1,5 +1,6 @@
 """Explicit SQLite storage for laptop trials without a MySQL server."""
 from contextlib import contextmanager
+import json
 from pathlib import Path
 import sqlite3
 import time
@@ -18,11 +19,14 @@ class SQLiteStore:
                 pain_score INTEGER,
                 heart_rate REAL, spo2 REAL, temperature REAL,
                 respiration_rate REAL, systolic_bp INTEGER,
-                diastolic_bp INTEGER, arrival_timestamp INTEGER
+                diastolic_bp INTEGER, arrival_timestamp INTEGER,
+                patient_details TEXT
             )""")
             columns = {row["name"] for row in conn.execute("PRAGMA table_info(patient_data)")}
             if "pain_score" not in columns:
                 conn.execute("ALTER TABLE patient_data ADD COLUMN pain_score INTEGER")
+            if "patient_details" not in columns:
+                conn.execute("ALTER TABLE patient_data ADD COLUMN patient_details TEXT")
 
     @contextmanager
     def connection(self):
@@ -65,10 +69,12 @@ class SQLiteStore:
                 ORDER BY arrival_timestamp DESC, id DESC LIMIT ?""", (max(0, limit),)).fetchall()
         return [dict(row) for row in rows]
 
-    def update_patient_info(self, bed_id, patient_name, relative_name):
+    def update_patient_info(self, bed_id, patient_name, relative_name, patient_details=None):
+        details = json.dumps(patient_details, ensure_ascii=False) if patient_details else None
         with self.connection() as conn:
-            cursor = conn.execute("""UPDATE patient_data SET patient_name = ?, relative_name = ?
+            cursor = conn.execute("""UPDATE patient_data
+                SET patient_name = ?, relative_name = ?, patient_details = ?
                 WHERE id = (SELECT id FROM patient_data WHERE bed_id = ?
                             ORDER BY arrival_timestamp DESC, id DESC LIMIT 1)""",
-                                  (patient_name, relative_name, bed_id))
+                                  (patient_name, relative_name, details, bed_id))
             return cursor.rowcount > 0

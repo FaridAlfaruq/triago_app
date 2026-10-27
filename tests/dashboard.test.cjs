@@ -23,4 +23,13 @@ vm.runInContext('bedsData.A1.pain_score = null; displayBedDetail("A1");', contex
 assert.ok(!elements.bedDetailContent.innerHTML.includes('null / 10'));
 assert.ok(!elements.bedDetailContent.innerHTML.includes('undefined / 10'));
 assert.equal(elements.panelBedTitle.textContent, 'DETAIL BED — A1');
+vm.runInContext(`
+  bedsData.A1.patient_details = {chief_complaint: '<script>x</script>', payer: 'bpjs', sex: 'P'};
+  displayBedDetail('A1');
+`, context);
+const detailHtml = elements.bedDetailContent.innerHTML;
+assert.ok(detailHtml.includes('&lt;script&gt;x&lt;/script&gt;'));
+assert.ok(!detailHtml.includes('<script>'));
+assert.ok(detailHtml.includes('BPJS Kesehatan'));
+assert.ok(detailHtml.includes('Perempuan'));
 console.log('Dashboard escapes patient input and distinguishes measured zero pain from unknown.');

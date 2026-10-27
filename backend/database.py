@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import threading
@@ -125,7 +126,7 @@ def save_patient(data: dict) -> bool:
     except Error as err:
         print(f"[DATABASE][ERROR] Gagal insert data pasien: {err}", flush=True)
         if getattr(err, "errno", None) == 1054:
-            print("[DATABASE] Periksa migrasi backend/migrations/001_add_pain_score.sql", flush=True)
+            print("[DATABASE] Kolom tabel belum lengkap; jalankan migrasi di backend/migrations/", flush=True)
         conn.rollback()
         return False
     finally:
@@ -155,10 +156,11 @@ def get_patient_history(limit: int = 50):
         cursor.close()
 
 
-def update_patient_info(bed_id: str, patient_name: str, relative_name: str) -> bool:
-    """Memperbarui nama pasien dan penanggung jawab pada baris terbaru di MySQL untuk bed tertentu."""
+def update_patient_info(bed_id: str, patient_name: str, relative_name: str,
+                        patient_details: dict = None) -> bool:
+    """Memperbarui identitas pasien pada baris terbaru di MySQL untuk bed tertentu."""
     if _sqlite_store is not None:
-        return _sqlite_store.update_patient_info(bed_id, patient_name, relative_name)
+        return _sqlite_store.update_patient_info(bed_id, patient_name, relative_name, patient_details)
     try:
         conn = get_connection()
     except Error:
@@ -168,13 +170,14 @@ def update_patient_info(bed_id: str, patient_name: str, relative_name: str) -> b
     cursor = conn.cursor()
     sql = """
     UPDATE patient_data 
-    SET patient_name = %s, relative_name = %s 
+    SET patient_name = %s, relative_name = %s, patient_details = %s
     WHERE bed_id = %s 
     ORDER BY arrival_timestamp DESC 
     LIMIT 1
     """
+    details = json.dumps(patient_details, ensure_ascii=False) if patient_details else None
     try:
-        cursor.execute(sql, (patient_name, relative_name, bed_id))
+        cursor.execute(sql, (patient_name, relative_name, details, bed_id))
         conn.commit()
         print(f"[DATABASE] Identitas pasien Bed {bed_id} berhasil diperbarui di MySQL.", flush=True)
         return True
