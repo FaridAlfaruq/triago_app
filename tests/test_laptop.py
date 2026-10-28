@@ -102,14 +102,14 @@ class LaptopDatabaseTests(unittest.TestCase):
         service.process(measurement(), event_id="test-event", require_database=True)
         self.assertEqual(len(self.store.get_patient_history()), 1)
 
-    def test_identity_edit_updates_only_latest_measurement_for_bed(self):
+    def test_identity_edit_updates_only_current_patient_row(self):
         self.store.save_patient({**measurement(), "bed_id": "01", "arrival_timestamp": 1})
         self.store.save_patient({**measurement(), "bed_id": "01", "arrival_timestamp": 2})
-        self.assertTrue(self.store.update_patient_info("01", "Nama Baru", "Wali"))
+        self.assertTrue(self.store.update_patient_info("01", 2, "Nama Baru", "Wali"))
         rows = self.store.get_patient_history()
         self.assertEqual(rows[0]["patient_name"], "Nama Baru")
         self.assertEqual(rows[1]["patient_name"], "SIMULASI")
-        self.assertFalse(self.store.update_patient_info("MISSING", "Nama", "Wali"))
+        self.assertFalse(self.store.update_patient_info("MISSING", 2, "Nama", "Wali"))
 
 
 class LaptopWorkflowTests(unittest.TestCase):

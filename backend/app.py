@@ -126,22 +126,27 @@ def reset_all_beds():
 @app.route("/api/beds/<bed_id>/patient", methods=["POST"])
 def update_bed_patient(bed_id):
     """Memperbarui identitas dan data registrasi pasien pada bed tertentu."""
-    data = request.get_json(silent=True) or {}
-    patient_name = str(data.get("patient_name") or "").strip()[:100] or "Pasien Tanpa Nama"
-    relative_name = str(data.get("relative_name") or "").strip()[:100] or "—"
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"status": "error", "message": "Body harus berupa object JSON"}), 400
+    for key in ("patient_name", "relative_name"):
+        if data.get(key) is not None and not isinstance(data[key], str):
+            return jsonify({"status": "error", "message": f"{key} harus berupa teks"}), 400
+    patient_name = (data.get("patient_name") or "").strip()[:100] or "Pasien Tanpa Nama"
+    relative_name = (data.get("relative_name") or "").strip()[:100] or "—"
     try:
         details = validate_patient_details(data.get("details"))
     except ValueError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 400
 
-    success = bed_manager.update_patient_identity(bed_id, patient_name, relative_name, details)
-    if not success:
+    updated_bed_info = bed_manager.update_patient_identity(bed_id, patient_name, relative_name, details)
+    if updated_bed_info is None:
         return jsonify({"status": "error", "message": f"Bed {bed_id} tidak ditemukan"}), 404
 
-    # Simpan/update ke MySQL database
-    saved_to_db = update_patient_info(bed_id, patient_name, relative_name, details)
+    # Simpan ke baris database milik pasien yang sedang menempati bed ini.
+    saved_to_db = update_patient_info(bed_id, updated_bed_info["arrival_timestamp"],
+                                      patient_name, relative_name, details)
 
-    updated_bed_info = bed_manager.get_all_beds_status()[bed_id]
     socketio.emit("bed_updated", updated_bed_info)
     print(f"[SERVER LOG] Identitas pasien Bed {bed_id} diperbarui: {patient_name} / {relative_name}", flush=True)
 
@@ -160,7 +165,7 @@ def discharge_bed(bed_id):
     if not success:
         return jsonify({"status": "error", "message": f"Bed {bed_id} tidak ditemukan"}), 404
 
-    updated_bed_info = bed_manager.get_all_beds_status()[bed_id]
+    updated_bed_info = bed_manager.get_bed(bed_id)
     socketio.emit("bed_updated", updated_bed_info)
     print(f"[SERVER LOG] Bed {bed_id} telah dikosongkan kembali.")
 

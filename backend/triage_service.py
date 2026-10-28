@@ -43,7 +43,7 @@ class TriageService:
                           "message": "Bed zona ini penuh; pasien masuk daftar tunggu.",
                           "saved_to_database": saved_to_db}
             else:
-                bed = deepcopy(self.bed_manager.get_all_beds_status()[assigned])
+                bed = self.bed_manager.get_bed(assigned)
                 result = {"status": "success", "assigned_bed": assigned, "zone": bed["zone"],
                           "message": f"Pasien diarahkan ke bed {assigned}",
                           "saved_to_database": saved_to_db, "data": bed}

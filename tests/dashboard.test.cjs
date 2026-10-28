@@ -60,3 +60,19 @@ assert.equal(big.rows, 6);
 assert.deepEqual(big.positions['05'], [6, 1]);  // sisi bawah: 2 bed di tengah 3 kolom
 assert.deepEqual(big.positions['11'], [1, 3]);
 console.log('Dashboard builds the U floor plan from bed zones.');
+
+// Di balik reverse proxy sub-path, API dan Socket.IO harus ikut sub-path.
+const calls = { io: null, fetch: [] };
+const subContext = vm.createContext({
+  document: { getElementById: id => elements[id], addEventListener() {} },
+  console: { warn() {}, error() {} }, setInterval() {},
+  location: { pathname: '/informatics/triago/' },
+  io: options => { calls.io = options; return { on() {} }; },
+  fetch: url => { calls.fetch.push(url); return Promise.resolve({ ok: false }); },
+});
+vm.runInContext(fs.readFileSync(path.join(__dirname, '../website/dashboard.js'), 'utf8'), subContext);
+assert.equal(calls.io.path, '/informatics/triago/socket.io');
+vm.runInContext('fetchInitialBeds()', subContext);
+assert.ok(calls.fetch.length > 0 && calls.fetch.every(url => !url.startsWith('/')));
+assert.ok(!fs.readFileSync(path.join(__dirname, '../website/dashboard.js'), 'utf8').match(/fetch\(['`]\//));
+console.log('Dashboard uses relative URLs that work under a sub-path.');

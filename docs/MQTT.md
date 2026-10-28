@@ -136,7 +136,7 @@ QoS `1`, `retain=False`.
 ```
 
 Raspi tidak mengirim `bed_id`. Backend memilih bed kosong di zona sesuai kategori:
-`red` → Resusitasi, lalu Darurat, lalu Non-Darurat; `yellow` → Darurat, lalu Resusitasi;
+`red` → Resusitasi, lalu Darurat, lalu Non-Darurat; `yellow` → Darurat, lalu Non-Darurat, lalu Resusitasi;
 `green` → Non-Darurat saja. Bila tidak ada bed, pasien masuk daftar tunggu (`WAITING`).
 `bed_id` dari outbox versi lama masih diterima tetapi diabaikan.
 

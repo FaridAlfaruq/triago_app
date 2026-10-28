@@ -285,6 +285,9 @@ class MqttFlowTests(unittest.TestCase):
             self.assertTrue(context.check_hostname)
             self.assertFalse(constructor.call_args.kwargs["clean_session"])
             self.assertTrue(constructor.call_args.kwargs["manual_ack"])
+            # Backend boleh membalas beberapa assignment beruntun; Raspi tetap satu per satu.
+            client.max_queued_messages_set.assert_called_once_with(0)
+            create_client(config()).max_queued_messages_set.assert_called_with(1)
 
     def test_subscription_status_tracks_broker_permissions(self):
         receiver = self.receiver()

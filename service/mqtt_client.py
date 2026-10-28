@@ -88,7 +88,9 @@ def create_client(config, *, subscriber=False):
     # Certificate and hostname verification remain enabled, including custom CAs.
     client.tls_set_context(ssl.create_default_context(cafile=config.ca_file))
     client.reconnect_delay_set(min_delay=1, max_delay=60)
-    client.max_queued_messages_set(1)
+    # Raspi mengirim outbox satu per satu. Backend bisa membalas beberapa
+    # assignment beruntun (backlog/multi-Raspi), jadi antreannya tidak dibatasi.
+    client.max_queued_messages_set(0 if subscriber else 1)
     return client
 
 

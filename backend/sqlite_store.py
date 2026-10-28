@@ -69,12 +69,14 @@ class SQLiteStore:
                 ORDER BY arrival_timestamp DESC, id DESC LIMIT ?""", (max(0, limit),)).fetchall()
         return [dict(row) for row in rows]
 
-    def update_patient_info(self, bed_id, patient_name, relative_name, patient_details=None):
+    def update_patient_info(self, bed_id, arrival_timestamp, patient_name, relative_name,
+                            patient_details=None):
         details = json.dumps(patient_details, ensure_ascii=False) if patient_details else None
         with self.connection() as conn:
             cursor = conn.execute("""UPDATE patient_data
                 SET patient_name = ?, relative_name = ?, patient_details = ?
-                WHERE id = (SELECT id FROM patient_data WHERE bed_id = ?
-                            ORDER BY arrival_timestamp DESC, id DESC LIMIT 1)""",
-                                  (patient_name, relative_name, details, bed_id))
+                WHERE id = (SELECT id FROM patient_data
+                            WHERE bed_id = ? AND arrival_timestamp = ?
+                            ORDER BY id DESC LIMIT 1)""",
+                                  (patient_name, relative_name, details, bed_id, arrival_timestamp))
             return cursor.rowcount > 0

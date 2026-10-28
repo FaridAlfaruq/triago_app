@@ -58,13 +58,28 @@ class BedZoneTests(unittest.TestCase):
         self.assertEqual(beds.beds["10"]["status"], "red")
         self.assertEqual(beds.beds["10"]["zone"], "green")
 
-    def test_full_yellow_zone_uses_resusitasi_but_never_non_darurat(self):
+    def test_full_yellow_zone_uses_non_darurat_before_resusitasi(self):
         beds = BedManager()
         fill(beds, "yellow", 6)
+        self.assertEqual(beds.assign_patient_to_bed(measurement("yellow")), "10")
+        self.assertEqual(beds.beds["10"]["status"], "yellow")
+        fill(beds, "yellow", 2)
+        self.assertEqual(beds.beds["01"]["status"], "empty")  # Resusitasi disisakan
         self.assertEqual(beds.assign_patient_to_bed(measurement("yellow")), "01")
         fill(beds, "yellow", 2)
         self.assertIsNone(beds.assign_patient_to_bed(measurement("yellow")))
-        self.assertEqual(beds.beds["10"]["status"], "empty")
+
+    def test_unknown_category_is_rejected(self):
+        with self.assertRaises(ValueError):
+            BedManager().assign_patient_to_bed(measurement("RED"))
+
+    def test_status_snapshot_is_a_copy(self):
+        beds = BedManager()
+        snapshot = beds.get_all_beds_status()
+        beds.assign_patient_to_bed(measurement("red"))
+        self.assertEqual(snapshot["01"]["status"], "empty")
+        snapshot["02"]["status"] = "red"
+        self.assertEqual(beds.beds["02"]["status"], "empty")
 
     def test_full_green_zone_waits_instead_of_taking_other_zones(self):
         beds = BedManager()
@@ -107,15 +122,23 @@ class PatientDetailsTests(unittest.TestCase):
             with self.assertRaises(ValueError, msg=details):
                 validate_patient_details(details)
 
-    def test_sqlite_stores_details_on_latest_row_and_migrates_old_schema(self):
+    def test_sqlite_stores_details_on_current_patient_row(self):
         with tempfile.TemporaryDirectory() as directory:
             store = SQLiteStore(Path(directory) / "patients.sqlite3")
             store.save_patient({**measurement(), "bed_id": "04", "arrival_timestamp": 1})
             store.save_patient({**measurement(), "bed_id": "04", "arrival_timestamp": 2})
-            self.assertTrue(store.update_patient_info("04", "Budi", "Ani", {"payer": "bpjs"}))
+            self.assertTrue(store.update_patient_info("04", 2, "Budi", "Ani", {"payer": "bpjs"}))
             rows = store.get_patient_history()
             self.assertEqual(rows[0]["patient_details"], '{"payer": "bpjs"}')
             self.assertIsNone(rows[1]["patient_details"])
+
+    def test_identity_never_overwrites_previous_patient_row(self):
+        # Pasien sebelumnya tersimpan; pasien sekarang (arrival 2) gagal tersimpan.
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "patients.sqlite3")
+            store.save_patient({**measurement(), "bed_id": "04", "arrival_timestamp": 1})
+            self.assertFalse(store.update_patient_info("04", 2, "Budi", "Ani", {"payer": "bpjs"}))
+            self.assertNotEqual(store.get_patient_history()[0]["patient_name"], "Budi")
 
 
 class PatientEndpointTests(unittest.TestCase):
@@ -145,7 +168,14 @@ class PatientEndpointTests(unittest.TestCase):
             "details": {"sex": "L", "payer": "umum", "allergies": ""}})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["data"]["patient_details"], {"sex": "L", "payer": "umum"})
-        self.update.assert_called_once_with("04", "Budi", "Ani", {"sex": "L", "payer": "umum"})
+        self.update.assert_called_once_with("04", self.beds.beds["04"]["arrival_timestamp"],
+                                            "Budi", "Ani", {"sex": "L", "payer": "umum"})
+
+    def test_non_text_names_return_400(self):
+        for body in ({"patient_name": 123}, {"relative_name": ["x"]}, ["x"]):
+            response = self.client.post("/api/beds/04/patient", json=body)
+            self.assertEqual(response.status_code, 400, body)
+        self.update.assert_not_called()
 
     def test_invalid_details_return_400_without_changes(self):
         response = self.client.post("/api/beds/04/patient", json={"details": {"nik": "12"}})

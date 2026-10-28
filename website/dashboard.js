@@ -1,4 +1,8 @@
-const socket = typeof io === 'function' ? io() : null;
+// Semua URL relatif terhadap folder halaman, agar dashboard tetap jalan di
+// balik reverse proxy sub-path (mis. /informatics/triago/).
+const BASE_PATH = (typeof location !== 'undefined' && location.pathname)
+  ? location.pathname.replace(/[^/]*$/, '') : '/';
+const socket = typeof io === 'function' ? io({ path: `${BASE_PATH}socket.io` }) : null;
 
 const catLabel = {
   red: 'Resusitasi',
@@ -50,7 +54,7 @@ function escapeHTML(value) {
 
 async function fetchInitialBeds() {
   try {
-    const response = await fetch('/api/beds');
+    const response = await fetch('api/beds');
     if (response.ok) {
       bedsData = await response.json();
       renderAllZones();
@@ -202,7 +206,7 @@ function displayBedDetail(bedId) {
 async function dischargeBed(bedId) {
   try {
     if (!confirm(`Kosongkan Bed ${bedId}? Data pasien di bed ini akan dihapus dari dashboard.`)) return;
-    const res = await fetch(`/api/beds/${encodeURIComponent(bedId)}/discharge`, { method: 'POST' });
+    const res = await fetch(`api/beds/${encodeURIComponent(bedId)}/discharge`, { method: 'POST' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     // Panel detail otomatis terupdate lewat event 'bed_updated' dari socket.
   } catch (error) {
@@ -238,7 +242,7 @@ async function savePatientData(event) {
   DETAIL_KEYS.forEach(key => { details[key] = document.getElementById('f_' + key).value.trim(); });
 
   try {
-    const response = await fetch(`/api/beds/${encodeURIComponent(bedId)}/patient`, {
+    const response = await fetch(`api/beds/${encodeURIComponent(bedId)}/patient`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

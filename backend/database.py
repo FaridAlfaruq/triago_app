@@ -156,11 +156,18 @@ def get_patient_history(limit: int = 50):
         cursor.close()
 
 
-def update_patient_info(bed_id: str, patient_name: str, relative_name: str,
-                        patient_details: dict = None) -> bool:
-    """Memperbarui identitas pasien pada baris terbaru di MySQL untuk bed tertentu."""
+def update_patient_info(bed_id: str, arrival_timestamp: int, patient_name: str,
+                        relative_name: str, patient_details: dict = None) -> bool:
+    """Memperbarui identitas pada baris pasien yang sedang menempati bed.
+
+    Baris dicocokkan dengan bed_id + arrival_timestamp, supaya data pasien
+    sebelumnya di bed yang sama tidak tertimpa bila penyimpanan pasien kini gagal.
+    """
+    if arrival_timestamp is None:
+        return False
     if _sqlite_store is not None:
-        return _sqlite_store.update_patient_info(bed_id, patient_name, relative_name, patient_details)
+        return _sqlite_store.update_patient_info(bed_id, arrival_timestamp, patient_name,
+                                                 relative_name, patient_details)
     try:
         conn = get_connection()
     except Error:
@@ -169,16 +176,19 @@ def update_patient_info(bed_id: str, patient_name: str, relative_name: str,
 
     cursor = conn.cursor()
     sql = """
-    UPDATE patient_data 
+    UPDATE patient_data
     SET patient_name = %s, relative_name = %s, patient_details = %s
-    WHERE bed_id = %s 
-    ORDER BY arrival_timestamp DESC 
+    WHERE bed_id = %s AND arrival_timestamp = %s
+    ORDER BY id DESC
     LIMIT 1
     """
     details = json.dumps(patient_details, ensure_ascii=False) if patient_details else None
     try:
-        cursor.execute(sql, (patient_name, relative_name, details, bed_id))
+        cursor.execute(sql, (patient_name, relative_name, details, bed_id, arrival_timestamp))
         conn.commit()
+        if cursor.rowcount == 0:
+            print(f"[DATABASE][WARN] Baris pasien Bed {bed_id} tidak ditemukan; identitas belum tersimpan.", flush=True)
+            return False
         print(f"[DATABASE] Identitas pasien Bed {bed_id} berhasil diperbarui di MySQL.", flush=True)
         return True
     except Error as err:

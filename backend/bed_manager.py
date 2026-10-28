@@ -1,6 +1,7 @@
 import os
 import time
 import threading
+from copy import deepcopy
 
 # Zona IGD memakai kode kategori triase: red = Resusitasi, yellow = Darurat,
 # green = Non-Darurat. Urutan ini juga urutan nomor bed pada denah U
@@ -13,11 +14,12 @@ ZONE_ENV = {"red": "TRIAGO_BEDS_RESUSITASI", "yellow": "TRIAGO_BEDS_DARURAT",
 # Target waktu penanganan (menit) mengikuti kategori triase, bukan lokasi bed.
 TARGET_MINUTES = {"red": 0, "yellow": 10, "green": 60}
 
-# Zona yang dicoba bila zona utama penuh. Pasien kritis boleh memakai bed zona
-# lain; pasien non-darurat menunggu agar bed resusitasi tetap tersedia.
+# Zona yang dicoba bila zona utama penuh. Pasien kuning didahulukan ke
+# Non-Darurat agar bed Resusitasi tetap tersedia untuk pasien merah; pasien
+# hijau menunggu bila zonanya penuh.
 ZONE_FALLBACK = {
     "red": ["red", "yellow", "green"],
-    "yellow": ["yellow", "red"],
+    "yellow": ["yellow", "green", "red"],
     "green": ["green"],
 }
 
@@ -72,7 +74,9 @@ class BedManager:
         }
 
     def _find_available_bed(self, category):
-        for zone in ZONE_FALLBACK.get(category, ["green"]):
+        if category not in ZONE_FALLBACK:
+            raise ValueError("triage_category harus red, yellow, atau green")
+        for zone in ZONE_FALLBACK[category]:
             for bed_id, bed in self.beds.items():
                 if bed["zone"] == zone and bed["status"] == "empty":
                     return bed_id
@@ -109,15 +113,16 @@ class BedManager:
 
     def update_patient_identity(self, bed_id: str, patient_name: str, relative_name: str,
                                 patient_details=None):
+        """Kembalikan salinan bed yang diperbarui, atau None bila bed tidak ada."""
         with self._lock:
             if bed_id not in self.beds:
-                return False
+                return None
             self.beds[bed_id].update({
                 "patient_name": patient_name,
                 "relative_name": relative_name,
                 "patient_details": dict(patient_details or {}),
             })
-            return True
+            return deepcopy(self.beds[bed_id])
 
     def discharge_bed(self, bed_id):
         """Kosongkan kembali sebuah bed (mis. setelah pasien dipindah/selesai ditangani)."""
@@ -131,7 +136,15 @@ class BedManager:
         """Kosongkan SEMUA bed sekaligus. Berguna untuk testing tanpa perlu restart Flask."""
         with self._lock:
             self._init_beds()
-        return self.beds
+            return deepcopy(self.beds)
 
     def get_all_beds_status(self):
-        return self.beds
+        # Salinan diambil di dalam lock agar jsonify tidak membaca dict yang
+        # sedang diubah worker MQTT.
+        with self._lock:
+            return deepcopy(self.beds)
+
+    def get_bed(self, bed_id):
+        with self._lock:
+            bed = self.beds.get(bed_id)
+            return deepcopy(bed) if bed is not None else None
