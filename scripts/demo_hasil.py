@@ -36,8 +36,19 @@ def latest_recording():
     return files[-1] if files else None
 
 
+def _ppg_pulse(x):
+    """Satu denyut PPG terhadap waktu sejak onset (detik): naik curam, puncak
+    membulat, lalu bahu dicrotic yang menempel di lereng turun."""
+    peak = 0.15
+    # Gaussian asimetris: naik cepat sebelum puncak, turun sedikit lebih lambat.
+    width = np.where(x < peak, 0.055, 0.075)
+    systolic = np.exp(-((x - peak) ** 2) / (2 * width ** 2))
+    shoulder = 0.33 * np.exp(-((x - (peak + 0.16)) ** 2) / (2 * 0.045 ** 2))  # bahu dicrotic
+    return systolic + shoulder
+
+
 def example_signals(hr, rr, seconds=10.0, fs=125, seed=7):
-    """ECG (P-QRS-T) dan PPG (sistolik + dicrotic notch) sintetis yang bersih."""
+    """ECG (P-QRS-T) dan PPG sintetis yang bersih, skala mirip satuan ADC perangkat."""
     rng = np.random.default_rng(seed)
     t = np.arange(0, seconds, 1 / fs)
     hr = float(np.clip(hr, 40, 160))
@@ -48,16 +59,16 @@ def example_signals(hr, rr, seconds=10.0, fs=125, seed=7):
     while beat < seconds + 1:
         # Variasi detak kecil (HRV) agar tidak terlihat seperti sinus sempurna.
         period = 60.0 / hr * (1 + 0.03 * np.sin(2 * np.pi * rr / 60 * beat) + rng.normal(0, 0.01))
-        for amp, offset, width in ((0.12, -0.20, 0.025), (-0.10, -0.035, 0.010), (1.20, 0.0, 0.012),
-                                   (-0.28, 0.035, 0.012), (0.32, 0.26, 0.045)):
+        for amp, offset, width in ((0.14, -0.19, 0.025), (-0.12, -0.035, 0.010), (1.30, 0.0, 0.013),
+                                   (-0.75, 0.035, 0.014), (0.70, 0.24, 0.045)):
             ecg += amp * np.exp(-((t - beat - offset) ** 2) / (2 * width ** 2))
-        for amp, offset, width in ((1.0, 0.20, 0.065), (0.38, 0.45, 0.060)):
-            ppg += amp * np.exp(-((t - beat - offset) ** 2) / (2 * width ** 2))
+        # Onset PPG ~0.18 s setelah puncak R (waktu tempuh nadi ke jari).
+        ppg += (1 + rng.normal(0, 0.03)) * _ppg_pulse(t - beat - 0.18)
         beat += period
     breathing = np.sin(2 * np.pi * rr / 60 * t)
-    ecg += 0.03 * breathing + rng.normal(0, 0.008, t.size)
-    ppg = ppg * (1 + 0.06 * breathing) + rng.normal(0, 0.004, t.size)
-    return t, ecg, ppg - ppg.mean()
+    ecg = 650 * (ecg + 0.04 * breathing) + rng.normal(0, 3, t.size)
+    ppg = 55 * ppg * (1 + 0.05 * breathing) + rng.normal(0, 0.08, t.size)
+    return t, ecg - np.median(ecg), ppg - ppg.mean()
 
 
 def load_results(json_path, signal="contoh", pain=None):
