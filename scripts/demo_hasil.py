@@ -5,9 +5,11 @@ Contoh (dari folder repo):
     python scripts/demo_hasil.py --bed 05              # nomor bed yang ditampilkan
     python scripts/demo_hasil.py --file data_pengukuran/20260803_165308_Bed03.json
     python scripts/demo_hasil.py --kirim               # kirim sungguhan ke backend (.env)
+    python scripts/demo_hasil.py --sinyal rekaman      # grafik dari rekaman, bukan contoh
 
-Tanpa --kirim tidak ada data yang dikirim ke backend/dashboard; alokasi bed
-disimulasikan. Esc atau Q untuk keluar.
+Grafik default memakai sinyal CONTOH (sintetis, bersih) dengan HR/RR rekaman;
+jangan disajikan sebagai hasil sensor. Tanpa --kirim tidak ada data yang dikirim
+ke backend/dashboard; alokasi bed disimulasikan. Esc atau Q untuk keluar.
 """
 import argparse
 import json
@@ -34,12 +36,36 @@ def latest_recording():
     return files[-1] if files else None
 
 
-def load_results(json_path):
+def example_signals(hr, rr, seconds=10.0, fs=125, seed=7):
+    """ECG (P-QRS-T) dan PPG (sistolik + dicrotic notch) sintetis yang bersih."""
+    rng = np.random.default_rng(seed)
+    t = np.arange(0, seconds, 1 / fs)
+    hr = float(np.clip(hr, 40, 160))
+    rr = float(np.clip(rr, 8, 40))
+    ecg = np.zeros_like(t)
+    ppg = np.zeros_like(t)
+    beat = 0.3
+    while beat < seconds + 1:
+        # Variasi detak kecil (HRV) agar tidak terlihat seperti sinus sempurna.
+        period = 60.0 / hr * (1 + 0.03 * np.sin(2 * np.pi * rr / 60 * beat) + rng.normal(0, 0.01))
+        for amp, offset, width in ((0.12, -0.20, 0.025), (-0.10, -0.035, 0.010), (1.20, 0.0, 0.012),
+                                   (-0.28, 0.035, 0.012), (0.32, 0.26, 0.045)):
+            ecg += amp * np.exp(-((t - beat - offset) ** 2) / (2 * width ** 2))
+        for amp, offset, width in ((1.0, 0.20, 0.065), (0.38, 0.45, 0.060)):
+            ppg += amp * np.exp(-((t - beat - offset) ** 2) / (2 * width ** 2))
+        beat += period
+    breathing = np.sin(2 * np.pi * rr / 60 * t)
+    ecg += 0.03 * breathing + rng.normal(0, 0.008, t.size)
+    ppg = ppg * (1 + 0.06 * breathing) + rng.normal(0, 0.004, t.size)
+    return t, ecg, ppg - ppg.mean()
+
+
+def load_results(json_path, signal="contoh", pain=None):
     """Bentuk dictionary hasil seperti keluaran ProcessingWorker dari file .json + .csv."""
     meta = json.loads(Path(json_path).read_text(encoding="utf-8")) if json_path else {}
     results = {
         "gcs": meta.get("GCS Score", 15),
-        "pain_score": meta.get("Pain Score"),
+        "pain_score": pain if pain is not None else meta.get("Pain Score"),
         "hr": float(meta.get("HR", 80.0)),
         "rr": float(meta.get("RR", 18.0)),
         "spo2": float(meta.get("SpO2", 97.0)),
@@ -53,17 +79,14 @@ def load_results(json_path):
         "rr_measured": True,
     }
     csv_path = Path(json_path).with_suffix(".csv") if json_path else None
-    if csv_path and csv_path.exists():
+    if signal == "rekaman" and csv_path and csv_path.exists():
         df = pd.read_csv(csv_path).dropna(subset=["Resample Time (s)", "ECG_Clean", "PPG_IR_Clean"])
         results["time_125"] = df["Resample Time (s)"].to_numpy()
         results["ecg_smooth"] = df["ECG_Clean"].to_numpy()
         results["ir_clean"] = df["PPG_IR_Clean"].to_numpy()
     else:
-        # Sinyal sintetis bila rekaman tidak ada, agar grafik tetap terisi.
-        t = np.arange(0, 10, 1 / 125)
-        results["time_125"] = t
-        results["ecg_smooth"] = np.sin(2 * np.pi * 1.3 * t) ** 15
-        results["ir_clean"] = np.sin(2 * np.pi * 1.3 * t)
+        t, ecg, ppg = example_signals(results["hr"], results["rr"])
+        results["time_125"], results["ecg_smooth"], results["ir_clean"] = t, ecg, ppg
     return results
 
 
@@ -90,10 +113,16 @@ def main():
     parser.add_argument("--bed", help="nomor bed yang ditampilkan saat simulasi, mis. 05")
     parser.add_argument("--kirim", action="store_true", help="kirim sungguhan ke backend sesuai .env")
     parser.add_argument("--jendela", action="store_true", help="jendela 1280x800, bukan layar penuh")
+    parser.add_argument("--sinyal", choices=("contoh", "rekaman"), default="contoh",
+                        help="grafik: contoh sintetis yang bersih (default) atau sinyal rekaman")
+    parser.add_argument("--nyeri", type=int, choices=range(0, 11), metavar="0-10",
+                        help="pain score yang ditampilkan (rekaman lama belum punya)")
     args = parser.parse_args()
 
     json_path = Path(args.file) if args.file else latest_recording()
-    print(f"[DEMO] Rekaman: {json_path or 'tidak ada, memakai data sintetis'}")
+    print(f"[DEMO] Rekaman: {json_path or 'tidak ada, memakai nilai default'}")
+    if args.sinyal == "contoh":
+        print("[DEMO] Grafik memakai sinyal CONTOH (sintetis), bukan hasil sensor.")
 
     app = QApplication(sys.argv)
     import GUI.output_page as output_page
@@ -101,7 +130,7 @@ def main():
         output_page.TriageApiClient = lambda: SimulatedClient(args.bed)
     page = output_page.OutputPage()
     page.setWindowTitle("TriaGO - Demo Halaman Hasil")
-    page.update_results(load_results(json_path))
+    page.update_results(load_results(json_path, args.sinyal, args.nyeri))
     for key in ("Esc", "Q"):
         QShortcut(QKeySequence(key), page, activated=app.quit)
     page.home_requested.connect(app.quit)

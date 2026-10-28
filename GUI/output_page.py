@@ -79,19 +79,21 @@ class OutputPage(QWidget):
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
 
+        header_layout.addStretch()
+
         self.triage_container = QHBoxLayout()
         self.triage_container.setSpacing(10)
         
         self.badge_color = QFrame()
-        self.badge_color.setFixedSize(40, 40)
+        self.badge_color.setFixedSize(48, 48)
         self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
         
         self.lbl_status_text = QLabel("RESUSITASI")
         self.lbl_status_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_status_text.setFixedHeight(40)
-        self.lbl_status_text.setMinimumWidth(160)
+        self.lbl_status_text.setFixedHeight(48)
+        self.lbl_status_text.setMinimumWidth(0)
         self.lbl_status_text.setStyleSheet("""
-            font-size: 20px; font-weight: 900; color: #FFFFFF;
+            font-size: 24px; font-weight: 900; color: #FFFFFF;
             background-color: #FF8A8A; border-radius: 8px; 
             padding-left: 12px; padding-right: 12px;
         """)
@@ -99,13 +101,12 @@ class OutputPage(QWidget):
         # Tujuan pasien: zona dari kategori triase, nomor bed dari backend.
         self.lbl_assignment = QLabel("")
         self.lbl_assignment.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_assignment.setFixedHeight(40)
-        self.lbl_assignment.setMinimumWidth(280)
+        self.lbl_assignment.setFixedHeight(48)
+        self.lbl_assignment.setMinimumWidth(0)
 
         self.triage_container.addWidget(self.badge_color)
-        self.triage_container.addWidget(self.lbl_status_text, stretch=1)
-        self.triage_container.addWidget(self.lbl_assignment, stretch=1)
-        header_layout.addLayout(self.triage_container, stretch=1)
+        self.triage_container.addWidget(self.lbl_status_text, stretch=2)
+        self.triage_container.addWidget(self.lbl_assignment, stretch=3)
 
         lbl_logo = QLabel()
         lbl_logo.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -121,6 +122,7 @@ class OutputPage(QWidget):
         header_layout.addWidget(lbl_logo)
 
         main_layout.addLayout(header_layout)
+        main_layout.addLayout(self.triage_container)
 
         # =========================================================================
         # 2. BODY LAYOUT (3 BARIS)
@@ -407,7 +409,7 @@ class OutputPage(QWidget):
             self.lbl_assignment.setText(f"ZONA {ZONE_LABELS.get(zone, zone.upper())} · {bed_text.upper()}")
             color = ZONE_COLORS.get(zone, "#214889")
         self.lbl_assignment.setStyleSheet(
-            f"font-size: 18px; font-weight: 900; color: {color}; background-color: #FFFFFF; "
+            f"font-size: 24px; font-weight: 900; color: {color}; background-color: #FFFFFF; "
             f"border: 2px solid {color}; border-radius: 8px; padding-left: 12px; padding-right: 12px;")
 
     def _poll_assignment(self):
@@ -450,19 +452,19 @@ class OutputPage(QWidget):
         if "RESUSITASI" in st or "MERAH" in st or "RED" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
             self.lbl_status_text.setText("RESUSITASI")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FFEBEE; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #FF5252;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FFEBEE; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #FF5252;")
         elif "NON" in st or "HIJAU" in st or "GREEN" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
         elif "DARURAT" in st or "KUNING" in st or "YELLOW" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
         else:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
         self.assignment_timer.stop()
