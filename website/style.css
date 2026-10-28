@@ -634,26 +634,10 @@ textarea.form-input{
   background:#F3F7EF;
 }
 
-/* ---------- Panel kanan & tombol layar penuh ---------- */
+/* ---------- Panel kanan ---------- */
 
 .detail-panel{
   margin-bottom:18px;
-}
-
-.btn-fullscreen{
-  margin-top:8px;
-  padding:5px 12px;
-  background:#fff;
-  color:var(--navy-soft);
-  border:1.5px solid var(--border-strong);
-  border-radius:999px;
-  font-size:11px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.btn-fullscreen:hover{
-  background:#F3F7EF;
 }
 
 /* ---------- Mode monitor (layar landscape >= 1024px) ----------
@@ -677,8 +661,8 @@ header{
   margin-bottom:clamp(8px,1.6vh,20px);
 }
 
-.title-block h1{ font-size:clamp(20px,3vh,34px); }
-.title-block p{ font-size:clamp(12px,1.5vh,16px); }
+.title-block h1{ font-size:clamp(28px,4.6vh,54px); line-height:1.1; }
+.title-block p{ font-size:clamp(13px,1.9vh,22px); }
 .clock-time{ font-size:clamp(20px,3.2vh,38px); }
 .clock-date,
 .clock-facility{ font-size:clamp(11px,1.4vh,16px); }
@@ -748,8 +732,9 @@ header{
 }
 
 .detail-panel{
-  flex:1;
+  flex:0 1 auto;
   min-height:0;
+  max-height:44vh;
   overflow-y:auto;
   margin-bottom:clamp(10px,1.6vh,18px);
 }
@@ -760,7 +745,8 @@ header{
 .cap-row{ font-size:clamp(13px,1.6vh,18px); padding:clamp(6px,1vh,10px) 0; }
 
 .logo-block{
-  flex:none;
+  flex:1 0 auto;
+  align-items:flex-end;
   margin-top:clamp(8px,1.4vh,18px);
 }
 
@@ -828,8 +814,4 @@ padding:12px;
 grid-template-columns:1fr;
 }
 
-}
-/* Tombol layar penuh hanya berguna di monitor. */
-@media(max-width:900px){
-.btn-fullscreen{display:none;}
 }

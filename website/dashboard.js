@@ -331,17 +331,6 @@ function tickClock() {
   document.getElementById('clockDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
-// Layar penuh untuk monitor IGD (F11 juga bisa).
-function toggleFullscreen() {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen?.();
-}
-
-document.addEventListener('fullscreenchange', () => {
-  const button = document.getElementById('btnFullscreen');
-  if (button) button.textContent = document.fullscreenElement ? 'Keluar layar penuh' : 'Layar penuh';
-});
-
 document.addEventListener('DOMContentLoaded', () => {
   fetchInitialBeds();
   tickClock();
