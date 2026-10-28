@@ -81,7 +81,8 @@ function renderFloor() {
 
   const layout = floorLayout(bedsData);
   container.style.gridTemplateColumns = `repeat(${layout.cols},minmax(0,1fr))`;
-  container.style.gridTemplateRows = `repeat(${layout.rows},auto)`;
+  // Baris sama tinggi: di mode monitor denah mengisi sisa layar.
+  container.style.gridTemplateRows = `repeat(${layout.rows},minmax(0,1fr))`;
   const inner = `2 / ${layout.cols}`;
   container.querySelector('.floor-entrance').style.gridColumn = inner;
   const station = container.querySelector('.nurse-station');
@@ -329,6 +330,17 @@ function tickClock() {
   document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
   document.getElementById('clockDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
 }
+
+// Layar penuh untuk monitor IGD (F11 juga bisa).
+function toggleFullscreen() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen?.();
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const button = document.getElementById('btnFullscreen');
+  if (button) button.textContent = document.fullscreenElement ? 'Keluar layar penuh' : 'Layar penuh';
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchInitialBeds();

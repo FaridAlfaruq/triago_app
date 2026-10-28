@@ -634,6 +634,140 @@ textarea.form-input{
   background:#F3F7EF;
 }
 
+/* ---------- Panel kanan & tombol layar penuh ---------- */
+
+.detail-panel{
+  margin-bottom:18px;
+}
+
+.btn-fullscreen{
+  margin-top:8px;
+  padding:5px 12px;
+  background:#fff;
+  color:var(--navy-soft);
+  border:1.5px solid var(--border-strong);
+  border-radius:999px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-fullscreen:hover{
+  background:#F3F7EF;
+}
+
+/* ---------- Mode monitor (layar landscape >= 1024px) ----------
+   Seluruh dashboard pas satu layar tanpa scroll, untuk monitor/TV IGD.
+   Ukuran mengikuti tinggi layar (vh) agar sama terbaca di 768p dan 1080p. */
+@media (min-width:1024px) and (min-aspect-ratio:4/3){
+
+html,body{
+  height:100%;
+  overflow:hidden;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+  padding:clamp(12px,2.2vh,28px) clamp(16px,2vw,40px);
+}
+
+header{
+  flex:none;
+  margin-bottom:clamp(8px,1.6vh,20px);
+}
+
+.title-block h1{ font-size:clamp(20px,3vh,34px); }
+.title-block p{ font-size:clamp(12px,1.5vh,16px); }
+.clock-time{ font-size:clamp(20px,3.2vh,38px); }
+.clock-date,
+.clock-facility{ font-size:clamp(11px,1.4vh,16px); }
+
+.stats-row{
+  flex:none;
+  margin-bottom:clamp(8px,1.6vh,20px);
+}
+
+.stat-col{ gap:clamp(4px,.8vh,8px); }
+
+.pill-badge{
+  padding:clamp(4px,.9vh,10px) 0;
+  font-size:clamp(16px,2.4vh,28px);
+}
+
+.stat-card{ height:clamp(52px,9vh,110px); }
+.stat-card .n{ font-size:clamp(28px,5vh,56px); }
+.stat-card .l{ font-size:clamp(12px,1.8vh,20px); margin-top:2px; }
+
+.layout{
+  flex:1;
+  min-height:0;
+  grid-template-columns:minmax(0,1fr) clamp(280px,21vw,400px);
+  align-items:stretch;
+}
+
+.wrapper{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  padding:clamp(12px,1.8vh,22px);
+}
+
+.panel-title{
+  flex:none;
+  margin-bottom:clamp(8px,1.4vh,16px);
+  font-size:clamp(14px,1.8vh,20px);
+}
+
+.legend-item{ font-size:clamp(11px,1.4vh,15px); }
+
+.igd-floor{
+  flex:1;
+  min-height:0;
+  gap:clamp(6px,1.2vh,14px);
+}
+
+.bed{
+  aspect-ratio:auto;
+  min-height:0;
+  border-radius:clamp(10px,1.4vh,16px);
+}
+
+.bed-id{ font-size:clamp(16px,3vh,34px); }
+.bed-cat{ font-size:clamp(10px,1.5vh,17px); }
+.bed-timer{ font-size:clamp(10px,1.5vh,17px); }
+.bed-zone{ font-size:clamp(9px,1.3vh,15px); }
+
+.floor-entrance{ font-size:clamp(11px,1.4vh,15px); }
+.nurse-station{ font-size:clamp(13px,2vh,22px); }
+
+.side-column{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.detail-panel{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  margin-bottom:clamp(10px,1.6vh,18px);
+}
+
+#bedDetailContent .modal-row{ font-size:clamp(12px,1.5vh,17px); }
+#bedDetailContent p{ font-size:clamp(12px,1.4vh,16px) !important; }
+.detail-section{ font-size:clamp(11px,1.3vh,14px); }
+.cap-row{ font-size:clamp(13px,1.6vh,18px); padding:clamp(6px,1vh,10px) 0; }
+
+.logo-block{
+  flex:none;
+  margin-top:clamp(8px,1.4vh,18px);
+}
+
+.logo-img{ width:clamp(140px,11vw,240px); }
+
+}
+
 @media(max-width:900px){
 
 .layout{
@@ -694,4 +828,8 @@ padding:12px;
 grid-template-columns:1fr;
 }
 
+}
+/* Tombol layar penuh hanya berguna di monitor. */
+@media(max-width:900px){
+.btn-fullscreen{display:none;}
 }
