@@ -7,8 +7,8 @@ direction = DigitalOutputDevice(21)
 
 # PENGATURAN MANUAL
 ARAH = "CCW"  # Pilih "CW" (maju) atau "CCW" (mundur)
-JUMLAH_STEP = 200  # Jumlah langkah per eksekusi (misal: 50, 100, 200)
-DELAY = 0.004  # Kecepatan gerak (makin besar nilainya makin pelan)
+JUMLAH_STEP = 20  # Jumlah langkah per eksekusi (misal: 50, 100, 200)
+DELAY = 0.04  # Kecepatan gerak (makin besar nilainya makin pelan)
 
 try:
     # Tentukan arah
