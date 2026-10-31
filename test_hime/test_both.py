@@ -12,7 +12,7 @@ SW_END = DigitalInputDevice(26, pull_up=True)
 # Nilai saat saklar tertabrak:
 # 1 = jika pakai COM + NC
 # 0 = jika pakai COM + NO
-HIT_VALUE = 1  
+HIT_VALUE = 0  
 
 # Arah gerakan (1 = maju/atas, 0 = mundur/bawah)
 DIR_PIN.value = 1 # CW (menjauhi stepper motor) # CCW/0 (mendekati stepper motor)
