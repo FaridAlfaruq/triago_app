@@ -1,45 +1,46 @@
+
 import time
 from gpiozero import DigitalOutputDevice, DigitalInputDevice
 
-# Pin Stepper
-DIR_PIN = DigitalOutputDevice(20)
-STEP_PIN = DigitalOutputDevice(21)
+DIR = DigitalOutputDevice(20)
+STEP = DigitalOutputDevice(21)
+START = DigitalInputDevice(16, pull_up=True)
+END = DigitalInputDevice(26, pull_up=True)
 
-# Pin Limit Switch
-SW_START = DigitalInputDevice(16, pull_up=True)
-SW_END = DigitalInputDevice(26, pull_up=True)
+SPEED = 0.001
+HIT = 0
 
-# Nilai saat saklar tertabrak:
-# 1 = jika pakai COM + NC
-# 0 = jika pakai COM + NO
-HIT_VALUE = 0  
-
-# Arah gerakan (1 = maju/atas, 0 = mundur/bawah)
-DIR_PIN.value = 1 # CW (menjauhi stepper motor) # CCW/0 (mendekati stepper motor)
-
-print("Motor berjalan... Tekan limit switch untuk STOP.")
+direction = "CCW"
 
 try:
     while True:
-        # Cek saklar sebelum melangkah
-        if SW_START.value == HIT_VALUE:
-            print("\n[STOP] Switch START (GPIO 16) tertabrak!")
-            break
+        DIR.value = 1 if direction == "CW" else 0
 
-        if SW_END.value == HIT_VALUE:
-            print("\n[STOP] Switch END (GPIO 26) tertabrak!")
-            break
+        if direction == "CCW" and START.value == HIT:
+            direction = "CW"
+            print("START tersentuh -> CW")
+            time.sleep(0.2)
+            continue
 
-        # 1 Langkah (Step pulse)
-        STEP_PIN.on()
-        time.sleep(0.1)  # Kecepatan (makin kecil makin cepat)
-        STEP_PIN.off()
-        time.sleep(0.1)
+        if direction == "CW" and END.value == HIT:
+            direction = "CCW"
+            print("END tersentuh -> CCW")
+            time.sleep(0.2)
+            continue
+
+        STEP.on()
+        time.sleep(SPEED)
+        STEP.off()
+        time.sleep(SPEED)
 
 except KeyboardInterrupt:
-    print("\nDihentikan manual.")
+    print("Dihentikan manual.")
 
 finally:
-    STEP_PIN.off()
-    DIR_PIN.off()
-    print("Selesai.")
+    STEP.off()
+    DIR.off()
+    STEP.close()
+    DIR.close()
+    START.close()
+    END.close()
+    print("Pengujian selesai.")
