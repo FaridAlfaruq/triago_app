@@ -258,13 +258,35 @@ class PlotPage(QWidget):
         main_layout.addWidget(ppg_frame, stretch=1)
 
     def start_session(self, patient_info):
+        # Simpan informasi pasien
         self.patient_data = patient_info
+
+        # Reset buffer pengukuran
         self.recorded_data = []
         self.time_buffer.clear()
         self.ecg_buffer.clear()
         self.ppg_buffer.clear()
 
+        # Reset filter agar sesi baru tidak mewarisi state sebelumnya
+        self.live_filter = LiveSignalFilter()
+
+        # Reset counter dan progress
+        self.ui_update_counter = 0
         self.progress_bar.setValue(0)
+
+        # Pastikan tidak ada worker dari sesi sebelumnya
+        self.close_threads()
+
+        # Aktifkan penerimaan data sensor
+        self.is_recording = True
+
+        # Buat dan jalankan worker STM32
+        self.worker = STM32Worker()
+        self.worker.data_received.connect(self.handle_new_packet)
+        self.worker.error_occurred.connect(self._handle_sensor_error)
+        self.worker.start()
+
+        print("[LOG STM32] Worker akuisisi sensor berhasil dijalankan.")
 
     def _handle_sensor_error(self, message):
         self.is_recording = False
