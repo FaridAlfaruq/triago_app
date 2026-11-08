@@ -165,29 +165,67 @@ class ProcessingWorker(QThread):
             gcs_val = float(patient.get('gcs') if patient.get('gcs') is not None else 15)
             pain_val = float(patient.get('pain_score') if patient.get('pain_score') is not None else 0)
 
+
             # -----------------------------------------------------------------
             # TAHAP 3.5: SQA 10s Window (Stride 2s) & Deep Learning BPNet Inference
+            # ECG + PPG Inframerah, Tanpa Kalibrasi Manset
             # -----------------------------------------------------------------
             bp_res = {}
             sqa_error = None
-            cuff, raw_sample = patient.pop("cuff_reference", (None, None))
+
             if self.bpnet_predictor is None:
                 sqa_error = "Model BP revisi tidak tersedia."
-            elif self.raw_ir is not None and len(self.raw_time) >= 2:
+
+            elif (
+                self.raw_ecg is not None
+                and self.raw_ir is not None
+                and self.raw_time is not None
+                and len(self.raw_time) >= 2
+            ):
                 try:
-                    bp_ecg, bp_ppg = preprocess_revised_bp(self.raw_time, self.raw_ecg, self.raw_time, self.raw_ir)
-                    cuff_sample = int(raw_sample * 125 / self.fs_orig) if raw_sample is not None else None
-                    bp_res = self.bpnet_predictor.predict_recording(
-                        bp_ecg, bp_ppg, cuff_reference=cuff, cuff_sample=cuff_sample
+                    # Preprocessing menggunakan ECG dan PPG inframerah.
+                    # Kedua sinyal diproses berdasarkan timestamp masing-masing.
+                    bp_ecg, bp_ppg = preprocess_revised_bp(
+                        self.raw_time,
+                        self.raw_ecg,
+                        self.raw_time,
+                        self.raw_ir
                     )
+
+                    # Inferensi BP tanpa referensi manset.
+                    bp_res = self.bpnet_predictor.predict_recording(
+                        bp_ecg,
+                        bp_ppg
+                    )
+
                 except Exception as exc:
                     sqa_error = f"Gagal inferensi BP: {exc}"
                     print(f"[ERROR BPNET] {sqa_error}")
+
+            else:
+                sqa_error = "Sinyal ECG atau PPG inframerah tidak tersedia."
+
+            # Ambil hasil estimasi tekanan darah dan evaluasi kualitas sinyal.
             sqa_passed = bp_res.get("sqa_passed", False)
             passed_segments = bp_res.get("passed_segments", 0)
             total_segments = bp_res.get("total_segments", 0)
-            sys_val, dia_val = bp_res.get("sbp"), bp_res.get("dbp")
+
+            sys_val = bp_res.get("sbp")
+            dia_val = bp_res.get("dbp")
+
+            # Status yang diharapkan: uncalibrated apabila inferensi berhasil
+            # tanpa referensi manset.
             bp_mode = bp_res.get("bp_mode", "unavailable")
+
+            print(
+                f"[BPNET] SBP={sys_val}, DBP={dia_val}, "
+                f"Mode={bp_mode}, "
+                f"SQA={passed_segments}/{total_segments}"
+            )
+
+            if sqa_error:
+                print(f"[WARN BPNET] {sqa_error}")
+
 
             # Susun tanda vital mentah untuk ONNX XGBoost Triase (11 fitur)
             raw_data = {
