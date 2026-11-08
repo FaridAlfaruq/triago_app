@@ -36,7 +36,7 @@ class OutputPage(QWidget):
         self.iot_json_payload = ""
         
         # Inisialisasi API Client (Menghubungkan ke IP Server Laptop B)
-        self.api_client = TriageApiClient(base_url="http://10.85.145.98:5000") if TriageApiClient else None
+        self.api_client = TriageApiClient() if TriageApiClient else None
         
         self.setup_ui()
 
@@ -296,7 +296,6 @@ class OutputPage(QWidget):
 
         # 5. Pengiriman Payload ke Flask API Backend
         if self.api_client and triage_valid:
-            bed_id = data.get("bed", "A1")
             vitals_dict = {
                 "hr": hr,
                 "spo2": spo2,
@@ -309,16 +308,16 @@ class OutputPage(QWidget):
             xgb_score = data.get("xgboost_score", 0.0)
 
             is_sent = self.api_client.send_triage_result(
-                bed_id=bed_id,
                 gcs_score=gcs,
                 vitals=vitals_dict,
                 classification=triage_cat,
-                score=xgb_score
+                score=xgb_score,
+                pain_score=pain,
             )
             if is_sent:
-                print(f"[GUI LOG] [BERHASIL] Data pengukuran Bed {bed_id} telah terkirim ke backend dan diproses ke database.")
+                print(f"[GUI LOG] Status pengiriman: {self.api_client.last_delivery_status}")
             else:
-                print(f"[GUI LOG] [GAGAL] Data pengukuran Bed {bed_id} TIDAK terkirim ke backend / database.")
+                print("[GUI LOG] Pengiriman hasil triase gagal.")
         elif self.api_client:
             print(
                 "[WARN API] Hasil triase tidak dikirim karena inferensi model gagal: "
