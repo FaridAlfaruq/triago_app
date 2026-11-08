@@ -249,8 +249,25 @@ class ProcessingWorker(QThread):
 
             if not AUTOMATIC_TRIAGE_VALIDATED:
                 triage_error = "Triase otomatis menunggu validasi suhu, tekanan darah, dan Raspberry Pi."
-            elif temp_val is None or bp_mode != "calibrated" or input_warnings:
-                triage_error = "Input pengukuran belum memenuhi syarat triase otomatis."
+            
+            
+            elif temp_val is None:
+                triage_error = "Suhu tubuh tidak tersedia."
+            elif self.triage_predictor is not None:
+                try:
+                    label, conf, proba = self.triage_predictor.predict(raw_data)
+                    triage_label = label
+                    triage_valid = True
+                    triage_error = None
+                    triage_score = conf
+                    triage_probabilities = list(proba)
+
+                    print(f"[ONNX] {label} (confidence={conf:.4f})")
+                except Exception as exc:
+                    triage_error = f"Kesalahan saat inferensi ONNX: {exc}"
+                    print(f"[ERROR ONNX] {triage_error}")
+            
+            
             elif self.triage_predictor is not None:
                 try:
                     label, conf, proba = self.triage_predictor.predict(raw_data)
