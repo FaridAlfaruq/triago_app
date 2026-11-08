@@ -256,7 +256,16 @@ class OutputPage(QWidget):
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C" if temp_skin is not None else "")
 
         # 2. Update Header Triase UI
-        triage_valid = data.get("triage_valid") is True and has_bp and bp_mode == "uncalibrated" and temp_core is not None
+        triage_valid = data.get("triage_valid") is True
+
+        triage_status_text = (
+            data.get("triage_status", "TIDAK TERSEDIA")
+            if triage_valid
+            else "TIDAK TERSEDIA"
+        )
+
+        self.update_triage_header(triage_status_text)
+
         triage_status_text = data["triage_status"] if triage_valid else "TIDAK TERSEDIA"
         self.update_triage_header(triage_status_text)
         input_warnings = data.get("triage_input_warnings", [])
