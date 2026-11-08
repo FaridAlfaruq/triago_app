@@ -17,6 +17,7 @@ from GUI.loading_page import LoadingPage
 from GUI.output_page import OutputPage
 from GUI.plot_page import PlotPage
 from GUI.regist_page import RegistrationPage
+from model.temperature_estimation import temperature_samples
 
 
 # =====================================================================
@@ -110,22 +111,16 @@ class TriaGoApplication(QMainWindow):
             raw_red = np.array([p["ppg"]["red"] for p in raw_data_list])
             raw_ir = np.array([p["ppg"]["ir"] for p in raw_data_list])
 
-            skin_temp = self.current_patient_info.get("temp_skin", 36.5)
-            amb_temp = self.current_patient_info.get("temp_ambient", 31.52)
-            
-            raw_temp_obj = np.array([
-                p.get("temp_skin", p.get("temp_obj", p.get("temperature", {}).get("object", skin_temp)))
-                for p in raw_data_list
-            ]) if raw_data_list else np.array([])
-            
-            raw_temp_amb = np.array([
-                p.get("temp_ambient", p.get("temp_amb", p.get("temperature", {}).get("ambient", amb_temp)))
-                for p in raw_data_list
-            ]) if raw_data_list else np.array([])
-
-            self.current_patient_info["raw_temp_obj"] = raw_temp_obj
-            self.current_patient_info["raw_temp_amb"] = raw_temp_amb
-            print(f"[LOG MAIN_GUI] Data Suhu Pasien Siap -> Kulit: {skin_temp}°C | Lingkungan: {amb_temp}°C (Populated {len(raw_temp_obj)} samples)")
+            skin = temperature_samples([
+                packet.get("temp_skin", packet.get("temp_obj", (packet.get("temperature") or {}).get("object")))
+                for packet in raw_data_list
+            ], -70, 380)
+            ambient = temperature_samples([
+                packet.get("temp_ambient", packet.get("temp_amb", (packet.get("temperature") or {}).get("ambient")))
+                for packet in raw_data_list
+            ], -40, 125)
+            self.current_patient_info["raw_temp_obj"] = skin
+            self.current_patient_info["raw_temp_amb"] = ambient
 
             # Oper data ke LoadingPage
             self.page_loading.start_processing(
@@ -151,9 +146,6 @@ class TriaGoApplication(QMainWindow):
         if hasattr(self.page_output, "update_results"):
             self.page_output.update_results(calculation_results)
             
-        triage_status = calculation_results.get("triage_status", "NON-DARURAT")
-        self.page_output.update_triage_header(triage_status)
-        
         # 3. Pindah ke Halaman Output (Index 4)
         self.stacked_widget.setCurrentIndex(4)
 
@@ -188,8 +180,8 @@ class TriaGoApplication(QMainWindow):
             ir_clean = results.get("ir_clean", [])
             ecg_clean = results.get("ecg_smooth", [])
             
-            temp_obj = results.get("temp_skin", results.get("temperature", 36.5))
-            temp_amb = results.get("temp_ambient", 31.52)
+            temp_obj = results.get("temp_skin")
+            temp_amb = results.get("temp_ambient")
             
             n_raw = len(raw_time) if len(raw_time) > 0 else (len(time_125) if len(time_125) > 0 else 1)
             
@@ -227,12 +219,13 @@ class TriaGoApplication(QMainWindow):
                 "SpO2": float(results.get("spo2", 0.0)),
                 "PI Red": float(results.get("pi_red", 0.0)),
                 "PI IR": float(results.get("pi_ir", 0.0)),
-                "SBP": float(results.get("systolic", 120)),
-                "DBP": float(results.get("diastolic", 80)),
-                "Suhu Core": float(results.get("temperature", 36.5)),
-                "Suhu Skin": float(results.get("temp_skin", temp_obj)),
-                "Suhu Amb": float(results.get("temp_ambient", temp_amb)),
-                "Triage Status": str(results.get("triage_status", "DARURAT")),
+                "SBP": results.get("systolic") if results.get("bp_mode") == "calibrated" else None,
+                "DBP": results.get("diastolic") if results.get("bp_mode") == "calibrated" else None,
+                "BP Mode": results.get("bp_mode", "unavailable"),
+                "Suhu Core": results.get("temperature"),
+                "Suhu Skin": temp_obj,
+                "Suhu Amb": temp_amb,
+                "Triage Status": str(results.get("triage_status", "TIDAK TERSEDIA")),
                 "Triage Confidence": float(results.get("xgboost_score", 0.0))
             }
             with open(json_filename, "w", encoding="utf-8") as f:
