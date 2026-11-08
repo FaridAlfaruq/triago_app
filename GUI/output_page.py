@@ -218,14 +218,14 @@ class OutputPage(QWidget):
         """Memperbarui UI parameter medis, merender grafik ECG/PPG, dan kirim API Backend."""
         self.calculation_results = data
 
-        temp_core = data.get("temperature", 36.5)
-        temp_skin = data.get("temp_skin", 34.5)
+        temp_core = data.get("temperature")
+        temp_skin = data.get("temp_skin")
 
         hr = data.get("hr", 0.0)
         rr = data.get("rr", 0.0)
         spo2 = data.get("spo2", 0.0)
-        sys_bp = data.get("systolic", 120)
-        dia_bp = data.get("diastolic", 80)
+        sys_bp = data.get("systolic")
+        dia_bp = data.get("diastolic")
         gcs = data.get("gcs", 15)
         pain = data.get("pain_score", 0)
 
@@ -246,14 +246,18 @@ class OutputPage(QWidget):
 
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         
-        self.lbl_bp_val.setText(f"{int(sys_bp)}/{int(dia_bp)} mmHg")
-        self.lbl_bp_sub.setText(f"MAP: {int(dia_bp + (sys_bp - dia_bp)/3)} mmHg")
+        bp_mode = data.get("bp_mode", "unavailable")
+        bp_label = {"calibrated": "Calibrated estimate", "uncalibrated": "Uncalibrated estimate"}.get(bp_mode)
+        has_bp = sys_bp is not None and dia_bp is not None and bp_label is not None
+        self.lbl_bp_val.setText(f"{sys_bp:.1f}/{dia_bp:.1f} mmHg" if has_bp else "BP unavailable")
+        self.lbl_bp_sub.setText(bp_label if has_bp else "")
 
-        self.lbl_temp_val.setText(f"{temp_core:.1f} °C")
-        self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C")
+        self.lbl_temp_val.setText(f"{temp_core:.1f} °C" if temp_core is not None else "Temperature unavailable")
+        self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C" if temp_skin is not None else "")
 
         # 2. Update Header Triase UI
-        triage_status_text = data.get("triage_status", "NON-DARURAT")
+        triage_valid = data.get("triage_valid") is True and has_bp and bp_mode == "calibrated" and temp_core is not None
+        triage_status_text = data["triage_status"] if triage_valid else "TIDAK TERSEDIA"
         self.update_triage_header(triage_status_text)
         input_warnings = data.get("triage_input_warnings", [])
         if input_warnings:
@@ -291,7 +295,7 @@ class OutputPage(QWidget):
             self.plot_ppg.enableAutoRange(axis='y')
 
         # 5. Pengiriman Payload ke Flask API Backend
-        if self.api_client and data.get("triage_valid", True):
+        if self.api_client and triage_valid:
             bed_id = data.get("bed", "A1")
             vitals_dict = {
                 "hr": hr,

@@ -7,6 +7,8 @@ stride overlap 2s, phase alignment korelasi silang, dan ekstraksi 7-channel feat
 """
 
 import os
+import hashlib
+import json
 from pathlib import Path
 import numpy as np
 import scipy.signal as signal
@@ -323,3 +325,150 @@ class BPNetTflitePredictor:
             "dbp": round(dbp_avg, 1),
             "rejections": rejections
         }
+
+
+REVISED_MANIFEST_PATH = MODEL_DIR / "revised_bp_manifest.json"
+REVISED_CHANNELS = ("ecg", "ppg", "vpg", "apg", "ecg_ppg_product", "ecg_envelope", "ppg_envelope")
+
+
+def preprocess_revised_bp(ecg_time, raw_ecg, ppg_time, raw_ir):
+    """Match Bp revisi stage 1 on the common 125 Hz time grid."""
+    time = np.arange(max(ecg_time[0], ppg_time[0]), min(ecg_time[-1], ppg_time[-1]), 1 / 125)
+    if len(time) < 1250:
+        return np.array([]), np.array([])
+    ecg = np.interp(time, ecg_time, raw_ecg)
+    ppg = -np.interp(time, ppg_time, raw_ir)
+    ecg_sos = signal.butter(4, [0.5, 40], btype="bandpass", fs=125, output="sos")
+    ppg_sos = signal.butter(4, [0.5, 10], btype="bandpass", fs=125, output="sos")
+    return signal.sosfiltfilt(ecg_sos, ecg), signal.sosfiltfilt(ppg_sos, ppg)
+
+
+def evaluate_revised_window(ecg, ppg):
+    """Apply the stage 1 and PulseDB tight SQI used to select training windows."""
+    if not np.isfinite(ecg).all() or not np.isfinite(ppg).all():
+        return False, "Nonfinite signal"
+    if np.std(ecg) < 1e-4 or np.std(ppg) < 1e-4:
+        return False, "Flatline signal"
+
+    energy = np.diff(ecg, prepend=ecg[0]) ** 2
+    mwi = np.convolve(energy, np.ones(18) / 18, mode="same")
+    ecg_peaks, _ = find_peaks(mwi, distance=50, prominence=0.3 * np.std(mwi))
+    ppg_peaks, _ = find_peaks(ppg, distance=50, prominence=0.25 * np.std(ppg))
+    if min(len(ecg_peaks), len(ppg_peaks)) < 4:
+        return False, "Too few peaks"
+    rates = [7500 / np.mean(np.diff(peaks)) for peaks in (ecg_peaks, ppg_peaks)]
+    if not all(40 <= rate <= 180 for rate in rates) or abs(rates[0] - rates[1]) > 6:
+        return False, "Heart-rate disagreement or out of range"
+    if compute_ppg_skewness(ppg) <= -0.15 or compute_ppg_kurtosis(ppg) < 1.8:
+        return False, "PPG morphology"
+    frequencies, power = welch(ppg, fs=125, nperseg=250)
+    cardiac = power[(frequencies >= 0.5) & (frequencies <= 8)].sum()
+    if cardiac / (power.sum() + 1e-9) < 0.5:
+        return False, "Stage 1 spectral power"
+
+    ecg_z = ((ecg - ecg.mean()) / (ecg.std() + 1e-8)).astype(np.float32)
+    ppg_z = ((ppg - ppg.mean()) / (ppg.std() + 1e-8)).astype(np.float32)
+    ecg_peaks, _ = find_peaks(ecg_z, distance=50, prominence=0.8)
+    ppg_peaks, _ = find_peaks(ppg_z, distance=50, prominence=0.5)
+    counts = len(ecg_peaks), len(ppg_peaks)
+    if not all(7 <= count <= 22 for count in counts) or abs(counts[0] - counts[1]) > 1:
+        return False, "Tight SQI peak counts"
+    intervals = np.diff(ppg_peaks)
+    if np.std(intervals) / (np.mean(intervals) + 1e-6) > 0.15:
+        return False, "Irregular PPG beat intervals"
+    frequencies, power = welch(ppg_z, fs=125, nperseg=256)
+    cardiac = power[(frequencies >= 0.8) & (frequencies <= 3.5)].sum()
+    total = power[(frequencies >= 0.5) & (frequencies <= 15)].sum()
+    if cardiac / (total + 1e-8) < 0.65:
+        return False, "Tight SQI spectral power"
+    return True, ""
+
+
+def parse_cuff_reference(text):
+    try:
+        sbp, dbp = (float(value) for value in text.split("/"))
+    except (AttributeError, ValueError):
+        return None
+    # The revised model was fit only within these target bounds.
+    return (sbp, dbp) if 70 <= sbp <= 200 and 40 <= dbp <= 120 and sbp > dbp else None
+
+
+class RevisedBPPredictor:
+    def __init__(self, manifest_path=REVISED_MANIFEST_PATH):
+        manifest_path = Path(manifest_path)
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if tuple(manifest["channels"]) != REVISED_CHANNELS or manifest["input_shape"] != [1, 1250, 7]:
+            raise ValueError("Revised BP input contract mismatch")
+        if manifest["output_order"] != ["sbp", "dbp"]:
+            raise ValueError("Revised BP output contract mismatch")
+        model_path = manifest_path.with_name(manifest["artifact"])
+        if hashlib.sha256(model_path.read_bytes()).hexdigest() != manifest["sha256"]:
+            raise ValueError("Revised BP artifact hash mismatch")
+        self.mean = np.array(manifest["target_mean"], dtype=float)
+        self.std = np.array(manifest["target_std"], dtype=float)
+        if self.mean.shape != (2,) or self.std.shape != (2,) or not np.isfinite([self.mean, self.std]).all() or np.any(self.std <= 0):
+            raise ValueError("Invalid revised BP target scaler")
+        if model_path.suffix == ".onnx":
+            import onnxruntime
+
+            self.session = onnxruntime.InferenceSession(str(model_path), providers=["CPUExecutionProvider"])
+            self.interpreter_backend = "onnxruntime"
+        elif model_path.suffix == ".tflite" and Interpreter is not None:
+            self.interpreter = Interpreter(model_path=str(model_path))
+            self.interpreter.allocate_tensors()
+            self.input_index = self.interpreter.get_input_details()[0]["index"]
+            self.output_index = self.interpreter.get_output_details()[0]["index"]
+            self.interpreter_backend = INTERPRETER_BACKEND
+        else:
+            raise RuntimeError("No runtime for the revised BP artifact")
+
+    def predict_segment(self, feat_7ch):
+        sample = feat_7ch[None].astype(np.float32)
+        if self.interpreter_backend == "onnxruntime":
+            output = self.session.run(["bp"], {"waveforms": sample})[0]
+        else:
+            self.interpreter.set_tensor(self.input_index, sample)
+            self.interpreter.invoke()
+            output = self.interpreter.get_tensor(self.output_index)
+        return tuple(map(float, output.reshape(2) * self.std + self.mean))
+
+    def predict_recording(self, ecg_125, ppg_125, cuff_reference=None, cuff_sample=None):
+        window_len = 1250
+        starts = range(0, min(len(ecg_125), len(ppg_125)) - window_len + 1, 250)
+        result = {"sqa_passed": False, "passed_segments": 0, "total_segments": len(starts),
+                  "sbp": None, "dbp": None, "bp_mode": "unavailable", "rejections": {}}
+        predictions = []
+        for start in starts:
+            end = start + window_len
+            ecg, ppg = ecg_125[start:end], ppg_125[start:end]
+            valid, reason = evaluate_revised_window(ecg, ppg)
+            if valid:
+                sbp, dbp = self.predict_segment(extract_7channel_features(ecg, ppg))
+                if np.isfinite(sbp) and 0 < dbp < sbp:
+                    predictions.append((start, sbp, dbp))
+                    continue
+                reason = "Invalid model prediction"
+            result["rejections"][reason] = result["rejections"].get(reason, 0) + 1
+        result["passed_segments"] = len(predictions)
+        if cuff_reference is not None:
+            sbp, dbp = cuff_reference
+            if parse_cuff_reference(f"{sbp}/{dbp}") is None or cuff_sample is None:
+                return result
+            anchor = next((row for row in predictions if row[0] <= cuff_sample < row[0] + window_len), None)
+            if anchor is None:
+                return result
+            anchor_start, anchor_sbp, anchor_dbp = anchor
+            calibrated = []
+            next_start = anchor_start + window_len
+            for start, sbp_pred, dbp_pred in predictions:
+                sbp_adjusted = sbp_pred + sbp - anchor_sbp
+                dbp_adjusted = dbp_pred + dbp - anchor_dbp
+                if start >= next_start and np.isfinite(sbp_adjusted) and 0 < dbp_adjusted < sbp_adjusted:
+                    calibrated.append((start, sbp_adjusted, dbp_adjusted))
+                    next_start = start + window_len
+            predictions = calibrated
+        if predictions:
+            sbp, dbp = np.median(np.asarray(predictions)[:, 1:], axis=0)
+            result.update(sqa_passed=True, sbp=float(sbp), dbp=float(dbp),
+                          bp_mode="calibrated" if cuff_reference is not None else "uncalibrated")
+        return result

@@ -1,0 +1,38 @@
+{
+  "fold": 1,
+  "artifact": "revised_bp.onnx",
+  "sha256": "7b2fa59afd27f17cc562a59b5d0781e921f7d67a6a322a74981abdc875078f21",
+  "channels": [
+    "ecg",
+    "ppg",
+    "vpg",
+    "apg",
+    "ecg_ppg_product",
+    "ecg_envelope",
+    "ppg_envelope"
+  ],
+  "input_shape": [
+    1,
+    1250,
+    7
+  ],
+  "output_order": [
+    "sbp",
+    "dbp"
+  ],
+  "target_mean": [
+    115.37261199951172,
+    76.63056945800781
+  ],
+  "target_std": [
+    14.40357780456543,
+    8.608461380004883
+  ],
+  "parity_windows": 158,
+  "max_conversion_error_mmhg": [
+    1.545669852021092e-05,
+    7.739060265521402e-06
+  ],
+  "torch_version": "2.14.1+cpu",
+  "validation_runtime": "onnxruntime"
+}

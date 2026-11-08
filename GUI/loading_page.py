@@ -18,7 +18,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Import modul pemrosesan ECG, PPG, Model ONNX Triase, dan Deep Learning BPNet
 from processing_data.processing_data import ECGProcessor, PPGProcessor
 from model.deployment_inference import TriageOnnxModel
-from model.bpnet_inference import BPNetTflitePredictor
+from model.bpnet_inference import RevisedBPPredictor, preprocess_revised_bp
+from model.temperature_estimation import estimate_core_temperature, ir_perfusion_percent
+
+AUTOMATIC_TRIAGE_VALIDATED = False
 
 
 # =====================================================================
@@ -87,7 +90,8 @@ class ProcessingWorker(QThread):
             self.status_updated.emit("Menjalankan Pemrosesan Sinyal PPG (SpO2 & PI)...", 60)
             self.msleep(100)
 
-            if self.raw_red is not None and self.raw_ir is not None and len(self.raw_red) > 0:
+            if (self.raw_red is not None and self.raw_ir is not None and len(self.raw_red) >= self.fs_orig * 2
+                    and np.isfinite(self.raw_red).all() and np.isfinite(self.raw_ir).all()):
                 ppg_results = self.ppg_processor.process_ppg(
                     raw_time=self.raw_time,
                     raw_red=self.raw_red,
@@ -103,7 +107,7 @@ class ProcessingWorker(QThread):
                 ir_peaks = ppg_results.get('ir_peaks')
                 ppg_hr = ppg_results['ppg_hr']
             else:
-                spo2 = 98.0
+                spo2 = 0.0
                 pi_red, pi_ir, ppg_hr = 0.0, 0.0, 0.0
                 red_clean, ir_clean = np.array([]), np.array([])
                 ir_peaks = None
@@ -126,7 +130,7 @@ class ProcessingWorker(QThread):
             # -----------------------------------------------------------------
             # TAHAP 4: Machine Learning Triage & SHAP Analysis (75% - 95%)
             # -----------------------------------------------------------------
-            self.status_updated.emit("Menjalankan Feature Engineering & ML Triage...", 85)
+            self.status_updated.emit("Mengestimasi suhu dan tekanan darah...", 85)
             self.msleep(100)
 
             patient = self.patient_info or {}
@@ -134,40 +138,14 @@ class ProcessingWorker(QThread):
             # -----------------------------------------------------------------
             # ESTIMASI SUHU TUBUH INTI (CBT / T_core)
             # -----------------------------------------------------------------
-            WEIGHT_CORE = 0.64
-            WEIGHT_SKIN = 0.36
-
-            # Ambil nilai mentah suhu dari patient_info (dukung scalar maupun array)
-            raw_temp_skin = patient.get('temp_skin') if patient.get('temp_skin') is not None else patient.get('temp_obj')
-            if raw_temp_skin is None and patient.get('raw_temp_obj') is not None and len(patient.get('raw_temp_obj')) > 0:
-                raw_temp_skin = float(np.mean(patient.get('raw_temp_obj')))
-
-            raw_temp_amb = patient.get('temp_ambient') if patient.get('temp_ambient') is not None else patient.get('temp_amb')
-            if raw_temp_amb is None and patient.get('raw_temp_amb') is not None and len(patient.get('raw_temp_amb')) > 0:
-                raw_temp_amb = float(np.mean(patient.get('raw_temp_amb')))
-
+            skin_samples = np.asarray(patient.get("raw_temp_obj", []), dtype=float)
+            ambient_samples = np.asarray(patient.get("raw_temp_amb", []), dtype=float)
+            valid = np.isfinite(skin_samples) & np.isfinite(ambient_samples)
+            temp_skin_val = float(np.mean(skin_samples[valid])) if np.any(valid) else None
+            temp_amb_val = float(np.mean(ambient_samples[valid])) if np.any(valid) else None
+            temp_pi_ir = ir_perfusion_percent(self.raw_ir, self.fs_orig)
+            temp_val = estimate_core_temperature(temp_skin_val, temp_amb_val, temp_pi_ir)
             input_warnings = []
-
-            # Logging warning jika salah satu/kedua suhu bernilai None
-            if raw_temp_skin is None or raw_temp_amb is None:
-                print(f"[WARN WORKER TEMP] Parameter 'temp_skin' ({raw_temp_skin}) atau 'temp_ambient' ({raw_temp_amb}) tidak ditemukan pada patient_info! Memakai nilai default (Kulit: 34.5°C, Amb: 28.0°C).")
-                input_warnings.append("temperature memakai nilai fallback")
-
-            temp_skin_val = float(raw_temp_skin if raw_temp_skin is not None else 34.5)
-            temp_amb_val = float(raw_temp_amb if raw_temp_amb is not None else 28.0)
-
-            # Hitung Estimasi Suhu Inti (CBT / T_core) Bioheat Transfer Terkalibrasi + Adaptif PPG IR Perfusi (MAE: 0.191°C, Akurasi: 99.48%)
-            k_env_base = -0.1858
-            beta_pi = -0.1980
-            pi_norm = float(np.clip(pi_ir if pi_ir > 0 else 0.2, 0.05, 3.0))
-            k_env_adaptive = k_env_base / (1.0 + beta_pi * (pi_norm - 0.2))  # Modulasi laju perfusi darah perifer omega_b
-            C_OFFSET = 5.6694  # Kalibrasi empiris teroptimasi Least Squares (MAE < 0.2°C)
-            t_core_calc = temp_skin_val + k_env_adaptive * (temp_skin_val - temp_amb_val) + C_OFFSET
-
-            # Gunakan T_core hasil kalkulasi sebagai temp_val (dikunci pada batas biologis aman)
-            temp_val = float(np.clip(t_core_calc, 30.0, 43.0))
-
-            print(f"[LOG CBT BIOHEAT OPTIMIZED] T_skin={temp_skin_val:.2f}°C, T_amb={temp_amb_val:.2f}°C, PI_IR={pi_ir:.3f}% => T_core={temp_val:.2f}°C (C_OFFSET=+{C_OFFSET}°C, MAE=0.191°C)")
 
             # Parameter vital sign lainnya
             if spo2 <= 0:
@@ -184,66 +162,32 @@ class ProcessingWorker(QThread):
             spo2_val = float(spo2 if spo2 > 0 else 98.0)
             rr_val = float(resp_rate if resp_rate > 0 else 16.0)
             hr_val = float(hr_ecg if hr_ecg > 0 else 75.0)
-            sys_val = float(patient.get('systolic') if patient.get('systolic') is not None else 120)
-            dia_val = float(patient.get('diastolic') if patient.get('diastolic') is not None else 80)
             gcs_val = float(patient.get('gcs') if patient.get('gcs') is not None else 15)
             pain_val = float(patient.get('pain_score') if patient.get('pain_score') is not None else 0)
 
             # -----------------------------------------------------------------
             # TAHAP 3.5: SQA 10s Window (Stride 2s) & Deep Learning BPNet Inference
             # -----------------------------------------------------------------
-            sqa_passed = False
-            sqa_error = None
-            passed_segments = 0
-            total_segments = 0
             bp_res = {}
-            bp_model_succeeded = False
-            
+            sqa_error = None
+            cuff, raw_sample = patient.pop("cuff_reference", (None, None))
             if self.bpnet_predictor is None:
-                sqa_error = "Model BPNet/LiteRT tidak tersedia; SQA dan estimasi tekanan darah tidak dijalankan."
-                bp_res = {"rejections": {"BPNet tidak tersedia": 1}}
-                print(f"[ERROR BPNET UNAVAILABLE] {sqa_error}")
-            elif len(ecg_smooth) < 1250 or len(ir_clean) < 1250:
-                sqa_error = "Sinyal ECG/PPG kurang dari 10 detik; SQA dan BPNet tidak dapat dijalankan."
-                bp_res = {"rejections": {"Sinyal kurang dari 10 detik": 1}}
-                print(f"[WARN SQA INPUT] {sqa_error}")
-            else:
+                sqa_error = "Model BP revisi tidak tersedia."
+            elif self.raw_ir is not None and len(self.raw_time) >= 2:
                 try:
+                    bp_ecg, bp_ppg = preprocess_revised_bp(self.raw_time, self.raw_ecg, self.raw_time, self.raw_ir)
+                    cuff_sample = int(raw_sample * 125 / self.fs_orig) if raw_sample is not None else None
                     bp_res = self.bpnet_predictor.predict_recording(
-                        ecg_125=ecg_smooth,
-                        ppg_125=ir_clean,
-                        fs=125.0,
-                        window_sec=10.0,
-                        stride_sec=2.0
+                        bp_ecg, bp_ppg, cuff_reference=cuff, cuff_sample=cuff_sample
                     )
-                    sqa_passed = bp_res["sqa_passed"]
-                    passed_segments = bp_res["passed_segments"]
-                    total_segments = bp_res["total_segments"]
-
-                    if sqa_passed:
-                        sys_val = float(bp_res["sbp"])
-                        dia_val = float(bp_res["dbp"])
-                        bp_model_succeeded = True
-                        print(f"[BPNET DL SUCCESS] SBP={sys_val:.1f} mmHg, DBP={dia_val:.1f} mmHg (dari {passed_segments}/{total_segments} segmen 10s lolos SQA)")
-                    else:
-                        sqa_error = bp_res.get(
-                            "sqa_error",
-                            "Tidak ada segmen sinyal 10s yang lolos SQA (Artefak/Noise tinggi). Silakan lakukan pengambilan data ulang.",
-                        )
-                        print(f"[WARN SQA FAILED] {sqa_error}")
                 except Exception as exc:
-                    sqa_passed = False
-                    sqa_error = f"Gagal inferensi BPNet: {exc}"
-                    bp_res = {"rejections": {"Kesalahan inferensi BPNet": 1}}
+                    sqa_error = f"Gagal inferensi BP: {exc}"
                     print(f"[ERROR BPNET] {sqa_error}")
-
-            # BP 120/80 hanya berstatus fallback jika model tidak menghasilkan
-            # prediksi dan registrasi pasien juga tidak menyediakan nilai BP.
-            if not bp_model_succeeded:
-                if patient.get('systolic') is None:
-                    input_warnings.append("systolic_bp memakai nilai fallback 120")
-                if patient.get('diastolic') is None:
-                    input_warnings.append("diastolic_bp memakai nilai fallback 80")
+            sqa_passed = bp_res.get("sqa_passed", False)
+            passed_segments = bp_res.get("passed_segments", 0)
+            total_segments = bp_res.get("total_segments", 0)
+            sys_val, dia_val = bp_res.get("sbp"), bp_res.get("dbp")
+            bp_mode = bp_res.get("bp_mode", "unavailable")
 
             # Susun tanda vital mentah untuk ONNX XGBoost Triase (11 fitur)
             raw_data = {
@@ -265,12 +209,10 @@ class ProcessingWorker(QThread):
             triage_features = {}
             inference_ms = None
 
-            if not sqa_passed:
-                triage_error = (
-                    "Inferensi triase dibatalkan karena SQA/BPNet belum "
-                    "menghasilkan tekanan darah yang valid."
-                )
-                print(f"[WARN ONNX SKIPPED] {triage_error}")
+            if not AUTOMATIC_TRIAGE_VALIDATED:
+                triage_error = "Triase otomatis menunggu validasi suhu, tekanan darah, dan Raspberry Pi."
+            elif temp_val is None or bp_mode != "calibrated" or input_warnings:
+                triage_error = "Input pengukuran belum memenuhi syarat triase otomatis."
             elif self.triage_predictor is not None:
                 try:
                     label, conf, proba = self.triage_predictor.predict(raw_data)
@@ -303,8 +245,9 @@ class ProcessingWorker(QThread):
 
                 # Parameter Medis Suhu (Estimasi Suhu Inti CBT)
                 "temperature": temp_val,                  # T_core (digunakan oleh ML Model & Display Utama)
-                "temp_skin": round(temp_skin_val, 1),     # Suhu kulit/object dari sensor
-                "temp_ambient": round(temp_amb_val, 1),   # Suhu lingkungan dari sensor
+                "temp_skin": temp_skin_val,
+                "temp_ambient": temp_amb_val,
+                "temperature_pi_percent": temp_pi_ir,
 
                 # Parameter Medis Lainnya
                 "hr": hr_val,
@@ -315,6 +258,7 @@ class ProcessingWorker(QThread):
                 "spo2": spo2_val,
                 "systolic": sys_val,
                 "diastolic": dia_val,
+                "bp_mode": bp_mode,
                 "pi_red": pi_red,
                 "pi_ir": pi_ir,
                 "ppg_hr": ppg_hr,
@@ -454,13 +398,13 @@ class LoadingPage(QWidget):
             print(f"[ERROR ONNX] {self.triage_model_error}")
 
         try:
-            self.bpnet_predictor = BPNetTflitePredictor()
+            self.bpnet_predictor = RevisedBPPredictor()
             print(
                 "[SUCCESS BPNET] Model Deep Learning BPNet & SQA Pipeline "
                 f"berhasil dimuat via {self.bpnet_predictor.interpreter_backend}."
             )
         except Exception as exc:
-            print(f"[WARN BPNET] Model BPNet TFLite belum siap ({exc}). Memakai fallback BP.")
+            print(f"[WARN BPNET] Model BP revisi belum siap ({exc}).")
 
     def setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -561,44 +505,6 @@ class LoadingPage(QWidget):
 
     def handle_processing_completion(self, results):
         """Dipanggil otomatis ketika pemrosesan data selesai."""
-        from PyQt6.QtCore import QTimer
-        sqa_passed = results.get("sqa_passed", True)
-
-        if not sqa_passed:
-            reasons_dict = results.get("sqa_rejections", {})
-            reasons_str = ", ".join([f"{k}" for k in reasons_dict.keys()]) if reasons_dict else "Artefak/Noise Tinggi"
-            
-            print(f"[SQA FAILED UI] Kualitas sinyal tidak stabil ({reasons_str})")
-            self.progress_bar.animate_to(100)
-            self._fade_to_text(f"Kualitas sinyal tidak stabil ({reasons_str})")
-            
-            # Ubah warna kartu loading ke merah/oranye peringatan
-            self.card_container.setStyleSheet("""
-                QFrame {
-                    background-color: #D35400; 
-                    border-radius: 28px; 
-                }
-            """)
-
-            def _step_prompt_retake():
-                self._fade_to_text("Silakan lakukan pengambilan data ulang...")
-                QTimer.singleShot(2200, _redirect_retake)
-
-            def _redirect_retake():
-                self.card_container.setStyleSheet("""
-                    QFrame {
-                        background-color: #214889; 
-                        border-radius: 28px; 
-                    }
-                """)
-                if hasattr(self, "parent_main_win"):
-                    self.parent_main_win.handle_sqa_retry()
-                else:
-                    self._fade_to_text("Siap pengambilan data ulang.")
-
-            QTimer.singleShot(2000, _step_prompt_retake)
-            return
-
         print("[LOG] Pemrosesan data selesai!")
         self._fade_to_text("Pemrosesan Data Selesai!")
 
