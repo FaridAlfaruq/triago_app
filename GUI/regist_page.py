@@ -155,7 +155,7 @@ class RegistrationPage(QWidget):
         
         center_layout.addSpacing(5) # Ruang antara GCS dan Pain Score
 
-        # --- Input Pain Score (Skala 1 - 10) ---
+        # --- Input Pain Score (Skala 0 - 10) ---
         pain_vbox = QVBoxLayout()
         pain_vbox.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
@@ -167,7 +167,7 @@ class RegistrationPage(QWidget):
         hbox_pain.setSpacing(10)
         hbox_pain.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        for p_score in range(1, 11):
+        for p_score in range(0, 11):
             btn_pain = QPushButton(str(p_score))
             btn_pain.setCheckable(True)
             btn_pain.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -249,7 +249,7 @@ class RegistrationPage(QWidget):
                 QPushButton:hover { border-color: #214889; color: #214889; }
             """)
 
-        if 1 <= score <= 3:
+        if 0 <= score <= 3:
             pain_color = "#34D980"  # Ringan: Hijau
         elif 4 <= score <= 6:
             pain_color = "#F09C00"  # Sedang: Jingga
