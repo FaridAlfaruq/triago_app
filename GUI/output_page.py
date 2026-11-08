@@ -247,9 +247,20 @@ class OutputPage(QWidget):
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         
         bp_mode = data.get("bp_mode", "unavailable")
-        bp_label = {"calibrated": "Calibrated estimate", "uncalibrated": "Uncalibrated estimate"}.get(bp_mode)
-        has_bp = sys_bp is not None and dia_bp is not None and bp_label is not None
-        self.lbl_bp_val.setText(f"{sys_bp:.1f}/{dia_bp:.1f} mmHg" if has_bp else "BP unavailable")
+
+        bp_label = {
+            "calibrated": "Calibrated estimate",
+            "uncalibrated": "Uncalibrated estimate",
+            "fallback": "Fallback 120/80 mmHg (BP tidak lolos SQA)"
+        }.get(bp_mode)
+
+        has_bp = sys_bp is not None and dia_bp is not None
+
+        self.lbl_bp_val.setText(
+            f"{sys_bp:.1f}/{dia_bp:.1f} mmHg"
+            if has_bp else "BP unavailable"
+        )
+
         self.lbl_bp_sub.setText(bp_label if has_bp else "")
 
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C" if temp_core is not None else "Temperature unavailable")

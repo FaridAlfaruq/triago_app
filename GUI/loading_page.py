@@ -213,18 +213,31 @@ class ProcessingWorker(QThread):
             sys_val = bp_res.get("sbp")
             dia_val = bp_res.get("dbp")
 
-            # Status yang diharapkan: uncalibrated apabila inferensi berhasil
-            # tanpa referensi manset.
             bp_mode = bp_res.get("bp_mode", "unavailable")
+
+            # Fallback BP jika prediksi tidak tersedia
+            bp_fallback_used = sys_val is None or dia_val is None
+
+            if bp_fallback_used:
+                sys_val = 120.0
+                dia_val = 80.0
+                bp_mode = "fallback"
+
+                input_warnings.append(
+                    "BP menggunakan fallback 120/80 mmHg"
+                )
 
             print(
                 f"[BPNET] SBP={sys_val}, DBP={dia_val}, "
-                f"Mode={bp_mode}, "
+                f"Mode={bp_mode}, Fallback={bp_fallback_used}, "
                 f"SQA={passed_segments}/{total_segments}"
             )
 
             if sqa_error:
                 print(f"[WARN BPNET] {sqa_error}")
+
+            if bp_fallback_used:
+                print("[WARN BPNET] Menggunakan fallback BP 120/80 mmHg.")
 
 
             # Susun tanda vital mentah untuk ONNX XGBoost Triase (11 fitur)
@@ -314,6 +327,7 @@ class ProcessingWorker(QThread):
                 "systolic": sys_val,
                 "diastolic": dia_val,
                 "bp_mode": bp_mode,
+                "bp_fallback_used": bp_fallback_used,
                 "pi_red": pi_red,
                 "pi_ir": pi_ir,
                 "ppg_hr": ppg_hr,
