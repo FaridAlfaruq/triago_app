@@ -21,7 +21,7 @@ from model.deployment_inference import TriageOnnxModel
 from model.bpnet_inference import RevisedBPPredictor, preprocess_revised_bp
 from model.temperature_estimation import estimate_core_temperature, ir_perfusion_percent
 
-AUTOMATIC_TRIAGE_VALIDATED = False
+AUTOMATIC_TRIAGE_VALIDATED = True
 
 
 # =====================================================================
