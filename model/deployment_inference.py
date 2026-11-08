@@ -45,7 +45,7 @@ def build_triage_input(vitals: dict[str, float]) -> np.ndarray:
     sys_safe = max(x["systolic_bp"], 1.0)
     dia_safe = max(x["diastolic_bp"], 1.0)
 
-    pulse_pressure = x["systolic_bp"] / dia_safe
+    pulse_pressure = x["systolic_bp"] - x["diastolic_bp"]
     shock_index = x["heart_rate"] / sys_safe
     map_val = x["diastolic_bp"] + (pulse_pressure / 3.0)
 
