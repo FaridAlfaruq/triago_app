@@ -16,7 +16,6 @@ if project_root not in sys.path:
 from akusisi_data.get_stm32 import stream_stm32_data
 from processing_data.preprocessing_LiveData import LiveSignalFilter
 from service.api_client import TriageApiClient
-from model.bpnet_inference import parse_cuff_reference
 
 
 # =====================================================================
@@ -194,16 +193,7 @@ class PlotPage(QWidget):
             lbl_logo.setText("TriaGO")
             lbl_logo.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889;")
         header_layout.addWidget(lbl_logo)
-        
         main_layout.addLayout(header_layout)
-        cuff_layout = QHBoxLayout()
-        self.cuff_input = QLineEdit()
-        self.cuff_input.setPlaceholderText("Manset opsional (SBP/DBP mmHg)")
-        self.cuff_button = QPushButton("Catat referensi manset")
-        self.cuff_button.clicked.connect(self.record_cuff_reference)
-        cuff_layout.addWidget(self.cuff_input)
-        cuff_layout.addWidget(self.cuff_button)
-        main_layout.addLayout(cuff_layout)
 
         # =====================================================================
         # BAGIAN 2: PLOTTING CONTAINER 
@@ -274,33 +264,7 @@ class PlotPage(QWidget):
         self.ecg_buffer.clear()
         self.ppg_buffer.clear()
 
-        self.patient_data.pop("cuff_reference", None)
-        self.cuff_input.clear()
-        self.cuff_button.setEnabled(True)
-        self.cuff_button.setText("Catat referensi manset")
-
         self.progress_bar.setValue(0)
-        self.ui_update_counter = 0
-        self.is_recording = True
-        
-        self.worker = STM32Worker()
-        self.worker.data_received.connect(self.handle_new_packet)
-        self.worker.error_occurred.connect(self._handle_sensor_error)
-        self.worker.start()
-
-    def record_cuff_reference(self):
-        warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
-        sample = len(self.recorded_data) - warmup_samples - 1
-        if not self.is_recording or sample < 0:
-            return
-        reference = parse_cuff_reference(self.cuff_input.text())
-        if reference is None:
-            self.cuff_button.setText("SBP/DBP tidak valid")
-            return
-        self.patient_data["cuff_reference"] = (reference, sample)
-        self.cuff_button.setText("Referensi manset tercatat")
-        self.cuff_button.setEnabled(False)
-        self.cuff_input.clear()
 
     def _handle_sensor_error(self, message):
         self.is_recording = False
