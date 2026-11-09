@@ -1,0 +1,24 @@
+{
+  "epoch": 12,
+  "sbp": {
+    "mae": 12.55,
+    "std": 16.78,
+    "pct_le_5": 31.58,
+    "pct_le_10": 53.55,
+    "pct_le_15": 68.2,
+    "bhs_grade": "D",
+    "aami_pass": false
+  },
+  "dbp": {
+    "mae": 10.13,
+    "std": 11.8,
+    "pct_le_5": 33.44,
+    "pct_le_10": 58.14,
+    "pct_le_15": 80.22,
+    "bhs_grade": "D",
+    "aami_pass": false
+  },
+  "uncal_sbp_mae": 15.32,
+  "uncal_dbp_mae": 9.22,
+  "param_count": 79090
+}

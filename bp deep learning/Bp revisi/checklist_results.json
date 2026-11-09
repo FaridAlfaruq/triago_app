@@ -1,0 +1,413 @@
+{
+  "metadata": {
+    "task_id": "TASK-CHECKLIST-15-EVAL",
+    "timestamp": "2026-10-28T02:56:09.321900",
+    "elapsed_s": 12.08
+  },
+  "dataset_summary": {
+    "raw_segments": 732,
+    "raw_subjects": 75,
+    "clean_segments": 472,
+    "clean_subjects": 57,
+    "cal_eval_segments": 415,
+    "anchor_segments": 41
+  },
+  "1_baseline_comparison": {
+    "zero_shot": {
+      "uncal": {
+        "sbp_mae": 16.67,
+        "dbp_mae": 8.06
+      },
+      "cal_1pt": {
+        "sbp_mae": 8.8,
+        "dbp_mae": 5.49,
+        "sbp_bhs": "D",
+        "dbp_bhs": "B",
+        "aami": false
+      }
+    },
+    "naive_tl": {
+      "uncal": {
+        "sbp_mae": 11.9,
+        "dbp_mae": 7.12
+      },
+      "cal_1pt": {
+        "sbp_mae": 5.51,
+        "dbp_mae": 2.67,
+        "sbp_bhs": "B",
+        "dbp_bhs": "A",
+        "aami": true
+      }
+    },
+    "modified_tl_v2": {
+      "uncal": {
+        "sbp_mae": 11.76,
+        "dbp_mae": 7.07
+      },
+      "cal_1pt": {
+        "sbp_mae": 4.9,
+        "dbp_mae": 2.3,
+        "sbp_bhs": "B",
+        "dbp_bhs": "A",
+        "aami": true
+      }
+    }
+  },
+  "2_ablation_study": {
+    "full_modified_tl_v2": {
+      "loss": "Huber + 1.5*Cal-Loss + 0.05*L2-SP",
+      "sbp_cal_mae": 4.9,
+      "dbp_cal_mae": 2.3,
+      "sbp_bhs": "B",
+      "dbp_bhs": "A",
+      "aami": true
+    },
+    "ablation_a_no_l2sp": {
+      "loss": "Huber + 1.5*Cal-Loss",
+      "sbp_cal_mae": 4.64,
+      "dbp_cal_mae": 2.2,
+      "sbp_bhs": "A",
+      "dbp_bhs": "A",
+      "aami": true
+    },
+    "ablation_b_no_cal_loss": {
+      "loss": "Huber + 0.05*L2-SP",
+      "sbp_cal_mae": 6.48,
+      "dbp_cal_mae": 2.94,
+      "sbp_bhs": "B",
+      "dbp_bhs": "A",
+      "aami": false
+    },
+    "ablation_c_pure_linear_probing": {
+      "loss": "Huber only (fresh head)",
+      "sbp_cal_mae": 3.67,
+      "dbp_cal_mae": 2.25,
+      "sbp_bhs": "A",
+      "dbp_bhs": "A",
+      "aami": true
+    }
+  },
+  "3_calibration_impact": {
+    "zero_shot": {
+      "sbp": {
+        "uncal_mae": 16.36,
+        "cal_mae": 8.8,
+        "gain_pct": 46.2
+      },
+      "dbp": {
+        "uncal_mae": 7.95,
+        "cal_mae": 5.49,
+        "gain_pct": 30.9
+      }
+    },
+    "naive_tl": {
+      "sbp": {
+        "uncal_mae": 11.87,
+        "cal_mae": 5.51,
+        "gain_pct": 53.6
+      },
+      "dbp": {
+        "uncal_mae": 7.06,
+        "cal_mae": 2.67,
+        "gain_pct": 62.2
+      }
+    },
+    "modified_tl_v2": {
+      "sbp": {
+        "uncal_mae": 11.71,
+        "cal_mae": 4.9,
+        "gain_pct": 58.2
+      },
+      "dbp": {
+        "uncal_mae": 7.03,
+        "cal_mae": 2.3,
+        "gain_pct": 67.3
+      }
+    },
+    "ablation_a_no_l2sp": {
+      "sbp": {
+        "uncal_mae": 11.74,
+        "cal_mae": 4.64,
+        "gain_pct": 60.5
+      },
+      "dbp": {
+        "uncal_mae": 7.04,
+        "cal_mae": 2.2,
+        "gain_pct": 68.8
+      }
+    },
+    "ablation_b_no_cal_loss": {
+      "sbp": {
+        "uncal_mae": 11.88,
+        "cal_mae": 6.48,
+        "gain_pct": 45.5
+      },
+      "dbp": {
+        "uncal_mae": 7.09,
+        "cal_mae": 2.94,
+        "gain_pct": 58.5
+      }
+    },
+    "ablation_c_pure_linear_probe": {
+      "sbp": {
+        "uncal_mae": 14.58,
+        "cal_mae": 3.67,
+        "gain_pct": 74.8
+      },
+      "dbp": {
+        "uncal_mae": 8.79,
+        "cal_mae": 2.25,
+        "gain_pct": 74.4
+      }
+    }
+  },
+  "4_cross_validation_robustness": {
+    "n_splits": 3,
+    "folds": [
+      {
+        "fold": 1,
+        "sbp_mae": 4.65,
+        "dbp_mae": 2.93
+      },
+      {
+        "fold": 2,
+        "sbp_mae": 5.28,
+        "dbp_mae": 2.07
+      },
+      {
+        "fold": 3,
+        "sbp_mae": 4.77,
+        "dbp_mae": 1.9
+      }
+    ],
+    "mean_sbp_mae": 4.9,
+    "std_sbp_mae": 0.27,
+    "mean_dbp_mae": 2.3,
+    "std_dbp_mae": 0.45
+  },
+  "5_generalization": {
+    "train_mae": {
+      "sbp": 11.49,
+      "dbp": 6.92
+    },
+    "oof_uncal_mae": {
+      "sbp": 11.76,
+      "dbp": 7.07
+    },
+    "oof_cal_mae": {
+      "sbp": 4.9,
+      "dbp": 2.3
+    },
+    "generalization_gap_sbp": 0.27,
+    "generalization_gap_dbp": 0.15
+  },
+  "6_regression_metrics": {
+    "sbp": {
+      "mae": 4.9,
+      "rmse": 6.34,
+      "signed_mean_bias": 1.22,
+      "error_std": 6.22
+    },
+    "dbp": {
+      "mae": 2.3,
+      "rmse": 3.22,
+      "signed_mean_bias": 0.05,
+      "error_std": 3.22
+    }
+  },
+  "7_bhs_error_thresholds": {
+    "sbp": {
+      "pct_le_5": 59.76,
+      "pct_le_10": 87.23,
+      "pct_le_15": 97.35,
+      "bhs_grade": "B"
+    },
+    "dbp": {
+      "pct_le_5": 89.4,
+      "pct_le_10": 98.07,
+      "pct_le_15": 100.0,
+      "bhs_grade": "A"
+    }
+  },
+  "8_aami_criteria": {
+    "sbp": {
+      "mean_bias_ok": true,
+      "std_ok": true,
+      "status": "PASS"
+    },
+    "dbp": {
+      "mean_bias_ok": true,
+      "std_ok": true,
+      "status": "PASS"
+    },
+    "verdict": "PASS"
+  },
+  "9_per_subject_analysis": {
+    "top_5_best": [
+      {
+        "id": "P020",
+        "sbp_mae": 0.33,
+        "dbp_mae": 0.57
+      },
+      {
+        "id": "P051",
+        "sbp_mae": 0.81,
+        "dbp_mae": 0.28
+      },
+      {
+        "id": "P016",
+        "sbp_mae": 1.73,
+        "dbp_mae": 0.33
+      },
+      {
+        "id": "P023",
+        "sbp_mae": 1.33,
+        "dbp_mae": 0.83
+      },
+      {
+        "id": "P063",
+        "sbp_mae": 1.09,
+        "dbp_mae": 1.26
+      }
+    ],
+    "top_5_worst": [
+      {
+        "id": "P028",
+        "sbp_mae": 10.67,
+        "dbp_mae": 7.84
+      },
+      {
+        "id": "P007",
+        "sbp_mae": 10.45,
+        "dbp_mae": 1.92
+      },
+      {
+        "id": "P018",
+        "sbp_mae": 9.4,
+        "dbp_mae": 2.93
+      },
+      {
+        "id": "P092",
+        "sbp_mae": 6.13,
+        "dbp_mae": 5.82
+      },
+      {
+        "id": "P065",
+        "sbp_mae": 8.69,
+        "dbp_mae": 2.76
+      }
+    ],
+    "cohort_distribution": {
+      "sbp": {
+        "mean": 3.97,
+        "median": 2.94,
+        "iqr": 3.26,
+        "min": 0.33,
+        "max": 10.67
+      },
+      "dbp": {
+        "mean": 2.0,
+        "median": 1.69,
+        "iqr": 1.07,
+        "min": 0.28,
+        "max": 7.84
+      }
+    }
+  },
+  "10_calibration_robustness": {
+    "anchor_segment_0_first": {
+      "sbp_mae": 4.9,
+      "sbp_bhs": "B",
+      "dbp_mae": 2.3,
+      "dbp_bhs": "A",
+      "n_eval": 415
+    },
+    "anchor_middle_segment": {
+      "sbp_mae": 3.31,
+      "sbp_bhs": "A",
+      "dbp_mae": 1.95,
+      "dbp_bhs": "A",
+      "n_eval": 415
+    },
+    "anchor_max_cardiac_psd": {
+      "sbp_mae": 4.02,
+      "sbp_bhs": "A",
+      "dbp_mae": 2.14,
+      "dbp_bhs": "A",
+      "n_eval": 415
+    }
+  },
+  "11_sqi_sensitivity": {
+    "tight_sqi_filtered": {
+      "n_seg": 472,
+      "n_subj": 57,
+      "uncal_mae": {
+        "sbp": 11.76,
+        "dbp": 7.07
+      },
+      "cal_mae": {
+        "sbp": 4.9,
+        "dbp": 2.3
+      },
+      "cal_bhs": {
+        "sbp": "B",
+        "dbp": "A"
+      }
+    },
+    "full_unfiltered": {
+      "n_seg": 732,
+      "n_subj": 75,
+      "uncal_mae": {
+        "sbp": 11.68,
+        "dbp": 7.32
+      },
+      "cal_mae": {
+        "sbp": 5.26,
+        "dbp": 2.54
+      },
+      "cal_bhs": {
+        "sbp": "B",
+        "dbp": "A"
+      }
+    }
+  },
+  "12_label_limitation": {
+    "ground_truth_cuff_std": 0.0,
+    "pred_within_subject_std": {
+      "sbp_mean": 2.51,
+      "sbp_median": 2.57,
+      "dbp_mean": 1.52,
+      "dbp_median": 1.38
+    }
+  },
+  "13_training_stability": {
+    "seeds": [
+      42,
+      123,
+      999
+    ],
+    "cal_sbp_mae_mean": 4.9,
+    "cal_sbp_mae_std": 0.0,
+    "cal_dbp_mae_mean": 2.3,
+    "cal_dbp_mae_std": 0.0
+  },
+  "14_data_leakage_audit": {
+    "train_test_subject_disjoint": "PASS",
+    "train_only_target_zscoring": "PASS",
+    "calibration_anchor_exclusion": "PASS",
+    "disjoint_eval_segments": 415,
+    "anchor_excluded_segments": 41
+  },
+  "15_computational_efficiency": {
+    "total_elapsed_s": 12.08,
+    "feature_extraction_s": 2.111,
+    "head_training_s": 0.479,
+    "inference_latency_ms": 39.87,
+    "hardware_threads": 6,
+    "parameter_counts": {
+      "backbone_frozen": 358432,
+      "heads_trainable": 49922,
+      "total_parameters": 408354
+    }
+  }
+}

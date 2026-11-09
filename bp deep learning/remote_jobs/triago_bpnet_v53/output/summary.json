@@ -1,0 +1,29 @@
+{
+  "model_name": "TriaGO_BPNet_v53_Precision",
+  "total_parameters": 374850,
+  "epochs_trained": 50,
+  "train_segments": 617,
+  "val_segments": 115,
+  "train_patients": 60,
+  "val_patients": 15,
+  "best_epoch": 1,
+  "val_loss": 1.4862,
+  "val_sbp_mae": 8.32,
+  "val_dbp_mae": 6.95,
+  "val_sbp_rmse": 10.37,
+  "val_dbp_rmse": 8.35,
+  "sbp_sd": 9.44,
+  "dbp_sd": 7.33,
+  "bhs_sbp": {
+    "le_5": 28.7,
+    "le_10": 56.5,
+    "le_15": 73.9
+  },
+  "bhs_dbp": {
+    "le_5": 18.3,
+    "le_10": 68.7,
+    "le_15": 88.7
+  },
+  "aami_sbp_pass": false,
+  "aami_dbp_pass": false
+}

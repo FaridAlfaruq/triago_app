@@ -1,0 +1,17 @@
+{
+  "id": "faridalfaruq/triago-bpnet-v53-gpu",
+  "title": "TriaGO BPNet v5.3 Precision GPU Training",
+  "code_file": "train.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "faridalfaruq/triago-clean-dataset-7ch"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

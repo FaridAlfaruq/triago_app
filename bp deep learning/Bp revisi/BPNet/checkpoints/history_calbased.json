@@ -1,0 +1,21 @@
+{
+  "protocol": "calbased",
+  "epochs": 1,
+  "best_val_mae": 6.12,
+  "checkpoint_path": "C:\\Users\\Adyty\\Documents\\Farid ITS\\Tugas Akhir\\scratch\\gemastik\\Bp revisi\\BPNet\\checkpoints\\best_calbpnet_calbased.pt",
+  "history": [
+    {
+      "epoch": 1,
+      "time_sec": 0.45,
+      "train_loss": 1.5967,
+      "train_mae_all": 4.11,
+      "train_mae_sbp": 5.33,
+      "train_mae_dbp": 2.89,
+      "val_loss": 2.5426,
+      "val_mae_all": 6.12,
+      "val_mae_sbp": 7.43,
+      "val_mae_dbp": 4.82,
+      "is_best": true
+    }
+  ]
+}

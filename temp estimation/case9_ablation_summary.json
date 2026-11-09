@@ -1,0 +1,44 @@
+[
+  {
+    "tau_sec": 180.0,
+    "mae": 0.2848,
+    "rmse": 0.5655,
+    "mean_bias": -0.2101,
+    "upper_loa": 0.8208,
+    "lower_loa": -1.2411,
+    "loa_width": 2.062,
+    "r2_score": -4.583,
+    "pearson_r": 0.4808,
+    "bias_pass": false,
+    "lower_loa_pass": false,
+    "r2_pass": false
+  },
+  {
+    "tau_sec": 60.0,
+    "mae": 0.1281,
+    "rmse": 0.2963,
+    "mean_bias": -0.0571,
+    "upper_loa": 0.5137,
+    "lower_loa": -0.628,
+    "loa_width": 1.1417,
+    "r2_score": -0.5323,
+    "pearson_r": 0.7482,
+    "bias_pass": true,
+    "lower_loa_pass": true,
+    "r2_pass": false
+  },
+  {
+    "tau_sec": 0.0,
+    "mae": 0.0516,
+    "rmse": 0.0652,
+    "mean_bias": 0.0111,
+    "upper_loa": 0.1372,
+    "lower_loa": -0.115,
+    "loa_width": 0.2522,
+    "r2_score": 0.9259,
+    "pearson_r": 0.9663,
+    "bias_pass": true,
+    "lower_loa_pass": true,
+    "r2_pass": true
+  }
+]

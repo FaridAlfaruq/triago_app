@@ -1,0 +1,139 @@
+{
+  "pi_tertile_edges": [
+    4.712,
+    8.535
+  ],
+  "results": {
+    "0. Linear Rational + c0 (reference)": {
+      "idea": "Current pick",
+      "params": [
+        0.84992,
+        1.07194,
+        1.23646
+      ],
+      "test": {
+        "mae": 0.3213,
+        "bias": -0.0386,
+        "sd": 0.4597,
+        "pass": 14,
+        "n": 20
+      }
+    },
+    "U1. Skin + constant": {
+      "idea": "Ignore ambient and PI entirely",
+      "params": [
+        3.1
+      ],
+      "test": {
+        "mae": 1.1325,
+        "bias": -0.3905,
+        "sd": 1.4267,
+        "pass": 0,
+        "n": 20
+      }
+    },
+    "U2. Mirror (no PI)": {
+      "idea": "Reflect ambient across skin, fixed gain",
+      "params": [
+        -0.79906,
+        12.49195
+      ],
+      "test": {
+        "mae": 0.4801,
+        "bias": -0.2195,
+        "sd": 0.5803,
+        "pass": 9,
+        "n": 20
+      }
+    },
+    "U3. Inverse-PI offset": {
+      "idea": "Offset grows when perfusion drops; ambient ignored",
+      "params": [
+        2.08253,
+        4.58323
+      ],
+      "test": {
+        "mae": 0.4481,
+        "bias": 0.0163,
+        "sd": 0.6054,
+        "pass": 11,
+        "n": 20
+      }
+    },
+    "U4. Exponential perfusion gate": {
+      "idea": "Gain decays exponentially with PI",
+      "params": [
+        0.1764,
+        0.68994,
+        0.41936
+      ],
+      "test": {
+        "mae": 0.382,
+        "bias": -0.0653,
+        "sd": 0.5491,
+        "pass": 13,
+        "n": 20
+      }
+    },
+    "U5. Kelvin power law": {
+      "idea": "Multiplicative ratio in absolute temperature",
+      "params": [
+        -0.79329,
+        12.46205
+      ],
+      "test": {
+        "mae": 0.4802,
+        "bias": -0.2196,
+        "sd": 0.5804,
+        "pass": 9,
+        "n": 20
+      }
+    },
+    "U6. PI tertile lookup table": {
+      "idea": "3 constants picked by PI bin, no physics",
+      "params": [
+        4.35859,
+        2.74973,
+        2.32823
+      ],
+      "test": {
+        "mae": 0.5479,
+        "bias": -0.2142,
+        "sd": 0.8415,
+        "pass": 11,
+        "n": 20
+      }
+    },
+    "U7. Lead filter (anti-lag)": {
+      "idea": "Linear Rational + 1 EMA lead term",
+      "params": [
+        0.83628,
+        1.02317,
+        1.55629,
+        1.15419
+      ],
+      "test": {
+        "mae": 0.2948,
+        "bias": -0.0323,
+        "sd": 0.4181,
+        "pass": 15,
+        "n": 20
+      }
+    },
+    "U8. Max-hold 180 s": {
+      "idea": "Use running max of skin instead of current skin",
+      "params": [
+        0.92677,
+        1.3539,
+        1.40656
+      ],
+      "test": {
+        "mae": 0.4253,
+        "bias": -0.075,
+        "sd": 0.5955,
+        "pass": 12,
+        "n": 20
+      }
+    }
+  }
+}

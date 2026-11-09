@@ -1,0 +1,57 @@
+{
+  "dataset_path": "C:\\Users\\Adyty\\Documents\\Farid ITS\\TriaGo\\data_primer",
+  "total_subjects": 21,
+  "clean_subjects": 11,
+  "total_segments_created": 126,
+  "clean_segments_sqi": 39,
+  "uncalibrated": {
+    "sbp": {
+      "mae": 12.92,
+      "std": 13.03,
+      "rmse": 15.69,
+      "bias": -8.74,
+      "pct_le_5": 25.64,
+      "pct_le_10": 46.15,
+      "pct_le_15": 61.54,
+      "bhs_grade": "D",
+      "aami_pass": false
+    },
+    "dbp": {
+      "mae": 6.37,
+      "std": 7.71,
+      "rmse": 7.71,
+      "bias": -0.03,
+      "pct_le_5": 46.15,
+      "pct_le_10": 74.36,
+      "pct_le_15": 100.0,
+      "bhs_grade": "C",
+      "aami_pass": true
+    }
+  },
+  "calibrated_1pt": {
+    "eval_segments": 28,
+    "multi_segment_subjects": 7,
+    "sbp": {
+      "mae": 3.54,
+      "std": 4.27,
+      "rmse": 4.84,
+      "bias": 2.28,
+      "pct_le_5": 75.0,
+      "pct_le_10": 92.86,
+      "pct_le_15": 100.0,
+      "bhs_grade": "A",
+      "aami_pass": true
+    },
+    "dbp": {
+      "mae": 2.91,
+      "std": 3.75,
+      "rmse": 4.12,
+      "bias": 1.69,
+      "pct_le_5": 78.57,
+      "pct_le_10": 92.86,
+      "pct_le_15": 100.0,
+      "bhs_grade": "A",
+      "aami_pass": true
+    }
+  }
+}

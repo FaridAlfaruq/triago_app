@@ -1,0 +1,26 @@
+{
+  "task_id": "STAGE1-SEGMENTATION-SQI",
+  "subject_id": "subject001",
+  "sampling_rate_hz": 125.0,
+  "segment_config": {
+    "window_sec": 10.0,
+    "stride_sec": 2.0,
+    "window_samples": 1250
+  },
+  "sqi_results": {
+    "total_segments": 25,
+    "passed_segments": 11,
+    "pass_rate_pct": 44.0,
+    "rejected_segments": 14
+  },
+  "sample_valid_metrics": {
+    "hr_ecg": 72.5,
+    "hr_ppg": 72.6,
+    "hr_diff": 0.1,
+    "skewness": 0.05,
+    "kurtosis": 3.37,
+    "spectral_snr": 0.985,
+    "n_ecg_peaks": 12,
+    "n_ppg_peaks": 12
+  }
+}

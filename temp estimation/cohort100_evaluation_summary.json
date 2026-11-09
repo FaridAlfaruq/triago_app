@@ -1,0 +1,3732 @@
+{
+  "study": "100-Case VitalDB Temperature Validation",
+  "timestamp": "2026-10-26 10:07:25",
+  "total_cases": 100,
+  "total_epochs": 75188,
+  "total_hours": 208.86,
+  "fixed_parameters": {
+    "a": 0.64182,
+    "b": 0.90705,
+    "alpha": 0.74725,
+    "w0": 14.307376,
+    "w1": 1.189176,
+    "w2": 0.64418,
+    "w3": -0.591838,
+    "w4": -0.904093
+  },
+  "train_patients": [
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13,
+    14,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    26,
+    29,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    40,
+    42,
+    43,
+    44,
+    46,
+    48,
+    49,
+    50,
+    51,
+    52,
+    54,
+    60,
+    61,
+    64,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    73,
+    77,
+    78,
+    79,
+    80,
+    82,
+    83,
+    84,
+    85,
+    87,
+    88,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    98,
+    99,
+    100,
+    103,
+    106,
+    108,
+    109,
+    110
+  ],
+  "test_patients": [
+    1,
+    5,
+    16,
+    24,
+    25,
+    27,
+    28,
+    30,
+    31,
+    38,
+    41,
+    45,
+    47,
+    57,
+    58,
+    62,
+    63,
+    65,
+    72,
+    74,
+    75,
+    81,
+    89,
+    90,
+    97,
+    101,
+    104,
+    105,
+    107,
+    115
+  ],
+  "test_metrics_30_patients": {
+    "1. Basic Bioheat (Fixed a,b,alpha)": {
+      "pooled_mae": 0.3515,
+      "macro_mae": 0.3122,
+      "rmse": 0.5303,
+      "bias": -0.0629,
+      "sd": 0.5266,
+      "lower_loa": -1.095,
+      "upper_loa": 0.9693,
+      "acc_35": 66.63,
+      "acc_20": 49.68,
+      "cases_passed": 19,
+      "cases_total": 30,
+      "pass_rate_pct": 63.3,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 0.1043,
+          "bias": 0.0414,
+          "sd": 0.1277,
+          "acc_35": 98.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 0.5965,
+          "bias": -0.5438,
+          "sd": 0.4522,
+          "acc_35": 27.8,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 0.1157,
+          "bias": 0.0934,
+          "sd": 0.1251,
+          "acc_35": 97.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 0.3151,
+          "bias": -0.0228,
+          "sd": 0.4973,
+          "acc_35": 70.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 0.2055,
+          "bias": 0.0745,
+          "sd": 0.3058,
+          "acc_35": 86.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 0.4543,
+          "bias": -0.1426,
+          "sd": 0.6246,
+          "acc_35": 55.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 0.387,
+          "bias": 0.0585,
+          "sd": 0.5619,
+          "acc_35": 61.8,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 0.1609,
+          "bias": 0.0489,
+          "sd": 0.2751,
+          "acc_35": 93.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 0.384,
+          "bias": -0.0402,
+          "sd": 0.5168,
+          "acc_35": 57.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 0.1171,
+          "bias": 0.0672,
+          "sd": 0.1509,
+          "acc_35": 95.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 0.2025,
+          "bias": 0.1109,
+          "sd": 0.2785,
+          "acc_35": 84.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 0.2472,
+          "bias": -0.0035,
+          "sd": 0.3959,
+          "acc_35": 78.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 0.1961,
+          "bias": 0.1042,
+          "sd": 0.2897,
+          "acc_35": 85.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 0.2299,
+          "bias": 0.0005,
+          "sd": 0.3305,
+          "acc_35": 80.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 0.1758,
+          "bias": 0.1031,
+          "sd": 0.2575,
+          "acc_35": 89.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 0.3051,
+          "bias": 0.1126,
+          "sd": 0.3992,
+          "acc_35": 67.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 0.1198,
+          "bias": 0.0797,
+          "sd": 0.1237,
+          "acc_35": 99.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 0.3667,
+          "bias": -0.1612,
+          "sd": 0.4724,
+          "acc_35": 58.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 0.2811,
+          "bias": 0.0441,
+          "sd": 0.4284,
+          "acc_35": 74.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 0.2254,
+          "bias": 0.0085,
+          "sd": 0.3041,
+          "acc_35": 80.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 0.7203,
+          "bias": -0.0985,
+          "sd": 0.9285,
+          "acc_35": 34.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 0.1775,
+          "bias": 0.0594,
+          "sd": 0.2611,
+          "acc_35": 89.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 0.5882,
+          "bias": -0.3129,
+          "sd": 0.6584,
+          "acc_35": 36.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 0.4193,
+          "bias": -0.0746,
+          "sd": 0.6161,
+          "acc_35": 61.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 0.1595,
+          "bias": 0.0201,
+          "sd": 0.2229,
+          "acc_35": 90.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 0.7209,
+          "bias": -0.5064,
+          "sd": 0.7618,
+          "acc_35": 23.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 0.2951,
+          "bias": -0.0573,
+          "sd": 0.3836,
+          "acc_35": 69.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 0.3642,
+          "bias": -0.0186,
+          "sd": 0.5424,
+          "acc_35": 64.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 0.5074,
+          "bias": -0.1484,
+          "sd": 0.6563,
+          "acc_35": 46.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 0.2228,
+          "bias": -0.0926,
+          "sd": 0.3888,
+          "acc_35": 86.8,
+          "pass_mae35": true
+        }
+      ]
+    },
+    "2. Linearized Bioheat Ridge (Fixed Weights)": {
+      "pooled_mae": 0.2525,
+      "macro_mae": 0.2336,
+      "rmse": 0.3525,
+      "bias": -0.0762,
+      "sd": 0.3441,
+      "lower_loa": -0.7507,
+      "upper_loa": 0.5983,
+      "acc_35": 74.71,
+      "acc_20": 53.42,
+      "cases_passed": 24,
+      "cases_total": 30,
+      "pass_rate_pct": 80.0,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 0.1108,
+          "bias": 0.0405,
+          "sd": 0.1325,
+          "acc_35": 99.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 0.4028,
+          "bias": -0.3739,
+          "sd": 0.2832,
+          "acc_35": 44.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 0.0807,
+          "bias": 0.0017,
+          "sd": 0.105,
+          "acc_35": 99.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 0.1909,
+          "bias": -0.0691,
+          "sd": 0.2896,
+          "acc_35": 86.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 0.1573,
+          "bias": 0.0302,
+          "sd": 0.2001,
+          "acc_35": 92.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 0.2928,
+          "bias": 0.0727,
+          "sd": 0.3996,
+          "acc_35": 69.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 0.2437,
+          "bias": -0.0536,
+          "sd": 0.3426,
+          "acc_35": 75.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 0.1108,
+          "bias": -0.0288,
+          "sd": 0.1688,
+          "acc_35": 95.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 0.3033,
+          "bias": -0.2264,
+          "sd": 0.2978,
+          "acc_35": 65.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 0.2276,
+          "bias": -0.2021,
+          "sd": 0.1668,
+          "acc_35": 80.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 0.2248,
+          "bias": -0.1906,
+          "sd": 0.1709,
+          "acc_35": 86.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 0.1595,
+          "bias": -0.029,
+          "sd": 0.2258,
+          "acc_35": 88.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 0.2243,
+          "bias": 0.1598,
+          "sd": 0.2384,
+          "acc_35": 77.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 0.1884,
+          "bias": 0.1422,
+          "sd": 0.1853,
+          "acc_35": 88.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 0.3997,
+          "bias": 0.3979,
+          "sd": 0.1451,
+          "acc_35": 33.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 0.2401,
+          "bias": -0.1954,
+          "sd": 0.2252,
+          "acc_35": 79.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 0.1021,
+          "bias": -0.0882,
+          "sd": 0.0952,
+          "acc_35": 98.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 0.2173,
+          "bias": -0.0057,
+          "sd": 0.3501,
+          "acc_35": 85.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 0.2575,
+          "bias": -0.2015,
+          "sd": 0.2465,
+          "acc_35": 78.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 0.1454,
+          "bias": -0.0283,
+          "sd": 0.1939,
+          "acc_35": 94.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 0.455,
+          "bias": -0.1879,
+          "sd": 0.5675,
+          "acc_35": 49.7,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 0.1219,
+          "bias": -0.0595,
+          "sd": 0.1692,
+          "acc_35": 97.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 0.3401,
+          "bias": -0.0556,
+          "sd": 0.426,
+          "acc_35": 58.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 0.3983,
+          "bias": -0.3336,
+          "sd": 0.3058,
+          "acc_35": 45.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 0.1474,
+          "bias": 0.0714,
+          "sd": 0.174,
+          "acc_35": 94.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 0.405,
+          "bias": -0.2849,
+          "sd": 0.4751,
+          "acc_35": 48.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 0.1641,
+          "bias": -0.0508,
+          "sd": 0.2041,
+          "acc_35": 90.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 0.1904,
+          "bias": 0.0083,
+          "sd": 0.2836,
+          "acc_35": 84.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 0.3938,
+          "bias": -0.3306,
+          "sd": 0.3475,
+          "acc_35": 49.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 0.1131,
+          "bias": -0.0497,
+          "sd": 0.1865,
+          "acc_35": 92.7,
+          "pass_mae35": true
+        }
+      ]
+    },
+    "3. TriaGo Empirical Formula": {
+      "pooled_mae": 2.2658,
+      "macro_mae": 2.212,
+      "rmse": 2.3226,
+      "bias": -2.2656,
+      "sd": 0.5114,
+      "lower_loa": -3.268,
+      "upper_loa": -1.2633,
+      "acc_35": 0.01,
+      "acc_20": 0.01,
+      "cases_passed": 0,
+      "cases_total": 30,
+      "pass_rate_pct": 0.0,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 1.8952,
+          "bias": -1.8952,
+          "sd": 0.1549,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 2.8545,
+          "bias": -2.8545,
+          "sd": 0.3373,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 1.8717,
+          "bias": -1.8717,
+          "sd": 0.1625,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 2.055,
+          "bias": -2.05,
+          "sd": 0.3199,
+          "acc_35": 0.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 1.8476,
+          "bias": -1.8476,
+          "sd": 0.2767,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 2.318,
+          "bias": -2.318,
+          "sd": 0.568,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 2.2304,
+          "bias": -2.2304,
+          "sd": 0.4784,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 1.9046,
+          "bias": -1.9046,
+          "sd": 0.224,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 2.7103,
+          "bias": -2.7103,
+          "sd": 0.4325,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 2.1243,
+          "bias": -2.1243,
+          "sd": 0.2379,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 2.1526,
+          "bias": -2.1526,
+          "sd": 0.1607,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 2.0607,
+          "bias": -2.0607,
+          "sd": 0.2531,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 1.8768,
+          "bias": -1.8768,
+          "sd": 0.2171,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 2.0303,
+          "bias": -2.0303,
+          "sd": 0.3016,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 1.3908,
+          "bias": -1.3908,
+          "sd": 0.2097,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 2.4966,
+          "bias": -2.4966,
+          "sd": 0.3586,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 1.9507,
+          "bias": -1.9507,
+          "sd": 0.158,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 2.36,
+          "bias": -2.36,
+          "sd": 0.4654,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 2.2317,
+          "bias": -2.2317,
+          "sd": 0.2582,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 2.3903,
+          "bias": -2.3903,
+          "sd": 0.2071,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 2.5495,
+          "bias": -2.5495,
+          "sd": 0.6047,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 2.1089,
+          "bias": -2.1089,
+          "sd": 0.2244,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 2.3637,
+          "bias": -2.3637,
+          "sd": 0.5749,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 2.4737,
+          "bias": -2.4737,
+          "sd": 0.4846,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 1.8881,
+          "bias": -1.8881,
+          "sd": 0.1957,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 2.7513,
+          "bias": -2.7499,
+          "sd": 0.4242,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 2.4969,
+          "bias": -2.4969,
+          "sd": 0.3242,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 2.2864,
+          "bias": -2.2864,
+          "sd": 0.3989,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 2.7304,
+          "bias": -2.7304,
+          "sd": 0.4744,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 1.9588,
+          "bias": -1.9588,
+          "sd": 0.242,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        }
+      ]
+    }
+  },
+  "full_metrics_100_patients": {
+    "1. Basic Bioheat (Fixed a,b,alpha)": {
+      "pooled_mae": 0.2997,
+      "macro_mae": 0.3045,
+      "rmse": 0.4604,
+      "bias": -0.0216,
+      "sd": 0.4599,
+      "lower_loa": -0.9229,
+      "upper_loa": 0.8798,
+      "acc_35": 72.62,
+      "acc_20": 54.06,
+      "cases_passed": 70,
+      "cases_total": 100,
+      "pass_rate_pct": 70.0,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 0.1043,
+          "bias": 0.0414,
+          "sd": 0.1277,
+          "acc_35": 98.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 2,
+          "n_epochs": 1313,
+          "mae": 0.1446,
+          "bias": 0.06,
+          "sd": 0.2358,
+          "acc_35": 94.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 3,
+          "n_epochs": 219,
+          "mae": 0.2549,
+          "bias": -0.0875,
+          "sd": 0.3499,
+          "acc_35": 74.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 4,
+          "n_epochs": 747,
+          "mae": 0.2181,
+          "bias": 0.0778,
+          "sd": 0.3063,
+          "acc_35": 80.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 0.5965,
+          "bias": -0.5438,
+          "sd": 0.4522,
+          "acc_35": 27.8,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 6,
+          "n_epochs": 192,
+          "mae": 0.192,
+          "bias": 0.1888,
+          "sd": 0.213,
+          "acc_35": 95.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 7,
+          "n_epochs": 894,
+          "mae": 0.2133,
+          "bias": 0.1213,
+          "sd": 0.2467,
+          "acc_35": 83.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 8,
+          "n_epochs": 450,
+          "mae": 0.164,
+          "bias": 0.0317,
+          "sd": 0.2444,
+          "acc_35": 89.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 9,
+          "n_epochs": 272,
+          "mae": 0.2958,
+          "bias": -0.1251,
+          "sd": 0.5422,
+          "acc_35": 82.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 10,
+          "n_epochs": 1545,
+          "mae": 0.2568,
+          "bias": -0.0562,
+          "sd": 0.379,
+          "acc_35": 77.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 11,
+          "n_epochs": 407,
+          "mae": 0.3327,
+          "bias": 0.0058,
+          "sd": 0.4664,
+          "acc_35": 65.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 13,
+          "n_epochs": 380,
+          "mae": 0.2744,
+          "bias": 0.0507,
+          "sd": 0.3538,
+          "acc_35": 70.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 14,
+          "n_epochs": 265,
+          "mae": 0.5923,
+          "bias": -0.1838,
+          "sd": 0.8076,
+          "acc_35": 49.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 0.1157,
+          "bias": 0.0934,
+          "sd": 0.1251,
+          "acc_35": 97.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 17,
+          "n_epochs": 828,
+          "mae": 0.3825,
+          "bias": 0.0034,
+          "sd": 0.5455,
+          "acc_35": 62.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 18,
+          "n_epochs": 219,
+          "mae": 0.1522,
+          "bias": 0.1436,
+          "sd": 0.097,
+          "acc_35": 99.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 19,
+          "n_epochs": 2204,
+          "mae": 0.3299,
+          "bias": -0.1636,
+          "sd": 0.4109,
+          "acc_35": 64.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 20,
+          "n_epochs": 562,
+          "mae": 0.3372,
+          "bias": 0.1139,
+          "sd": 0.5449,
+          "acc_35": 68.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 21,
+          "n_epochs": 776,
+          "mae": 0.1823,
+          "bias": -0.0032,
+          "sd": 0.2794,
+          "acc_35": 90.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 22,
+          "n_epochs": 1072,
+          "mae": 0.1358,
+          "bias": 0.1183,
+          "sd": 0.1695,
+          "acc_35": 97.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 0.3151,
+          "bias": -0.0228,
+          "sd": 0.4973,
+          "acc_35": 70.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 0.2055,
+          "bias": 0.0745,
+          "sd": 0.3058,
+          "acc_35": 86.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 26,
+          "n_epochs": 569,
+          "mae": 0.2029,
+          "bias": 0.0378,
+          "sd": 0.305,
+          "acc_35": 85.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 0.4543,
+          "bias": -0.1426,
+          "sd": 0.6246,
+          "acc_35": 55.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 0.387,
+          "bias": 0.0585,
+          "sd": 0.5619,
+          "acc_35": 61.8,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 29,
+          "n_epochs": 1548,
+          "mae": 0.2158,
+          "bias": 0.0296,
+          "sd": 0.3103,
+          "acc_35": 81.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 0.1609,
+          "bias": 0.0489,
+          "sd": 0.2751,
+          "acc_35": 93.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 0.384,
+          "bias": -0.0402,
+          "sd": 0.5168,
+          "acc_35": 57.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 32,
+          "n_epochs": 158,
+          "mae": 0.1176,
+          "bias": 0.085,
+          "sd": 0.1363,
+          "acc_35": 97.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 33,
+          "n_epochs": 437,
+          "mae": 0.2111,
+          "bias": 0.0251,
+          "sd": 0.2934,
+          "acc_35": 83.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 34,
+          "n_epochs": 2072,
+          "mae": 0.364,
+          "bias": -0.2184,
+          "sd": 0.4523,
+          "acc_35": 61.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 35,
+          "n_epochs": 352,
+          "mae": 0.2413,
+          "bias": 0.0377,
+          "sd": 0.3667,
+          "acc_35": 83.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 36,
+          "n_epochs": 354,
+          "mae": 0.3745,
+          "bias": -0.0808,
+          "sd": 0.5303,
+          "acc_35": 61.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 37,
+          "n_epochs": 921,
+          "mae": 0.2557,
+          "bias": 0.04,
+          "sd": 0.3866,
+          "acc_35": 77.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 0.1171,
+          "bias": 0.0672,
+          "sd": 0.1509,
+          "acc_35": 95.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 40,
+          "n_epochs": 255,
+          "mae": 0.4393,
+          "bias": -0.1911,
+          "sd": 0.5877,
+          "acc_35": 53.7,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 0.2025,
+          "bias": 0.1109,
+          "sd": 0.2785,
+          "acc_35": 84.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 42,
+          "n_epochs": 1143,
+          "mae": 0.1434,
+          "bias": 0.0628,
+          "sd": 0.172,
+          "acc_35": 94.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 43,
+          "n_epochs": 1277,
+          "mae": 0.1983,
+          "bias": 0.0447,
+          "sd": 0.2813,
+          "acc_35": 85.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 44,
+          "n_epochs": 755,
+          "mae": 0.4082,
+          "bias": -0.1597,
+          "sd": 0.5636,
+          "acc_35": 57.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 0.2472,
+          "bias": -0.0035,
+          "sd": 0.3959,
+          "acc_35": 78.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 46,
+          "n_epochs": 269,
+          "mae": 0.2574,
+          "bias": 0.1715,
+          "sd": 0.3,
+          "acc_35": 74.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 0.1961,
+          "bias": 0.1042,
+          "sd": 0.2897,
+          "acc_35": 85.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 48,
+          "n_epochs": 633,
+          "mae": 0.2471,
+          "bias": 0.0144,
+          "sd": 0.3519,
+          "acc_35": 78.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 49,
+          "n_epochs": 723,
+          "mae": 0.422,
+          "bias": 0.0575,
+          "sd": 0.561,
+          "acc_35": 52.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 50,
+          "n_epochs": 1364,
+          "mae": 0.33,
+          "bias": -0.1203,
+          "sd": 0.4304,
+          "acc_35": 64.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 51,
+          "n_epochs": 197,
+          "mae": 0.3722,
+          "bias": -0.0692,
+          "sd": 0.4891,
+          "acc_35": 58.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 52,
+          "n_epochs": 1127,
+          "mae": 0.1313,
+          "bias": 0.0418,
+          "sd": 0.1847,
+          "acc_35": 95.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 54,
+          "n_epochs": 1019,
+          "mae": 0.3396,
+          "bias": -0.0201,
+          "sd": 0.4746,
+          "acc_35": 63.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 0.2299,
+          "bias": 0.0005,
+          "sd": 0.3305,
+          "acc_35": 80.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 0.1758,
+          "bias": 0.1031,
+          "sd": 0.2575,
+          "acc_35": 89.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 60,
+          "n_epochs": 279,
+          "mae": 0.2011,
+          "bias": 0.1548,
+          "sd": 0.1989,
+          "acc_35": 95.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 61,
+          "n_epochs": 462,
+          "mae": 0.181,
+          "bias": 0.0096,
+          "sd": 0.2479,
+          "acc_35": 87.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 0.3051,
+          "bias": 0.1126,
+          "sd": 0.3992,
+          "acc_35": 67.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 0.1198,
+          "bias": 0.0797,
+          "sd": 0.1237,
+          "acc_35": 99.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 64,
+          "n_epochs": 735,
+          "mae": 0.3267,
+          "bias": -0.029,
+          "sd": 0.4455,
+          "acc_35": 64.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 0.3667,
+          "bias": -0.1612,
+          "sd": 0.4724,
+          "acc_35": 58.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 66,
+          "n_epochs": 673,
+          "mae": 0.156,
+          "bias": 0.1099,
+          "sd": 0.3113,
+          "acc_35": 94.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 67,
+          "n_epochs": 468,
+          "mae": 0.3244,
+          "bias": 0.1278,
+          "sd": 0.385,
+          "acc_35": 60.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 68,
+          "n_epochs": 353,
+          "mae": 0.2017,
+          "bias": 0.0793,
+          "sd": 0.2379,
+          "acc_35": 84.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 69,
+          "n_epochs": 402,
+          "mae": 0.2722,
+          "bias": 0.1141,
+          "sd": 0.3981,
+          "acc_35": 75.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 70,
+          "n_epochs": 858,
+          "mae": 0.2509,
+          "bias": -0.0177,
+          "sd": 0.3321,
+          "acc_35": 75.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 71,
+          "n_epochs": 271,
+          "mae": 0.1918,
+          "bias": -0.0036,
+          "sd": 0.3322,
+          "acc_35": 91.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 0.2811,
+          "bias": 0.0441,
+          "sd": 0.4284,
+          "acc_35": 74.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 73,
+          "n_epochs": 303,
+          "mae": 0.1927,
+          "bias": -0.0648,
+          "sd": 0.3423,
+          "acc_35": 88.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 0.2254,
+          "bias": 0.0085,
+          "sd": 0.3041,
+          "acc_35": 80.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 0.7203,
+          "bias": -0.0985,
+          "sd": 0.9285,
+          "acc_35": 34.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 77,
+          "n_epochs": 794,
+          "mae": 0.3112,
+          "bias": -0.0228,
+          "sd": 0.4081,
+          "acc_35": 64.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 78,
+          "n_epochs": 216,
+          "mae": 0.5102,
+          "bias": -0.0799,
+          "sd": 0.6223,
+          "acc_35": 37.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 79,
+          "n_epochs": 1078,
+          "mae": 0.3145,
+          "bias": 0.0105,
+          "sd": 0.427,
+          "acc_35": 65.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 80,
+          "n_epochs": 151,
+          "mae": 0.5188,
+          "bias": -0.1862,
+          "sd": 0.6545,
+          "acc_35": 44.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 0.1775,
+          "bias": 0.0594,
+          "sd": 0.2611,
+          "acc_35": 89.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 82,
+          "n_epochs": 90,
+          "mae": 0.4348,
+          "bias": -0.3386,
+          "sd": 0.5438,
+          "acc_35": 64.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 83,
+          "n_epochs": 1619,
+          "mae": 0.1341,
+          "bias": 0.0252,
+          "sd": 0.1929,
+          "acc_35": 94.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 84,
+          "n_epochs": 1168,
+          "mae": 0.3827,
+          "bias": 0.0099,
+          "sd": 0.5514,
+          "acc_35": 61.8,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 85,
+          "n_epochs": 360,
+          "mae": 0.1954,
+          "bias": -0.0278,
+          "sd": 0.3255,
+          "acc_35": 87.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 87,
+          "n_epochs": 237,
+          "mae": 0.616,
+          "bias": 0.1104,
+          "sd": 0.8899,
+          "acc_35": 42.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 88,
+          "n_epochs": 576,
+          "mae": 0.5661,
+          "bias": 0.0223,
+          "sd": 0.7277,
+          "acc_35": 40.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 0.5882,
+          "bias": -0.3129,
+          "sd": 0.6584,
+          "acc_35": 36.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 0.4193,
+          "bias": -0.0746,
+          "sd": 0.6161,
+          "acc_35": 61.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 91,
+          "n_epochs": 330,
+          "mae": 0.2449,
+          "bias": -0.0483,
+          "sd": 0.4252,
+          "acc_35": 83.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 92,
+          "n_epochs": 308,
+          "mae": 0.2318,
+          "bias": -0.0258,
+          "sd": 0.3416,
+          "acc_35": 86.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 93,
+          "n_epochs": 166,
+          "mae": 0.1643,
+          "bias": 0.0715,
+          "sd": 0.2317,
+          "acc_35": 89.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 94,
+          "n_epochs": 1491,
+          "mae": 0.2939,
+          "bias": 0.0632,
+          "sd": 0.3957,
+          "acc_35": 68.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 95,
+          "n_epochs": 71,
+          "mae": 0.7548,
+          "bias": -0.6807,
+          "sd": 0.7057,
+          "acc_35": 38.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 96,
+          "n_epochs": 2937,
+          "mae": 0.1606,
+          "bias": 0.0585,
+          "sd": 0.2562,
+          "acc_35": 90.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 0.1595,
+          "bias": 0.0201,
+          "sd": 0.2229,
+          "acc_35": 90.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 98,
+          "n_epochs": 449,
+          "mae": 0.1596,
+          "bias": 0.0806,
+          "sd": 0.1977,
+          "acc_35": 89.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 99,
+          "n_epochs": 339,
+          "mae": 0.8023,
+          "bias": -0.0367,
+          "sd": 1.1348,
+          "acc_35": 41.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 100,
+          "n_epochs": 187,
+          "mae": 0.3675,
+          "bias": -0.1616,
+          "sd": 0.5546,
+          "acc_35": 67.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 0.7209,
+          "bias": -0.5064,
+          "sd": 0.7618,
+          "acc_35": 23.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 103,
+          "n_epochs": 519,
+          "mae": 0.5695,
+          "bias": -0.015,
+          "sd": 0.7845,
+          "acc_35": 45.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 0.2951,
+          "bias": -0.0573,
+          "sd": 0.3836,
+          "acc_35": 69.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 0.3642,
+          "bias": -0.0186,
+          "sd": 0.5424,
+          "acc_35": 64.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 106,
+          "n_epochs": 195,
+          "mae": 0.5393,
+          "bias": 0.1229,
+          "sd": 0.7737,
+          "acc_35": 55.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 0.5074,
+          "bias": -0.1484,
+          "sd": 0.6563,
+          "acc_35": 46.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 108,
+          "n_epochs": 647,
+          "mae": 0.3294,
+          "bias": 0.1598,
+          "sd": 0.4181,
+          "acc_35": 66.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 109,
+          "n_epochs": 1256,
+          "mae": 0.1688,
+          "bias": 0.0118,
+          "sd": 0.2553,
+          "acc_35": 91.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 110,
+          "n_epochs": 461,
+          "mae": 0.2893,
+          "bias": 0.0036,
+          "sd": 0.3779,
+          "acc_35": 67.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 0.2228,
+          "bias": -0.0926,
+          "sd": 0.3888,
+          "acc_35": 86.8,
+          "pass_mae35": true
+        }
+      ]
+    },
+    "2. Linearized Bioheat Ridge (Fixed Weights)": {
+      "pooled_mae": 0.2397,
+      "macro_mae": 0.2465,
+      "rmse": 0.3297,
+      "bias": -0.0081,
+      "sd": 0.3296,
+      "lower_loa": -0.6542,
+      "upper_loa": 0.638,
+      "acc_35": 78.0,
+      "acc_20": 53.86,
+      "cases_passed": 83,
+      "cases_total": 100,
+      "pass_rate_pct": 83.0,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 0.1108,
+          "bias": 0.0405,
+          "sd": 0.1325,
+          "acc_35": 99.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 2,
+          "n_epochs": 1313,
+          "mae": 0.228,
+          "bias": 0.1895,
+          "sd": 0.179,
+          "acc_35": 86.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 3,
+          "n_epochs": 219,
+          "mae": 0.2227,
+          "bias": 0.2033,
+          "sd": 0.2408,
+          "acc_35": 86.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 4,
+          "n_epochs": 747,
+          "mae": 0.3394,
+          "bias": 0.3201,
+          "sd": 0.2318,
+          "acc_35": 63.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 0.4028,
+          "bias": -0.3739,
+          "sd": 0.2832,
+          "acc_35": 44.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 6,
+          "n_epochs": 192,
+          "mae": 0.1411,
+          "bias": -0.101,
+          "sd": 0.1554,
+          "acc_35": 95.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 7,
+          "n_epochs": 894,
+          "mae": 0.1537,
+          "bias": -0.108,
+          "sd": 0.1662,
+          "acc_35": 92.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 8,
+          "n_epochs": 450,
+          "mae": 0.1505,
+          "bias": 0.1025,
+          "sd": 0.152,
+          "acc_35": 95.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 9,
+          "n_epochs": 272,
+          "mae": 0.442,
+          "bias": -0.4361,
+          "sd": 0.2615,
+          "acc_35": 33.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 10,
+          "n_epochs": 1545,
+          "mae": 0.158,
+          "bias": 0.0743,
+          "sd": 0.2004,
+          "acc_35": 91.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 11,
+          "n_epochs": 407,
+          "mae": 0.2022,
+          "bias": -0.0075,
+          "sd": 0.2755,
+          "acc_35": 81.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 13,
+          "n_epochs": 380,
+          "mae": 0.2224,
+          "bias": 0.1775,
+          "sd": 0.2193,
+          "acc_35": 77.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 14,
+          "n_epochs": 265,
+          "mae": 0.3616,
+          "bias": -0.2296,
+          "sd": 0.3869,
+          "acc_35": 58.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 0.0807,
+          "bias": 0.0017,
+          "sd": 0.105,
+          "acc_35": 99.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 17,
+          "n_epochs": 828,
+          "mae": 0.4307,
+          "bias": 0.3879,
+          "sd": 0.3751,
+          "acc_35": 50.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 18,
+          "n_epochs": 219,
+          "mae": 0.1189,
+          "bias": -0.1059,
+          "sd": 0.099,
+          "acc_35": 99.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 19,
+          "n_epochs": 2204,
+          "mae": 0.2065,
+          "bias": -0.0945,
+          "sd": 0.2528,
+          "acc_35": 83.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 20,
+          "n_epochs": 562,
+          "mae": 0.4575,
+          "bias": -0.3854,
+          "sd": 0.4654,
+          "acc_35": 48.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 21,
+          "n_epochs": 776,
+          "mae": 0.1344,
+          "bias": -0.0287,
+          "sd": 0.1773,
+          "acc_35": 95.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 22,
+          "n_epochs": 1072,
+          "mae": 0.2242,
+          "bias": 0.213,
+          "sd": 0.1548,
+          "acc_35": 86.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 0.1909,
+          "bias": -0.0691,
+          "sd": 0.2896,
+          "acc_35": 86.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 0.1573,
+          "bias": 0.0302,
+          "sd": 0.2001,
+          "acc_35": 92.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 26,
+          "n_epochs": 569,
+          "mae": 0.3172,
+          "bias": 0.3021,
+          "sd": 0.1771,
+          "acc_35": 61.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 0.2928,
+          "bias": 0.0727,
+          "sd": 0.3996,
+          "acc_35": 69.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 0.2437,
+          "bias": -0.0536,
+          "sd": 0.3426,
+          "acc_35": 75.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 29,
+          "n_epochs": 1548,
+          "mae": 0.1376,
+          "bias": -0.0105,
+          "sd": 0.1929,
+          "acc_35": 93.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 0.1108,
+          "bias": -0.0288,
+          "sd": 0.1688,
+          "acc_35": 95.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 0.3033,
+          "bias": -0.2264,
+          "sd": 0.2978,
+          "acc_35": 65.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 32,
+          "n_epochs": 158,
+          "mae": 0.1645,
+          "bias": -0.1574,
+          "sd": 0.0984,
+          "acc_35": 97.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 33,
+          "n_epochs": 437,
+          "mae": 0.1699,
+          "bias": 0.0492,
+          "sd": 0.2117,
+          "acc_35": 92.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 34,
+          "n_epochs": 2072,
+          "mae": 0.194,
+          "bias": -0.0548,
+          "sd": 0.2551,
+          "acc_35": 85.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 35,
+          "n_epochs": 352,
+          "mae": 0.2033,
+          "bias": 0.1391,
+          "sd": 0.2991,
+          "acc_35": 81.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 36,
+          "n_epochs": 354,
+          "mae": 0.3871,
+          "bias": -0.3295,
+          "sd": 0.3095,
+          "acc_35": 47.7,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 37,
+          "n_epochs": 921,
+          "mae": 0.2305,
+          "bias": 0.1785,
+          "sd": 0.2444,
+          "acc_35": 81.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 0.2276,
+          "bias": -0.2021,
+          "sd": 0.1668,
+          "acc_35": 80.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 40,
+          "n_epochs": 255,
+          "mae": 0.4695,
+          "bias": -0.3265,
+          "sd": 0.5109,
+          "acc_35": 46.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 0.2248,
+          "bias": -0.1906,
+          "sd": 0.1709,
+          "acc_35": 86.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 42,
+          "n_epochs": 1143,
+          "mae": 0.1088,
+          "bias": -0.0488,
+          "sd": 0.1316,
+          "acc_35": 98.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 43,
+          "n_epochs": 1277,
+          "mae": 0.2026,
+          "bias": 0.1737,
+          "sd": 0.1695,
+          "acc_35": 88.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 44,
+          "n_epochs": 755,
+          "mae": 0.2391,
+          "bias": 0.0932,
+          "sd": 0.332,
+          "acc_35": 78.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 0.1595,
+          "bias": -0.029,
+          "sd": 0.2258,
+          "acc_35": 88.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 46,
+          "n_epochs": 269,
+          "mae": 0.2259,
+          "bias": -0.1744,
+          "sd": 0.1993,
+          "acc_35": 82.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 0.2243,
+          "bias": 0.1598,
+          "sd": 0.2384,
+          "acc_35": 77.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 48,
+          "n_epochs": 633,
+          "mae": 0.2628,
+          "bias": -0.2388,
+          "sd": 0.213,
+          "acc_35": 73.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 49,
+          "n_epochs": 723,
+          "mae": 0.2798,
+          "bias": 0.1854,
+          "sd": 0.3064,
+          "acc_35": 66.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 50,
+          "n_epochs": 1364,
+          "mae": 0.2047,
+          "bias": -0.0966,
+          "sd": 0.2527,
+          "acc_35": 84.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 51,
+          "n_epochs": 197,
+          "mae": 0.2426,
+          "bias": -0.0199,
+          "sd": 0.3099,
+          "acc_35": 74.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 52,
+          "n_epochs": 1127,
+          "mae": 0.1703,
+          "bias": 0.0108,
+          "sd": 0.2041,
+          "acc_35": 93.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 54,
+          "n_epochs": 1019,
+          "mae": 0.2241,
+          "bias": 0.1111,
+          "sd": 0.2936,
+          "acc_35": 81.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 0.1884,
+          "bias": 0.1422,
+          "sd": 0.1853,
+          "acc_35": 88.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 0.3997,
+          "bias": 0.3979,
+          "sd": 0.1451,
+          "acc_35": 33.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 60,
+          "n_epochs": 279,
+          "mae": 0.3115,
+          "bias": 0.3019,
+          "sd": 0.16,
+          "acc_35": 72.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 61,
+          "n_epochs": 462,
+          "mae": 0.2188,
+          "bias": 0.2085,
+          "sd": 0.2128,
+          "acc_35": 85.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 0.2401,
+          "bias": -0.1954,
+          "sd": 0.2252,
+          "acc_35": 79.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 0.1021,
+          "bias": -0.0882,
+          "sd": 0.0952,
+          "acc_35": 98.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 64,
+          "n_epochs": 735,
+          "mae": 0.232,
+          "bias": 0.1377,
+          "sd": 0.2596,
+          "acc_35": 78.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 0.2173,
+          "bias": -0.0057,
+          "sd": 0.3501,
+          "acc_35": 85.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 66,
+          "n_epochs": 673,
+          "mae": 0.2587,
+          "bias": 0.2586,
+          "sd": 0.174,
+          "acc_35": 87.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 67,
+          "n_epochs": 468,
+          "mae": 0.3722,
+          "bias": 0.3547,
+          "sd": 0.2567,
+          "acc_35": 47.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 68,
+          "n_epochs": 353,
+          "mae": 0.1403,
+          "bias": -0.0938,
+          "sd": 0.1541,
+          "acc_35": 93.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 69,
+          "n_epochs": 402,
+          "mae": 0.2099,
+          "bias": -0.109,
+          "sd": 0.2522,
+          "acc_35": 86.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 70,
+          "n_epochs": 858,
+          "mae": 0.1517,
+          "bias": -0.0756,
+          "sd": 0.1891,
+          "acc_35": 91.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 71,
+          "n_epochs": 271,
+          "mae": 0.1598,
+          "bias": -0.0076,
+          "sd": 0.2962,
+          "acc_35": 91.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 0.2575,
+          "bias": -0.2015,
+          "sd": 0.2465,
+          "acc_35": 78.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 73,
+          "n_epochs": 303,
+          "mae": 0.1139,
+          "bias": -0.0756,
+          "sd": 0.1614,
+          "acc_35": 94.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 0.1454,
+          "bias": -0.0283,
+          "sd": 0.1939,
+          "acc_35": 94.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 0.455,
+          "bias": -0.1879,
+          "sd": 0.5675,
+          "acc_35": 49.7,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 77,
+          "n_epochs": 794,
+          "mae": 0.3183,
+          "bias": 0.2903,
+          "sd": 0.2609,
+          "acc_35": 61.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 78,
+          "n_epochs": 216,
+          "mae": 0.2486,
+          "bias": 0.0345,
+          "sd": 0.3211,
+          "acc_35": 71.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 79,
+          "n_epochs": 1078,
+          "mae": 0.237,
+          "bias": 0.1373,
+          "sd": 0.2599,
+          "acc_35": 77.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 80,
+          "n_epochs": 151,
+          "mae": 0.238,
+          "bias": -0.0598,
+          "sd": 0.3152,
+          "acc_35": 76.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 0.1219,
+          "bias": -0.0595,
+          "sd": 0.1692,
+          "acc_35": 97.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 82,
+          "n_epochs": 90,
+          "mae": 0.2712,
+          "bias": -0.241,
+          "sd": 0.2606,
+          "acc_35": 72.2,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 83,
+          "n_epochs": 1619,
+          "mae": 0.1547,
+          "bias": 0.0688,
+          "sd": 0.1873,
+          "acc_35": 93.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 84,
+          "n_epochs": 1168,
+          "mae": 0.2471,
+          "bias": 0.0649,
+          "sd": 0.3298,
+          "acc_35": 77.3,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 85,
+          "n_epochs": 360,
+          "mae": 0.0965,
+          "bias": -0.0152,
+          "sd": 0.1402,
+          "acc_35": 96.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 87,
+          "n_epochs": 237,
+          "mae": 0.863,
+          "bias": -0.7233,
+          "sd": 0.6743,
+          "acc_35": 15.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 88,
+          "n_epochs": 576,
+          "mae": 0.3254,
+          "bias": 0.0713,
+          "sd": 0.4282,
+          "acc_35": 63.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 0.3401,
+          "bias": -0.0556,
+          "sd": 0.426,
+          "acc_35": 58.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 0.3983,
+          "bias": -0.3336,
+          "sd": 0.3058,
+          "acc_35": 45.9,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 91,
+          "n_epochs": 330,
+          "mae": 0.1756,
+          "bias": -0.1428,
+          "sd": 0.1993,
+          "acc_35": 90.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 92,
+          "n_epochs": 308,
+          "mae": 0.204,
+          "bias": -0.1842,
+          "sd": 0.1922,
+          "acc_35": 85.7,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 93,
+          "n_epochs": 166,
+          "mae": 0.1396,
+          "bias": -0.1055,
+          "sd": 0.143,
+          "acc_35": 94.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 94,
+          "n_epochs": 1491,
+          "mae": 0.2624,
+          "bias": -0.1855,
+          "sd": 0.265,
+          "acc_35": 74.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 95,
+          "n_epochs": 71,
+          "mae": 0.5553,
+          "bias": -0.4798,
+          "sd": 0.4183,
+          "acc_35": 28.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 96,
+          "n_epochs": 2937,
+          "mae": 0.3001,
+          "bias": 0.0352,
+          "sd": 0.3679,
+          "acc_35": 64.0,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 0.1474,
+          "bias": 0.0714,
+          "sd": 0.174,
+          "acc_35": 94.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 98,
+          "n_epochs": 449,
+          "mae": 0.1554,
+          "bias": 0.1295,
+          "sd": 0.1568,
+          "acc_35": 90.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 99,
+          "n_epochs": 339,
+          "mae": 0.4978,
+          "bias": -0.1576,
+          "sd": 0.6025,
+          "acc_35": 40.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 100,
+          "n_epochs": 187,
+          "mae": 0.2535,
+          "bias": -0.2209,
+          "sd": 0.2771,
+          "acc_35": 78.1,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 0.405,
+          "bias": -0.2849,
+          "sd": 0.4751,
+          "acc_35": 48.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 103,
+          "n_epochs": 519,
+          "mae": 0.3618,
+          "bias": 0.1472,
+          "sd": 0.4821,
+          "acc_35": 61.5,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 0.1641,
+          "bias": -0.0508,
+          "sd": 0.2041,
+          "acc_35": 90.8,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 0.1904,
+          "bias": 0.0083,
+          "sd": 0.2836,
+          "acc_35": 84.4,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 106,
+          "n_epochs": 195,
+          "mae": 0.3384,
+          "bias": 0.0163,
+          "sd": 0.4361,
+          "acc_35": 65.6,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 0.3938,
+          "bias": -0.3306,
+          "sd": 0.3475,
+          "acc_35": 49.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 108,
+          "n_epochs": 647,
+          "mae": 0.2576,
+          "bias": 0.114,
+          "sd": 0.3353,
+          "acc_35": 71.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 109,
+          "n_epochs": 1256,
+          "mae": 0.1433,
+          "bias": 0.0895,
+          "sd": 0.1555,
+          "acc_35": 95.9,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 110,
+          "n_epochs": 461,
+          "mae": 0.2011,
+          "bias": -0.1148,
+          "sd": 0.2159,
+          "acc_35": 85.5,
+          "pass_mae35": true
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 0.1131,
+          "bias": -0.0497,
+          "sd": 0.1865,
+          "acc_35": 92.7,
+          "pass_mae35": true
+        }
+      ]
+    },
+    "3. TriaGo Empirical Formula": {
+      "pooled_mae": 2.1488,
+      "macro_mae": 2.1474,
+      "rmse": 2.1998,
+      "bias": -2.1487,
+      "sd": 0.4713,
+      "lower_loa": -3.0725,
+      "upper_loa": -1.2249,
+      "acc_35": 0.03,
+      "acc_20": 0.01,
+      "cases_passed": 0,
+      "cases_total": 100,
+      "pass_rate_pct": 0.0,
+      "per_case": [
+        {
+          "caseid": 1,
+          "n_epochs": 680,
+          "mae": 1.8952,
+          "bias": -1.8952,
+          "sd": 0.1549,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 2,
+          "n_epochs": 1313,
+          "mae": 1.6138,
+          "bias": -1.6138,
+          "sd": 0.2702,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 3,
+          "n_epochs": 219,
+          "mae": 1.6638,
+          "bias": -1.6638,
+          "sd": 0.2635,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 4,
+          "n_epochs": 747,
+          "mae": 1.717,
+          "bias": -1.717,
+          "sd": 0.2903,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 5,
+          "n_epochs": 1232,
+          "mae": 2.8545,
+          "bias": -2.8545,
+          "sd": 0.3373,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 6,
+          "n_epochs": 192,
+          "mae": 1.9608,
+          "bias": -1.9608,
+          "sd": 0.1441,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 7,
+          "n_epochs": 894,
+          "mae": 2.1605,
+          "bias": -2.1605,
+          "sd": 0.2282,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 8,
+          "n_epochs": 450,
+          "mae": 1.7681,
+          "bias": -1.7681,
+          "sd": 0.1942,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 9,
+          "n_epochs": 272,
+          "mae": 2.4544,
+          "bias": -2.4544,
+          "sd": 0.359,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 10,
+          "n_epochs": 1545,
+          "mae": 1.9803,
+          "bias": -1.9803,
+          "sd": 0.3104,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 11,
+          "n_epochs": 407,
+          "mae": 2.0628,
+          "bias": -2.0628,
+          "sd": 0.2081,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 13,
+          "n_epochs": 380,
+          "mae": 1.9534,
+          "bias": -1.9534,
+          "sd": 0.2791,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 14,
+          "n_epochs": 265,
+          "mae": 2.5293,
+          "bias": -2.5293,
+          "sd": 0.5215,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 16,
+          "n_epochs": 1028,
+          "mae": 1.8717,
+          "bias": -1.8717,
+          "sd": 0.1625,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 17,
+          "n_epochs": 828,
+          "mae": 1.7535,
+          "bias": -1.7535,
+          "sd": 0.4283,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 18,
+          "n_epochs": 219,
+          "mae": 1.9668,
+          "bias": -1.9668,
+          "sd": 0.1674,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 19,
+          "n_epochs": 2204,
+          "mae": 2.3395,
+          "bias": -2.3395,
+          "sd": 0.3706,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 20,
+          "n_epochs": 562,
+          "mae": 2.8742,
+          "bias": -2.8742,
+          "sd": 0.3838,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 21,
+          "n_epochs": 776,
+          "mae": 2.0397,
+          "bias": -2.0397,
+          "sd": 0.2567,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 22,
+          "n_epochs": 1072,
+          "mae": 1.569,
+          "bias": -1.569,
+          "sd": 0.2074,
+          "acc_35": 0.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 24,
+          "n_epochs": 480,
+          "mae": 2.055,
+          "bias": -2.05,
+          "sd": 0.3199,
+          "acc_35": 0.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 25,
+          "n_epochs": 748,
+          "mae": 1.8476,
+          "bias": -1.8476,
+          "sd": 0.2767,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 26,
+          "n_epochs": 569,
+          "mae": 1.5791,
+          "bias": -1.5791,
+          "sd": 0.2488,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 27,
+          "n_epochs": 1418,
+          "mae": 2.318,
+          "bias": -2.318,
+          "sd": 0.568,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 28,
+          "n_epochs": 1656,
+          "mae": 2.2304,
+          "bias": -2.2304,
+          "sd": 0.4784,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 29,
+          "n_epochs": 1548,
+          "mae": 2.0493,
+          "bias": -2.0493,
+          "sd": 0.1856,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 30,
+          "n_epochs": 888,
+          "mae": 1.9046,
+          "bias": -1.9046,
+          "sd": 0.224,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 31,
+          "n_epochs": 760,
+          "mae": 2.7103,
+          "bias": -2.7103,
+          "sd": 0.4325,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 32,
+          "n_epochs": 158,
+          "mae": 2.0687,
+          "bias": -2.0687,
+          "sd": 0.1403,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 33,
+          "n_epochs": 437,
+          "mae": 2.3225,
+          "bias": -2.3225,
+          "sd": 0.2057,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 34,
+          "n_epochs": 2072,
+          "mae": 2.3341,
+          "bias": -2.3341,
+          "sd": 0.4369,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 35,
+          "n_epochs": 352,
+          "mae": 1.803,
+          "bias": -1.8011,
+          "sd": 0.3769,
+          "acc_35": 2.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 36,
+          "n_epochs": 354,
+          "mae": 2.5513,
+          "bias": -2.5513,
+          "sd": 0.3644,
+          "acc_35": 0.3,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 37,
+          "n_epochs": 921,
+          "mae": 1.7944,
+          "bias": -1.7944,
+          "sd": 0.214,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 38,
+          "n_epochs": 716,
+          "mae": 2.1243,
+          "bias": -2.1243,
+          "sd": 0.2379,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 40,
+          "n_epochs": 255,
+          "mae": 2.651,
+          "bias": -2.651,
+          "sd": 0.3485,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 41,
+          "n_epochs": 898,
+          "mae": 2.1526,
+          "bias": -2.1526,
+          "sd": 0.1607,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 42,
+          "n_epochs": 1143,
+          "mae": 2.0863,
+          "bias": -2.0863,
+          "sd": 0.1776,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 43,
+          "n_epochs": 1277,
+          "mae": 2.1382,
+          "bias": -2.1382,
+          "sd": 0.2674,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 44,
+          "n_epochs": 755,
+          "mae": 2.1865,
+          "bias": -2.1865,
+          "sd": 0.4833,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 45,
+          "n_epochs": 391,
+          "mae": 2.0607,
+          "bias": -2.0607,
+          "sd": 0.2531,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 46,
+          "n_epochs": 269,
+          "mae": 2.4125,
+          "bias": -2.4125,
+          "sd": 0.2015,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 47,
+          "n_epochs": 167,
+          "mae": 1.8768,
+          "bias": -1.8768,
+          "sd": 0.2171,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 48,
+          "n_epochs": 633,
+          "mae": 2.3098,
+          "bias": -2.3098,
+          "sd": 0.2313,
+          "acc_35": 0.2,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 49,
+          "n_epochs": 723,
+          "mae": 2.0215,
+          "bias": -2.0215,
+          "sd": 0.3895,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 50,
+          "n_epochs": 1364,
+          "mae": 2.2402,
+          "bias": -2.2402,
+          "sd": 0.3697,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 51,
+          "n_epochs": 197,
+          "mae": 2.1975,
+          "bias": -2.1975,
+          "sd": 0.4388,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 52,
+          "n_epochs": 1127,
+          "mae": 1.8546,
+          "bias": -1.8546,
+          "sd": 0.292,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 54,
+          "n_epochs": 1019,
+          "mae": 2.2371,
+          "bias": -2.2371,
+          "sd": 0.3306,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 57,
+          "n_epochs": 775,
+          "mae": 2.0303,
+          "bias": -2.0303,
+          "sd": 0.3016,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 58,
+          "n_epochs": 1026,
+          "mae": 1.3908,
+          "bias": -1.3908,
+          "sd": 0.2097,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 60,
+          "n_epochs": 279,
+          "mae": 1.4926,
+          "bias": -1.4926,
+          "sd": 0.1664,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 61,
+          "n_epochs": 462,
+          "mae": 2.0364,
+          "bias": -2.0364,
+          "sd": 0.2321,
+          "acc_35": 0.6,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 62,
+          "n_epochs": 745,
+          "mae": 2.4966,
+          "bias": -2.4966,
+          "sd": 0.3586,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 63,
+          "n_epochs": 305,
+          "mae": 1.9507,
+          "bias": -1.9507,
+          "sd": 0.158,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 64,
+          "n_epochs": 735,
+          "mae": 2.0079,
+          "bias": -2.0079,
+          "sd": 0.3032,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 65,
+          "n_epochs": 864,
+          "mae": 2.36,
+          "bias": -2.36,
+          "sd": 0.4654,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 66,
+          "n_epochs": 673,
+          "mae": 1.6846,
+          "bias": -1.6846,
+          "sd": 0.2276,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 67,
+          "n_epochs": 468,
+          "mae": 2.0039,
+          "bias": -2.0039,
+          "sd": 0.3187,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 68,
+          "n_epochs": 353,
+          "mae": 2.2804,
+          "bias": -2.2804,
+          "sd": 0.1605,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 69,
+          "n_epochs": 402,
+          "mae": 2.1191,
+          "bias": -2.1191,
+          "sd": 0.1978,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 70,
+          "n_epochs": 858,
+          "mae": 2.4232,
+          "bias": -2.4232,
+          "sd": 0.2801,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 71,
+          "n_epochs": 271,
+          "mae": 1.91,
+          "bias": -1.91,
+          "sd": 0.2435,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 72,
+          "n_epochs": 614,
+          "mae": 2.2317,
+          "bias": -2.2317,
+          "sd": 0.2582,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 73,
+          "n_epochs": 303,
+          "mae": 2.0207,
+          "bias": -2.0207,
+          "sd": 0.2119,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 74,
+          "n_epochs": 941,
+          "mae": 2.3903,
+          "bias": -2.3903,
+          "sd": 0.2071,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 75,
+          "n_epochs": 1489,
+          "mae": 2.5495,
+          "bias": -2.5495,
+          "sd": 0.6047,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 77,
+          "n_epochs": 794,
+          "mae": 2.0975,
+          "bias": -2.0975,
+          "sd": 0.4838,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 78,
+          "n_epochs": 216,
+          "mae": 2.2399,
+          "bias": -2.2399,
+          "sd": 0.3337,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 79,
+          "n_epochs": 1078,
+          "mae": 2.1594,
+          "bias": -2.1594,
+          "sd": 0.4362,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 80,
+          "n_epochs": 151,
+          "mae": 2.0641,
+          "bias": -2.0641,
+          "sd": 0.2804,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 81,
+          "n_epochs": 1084,
+          "mae": 2.1089,
+          "bias": -2.1089,
+          "sd": 0.2244,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 82,
+          "n_epochs": 90,
+          "mae": 2.1521,
+          "bias": -2.1521,
+          "sd": 0.3076,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 83,
+          "n_epochs": 1619,
+          "mae": 2.1456,
+          "bias": -2.1456,
+          "sd": 0.3215,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 84,
+          "n_epochs": 1168,
+          "mae": 2.1677,
+          "bias": -2.1677,
+          "sd": 0.4625,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 85,
+          "n_epochs": 360,
+          "mae": 1.9225,
+          "bias": -1.9225,
+          "sd": 0.1807,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 87,
+          "n_epochs": 237,
+          "mae": 3.2837,
+          "bias": -3.2837,
+          "sd": 0.5451,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 88,
+          "n_epochs": 576,
+          "mae": 2.1268,
+          "bias": -2.1268,
+          "sd": 0.295,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 89,
+          "n_epochs": 1541,
+          "mae": 2.3637,
+          "bias": -2.3637,
+          "sd": 0.5749,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 90,
+          "n_epochs": 318,
+          "mae": 2.4737,
+          "bias": -2.4737,
+          "sd": 0.4846,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 91,
+          "n_epochs": 330,
+          "mae": 2.0566,
+          "bias": -2.0566,
+          "sd": 0.2235,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 92,
+          "n_epochs": 308,
+          "mae": 2.2014,
+          "bias": -2.2014,
+          "sd": 0.2358,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 93,
+          "n_epochs": 166,
+          "mae": 2.0364,
+          "bias": -2.0364,
+          "sd": 0.1993,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 94,
+          "n_epochs": 1491,
+          "mae": 2.4205,
+          "bias": -2.4205,
+          "sd": 0.2737,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 95,
+          "n_epochs": 71,
+          "mae": 3.0124,
+          "bias": -3.0124,
+          "sd": 0.4834,
+          "acc_35": 1.4,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 96,
+          "n_epochs": 2937,
+          "mae": 1.8189,
+          "bias": -1.8189,
+          "sd": 0.4594,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 97,
+          "n_epochs": 1127,
+          "mae": 1.8881,
+          "bias": -1.8881,
+          "sd": 0.1957,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 98,
+          "n_epochs": 449,
+          "mae": 1.7462,
+          "bias": -1.7462,
+          "sd": 0.1709,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 99,
+          "n_epochs": 339,
+          "mae": 2.6787,
+          "bias": -2.6787,
+          "sd": 0.6496,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 100,
+          "n_epochs": 187,
+          "mae": 2.2554,
+          "bias": -2.2554,
+          "sd": 0.3286,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 101,
+          "n_epochs": 915,
+          "mae": 2.7513,
+          "bias": -2.7499,
+          "sd": 0.4242,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 103,
+          "n_epochs": 519,
+          "mae": 2.0237,
+          "bias": -2.0237,
+          "sd": 0.5131,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 104,
+          "n_epochs": 1003,
+          "mae": 2.4969,
+          "bias": -2.4969,
+          "sd": 0.3242,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 105,
+          "n_epochs": 1458,
+          "mae": 2.2864,
+          "bias": -2.2864,
+          "sd": 0.3989,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 106,
+          "n_epochs": 195,
+          "mae": 2.0629,
+          "bias": -2.0629,
+          "sd": 0.3378,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 107,
+          "n_epochs": 1734,
+          "mae": 2.7304,
+          "bias": -2.7304,
+          "sd": 0.4744,
+          "acc_35": 0.1,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 108,
+          "n_epochs": 647,
+          "mae": 1.9309,
+          "bias": -1.9309,
+          "sd": 0.29,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 109,
+          "n_epochs": 1256,
+          "mae": 1.9835,
+          "bias": -1.9835,
+          "sd": 0.1962,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 110,
+          "n_epochs": 461,
+          "mae": 2.573,
+          "bias": -2.573,
+          "sd": 0.2889,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        },
+        {
+          "caseid": 115,
+          "n_epochs": 220,
+          "mae": 1.9588,
+          "bias": -1.9588,
+          "sd": 0.242,
+          "acc_35": 0.0,
+          "pass_mae35": false
+        }
+      ]
+    }
+  },
+  "runtime_total_sec": 111.09
+}

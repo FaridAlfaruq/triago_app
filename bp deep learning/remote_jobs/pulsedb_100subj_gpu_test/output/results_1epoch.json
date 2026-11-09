@@ -1,0 +1,12 @@
+{
+  "status": "SUCCESS",
+  "n_subjects": 100,
+  "total_segments": 6601,
+  "device": "cuda",
+  "gpu_name": "Tesla T4",
+  "train_time_sec": 2.99,
+  "total_time_sec": 3.14,
+  "val_mae_all": 12.3,
+  "val_mae_sbp": 16.3,
+  "val_mae_dbp": 8.31
+}

@@ -1,0 +1,10 @@
+{
+  "status": "SUCCESS",
+  "device": "cuda",
+  "gpu_name": "Tesla T4",
+  "train_time_sec": 2.48,
+  "total_time_sec": 2.61,
+  "val_mae_all": 12.05,
+  "val_mae_sbp": 10.55,
+  "val_mae_dbp": 13.54
+}

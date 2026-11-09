@@ -1,0 +1,271 @@
+{
+  "calfree": {
+    "protocol": "calfree",
+    "best_epoch": 9,
+    "stopped_epoch": 34,
+    "overall_mae": 11.3,
+    "overall_rmse": 14.79,
+    "aami_pass": false,
+    "sbp": {
+      "mae": 13.73,
+      "rmse": 18.62,
+      "me": 1.11,
+      "std": 18.59,
+      "r2": 0.017,
+      "pearson_r": 0.356,
+      "aami_pass": false,
+      "bhs_grade": "D",
+      "pct_le_5": 24.8,
+      "pct_le_10": 50.3,
+      "pct_le_15": 66.1
+    },
+    "dbp": {
+      "mae": 8.88,
+      "rmse": 10.96,
+      "me": -0.35,
+      "std": 10.95,
+      "r2": -0.039,
+      "pearson_r": 0.4,
+      "aami_pass": false,
+      "bhs_grade": "D",
+      "pct_le_5": 33.4,
+      "pct_le_10": 61.2,
+      "pct_le_15": 82.3
+    },
+    "test_segments": 1320,
+    "test_subjects": [
+      "p000001",
+      "p000008",
+      "p000022",
+      "p000024",
+      "p000037",
+      "p000047",
+      "p000061",
+      "p000063",
+      "p000066",
+      "p000088",
+      "p000102",
+      "p000103",
+      "p000120",
+      "p001840",
+      "p002063",
+      "p002458",
+      "p002513",
+      "p002703",
+      "p003617",
+      "p004405"
+    ]
+  },
+  "calbased": {
+    "protocol": "calbased",
+    "best_epoch": 129,
+    "stopped_epoch": 154,
+    "overall_mae": 3.81,
+    "overall_rmse": 5.69,
+    "aami_pass": true,
+    "sbp": {
+      "mae": 4.76,
+      "rmse": 7.07,
+      "me": -0.2,
+      "std": 7.06,
+      "r2": 0.868,
+      "pearson_r": 0.932,
+      "aami_pass": true,
+      "bhs_grade": "B",
+      "pct_le_5": 68.0,
+      "pct_le_10": 89.0,
+      "pct_le_15": 94.4
+    },
+    "dbp": {
+      "mae": 2.86,
+      "rmse": 4.3,
+      "me": -0.31,
+      "std": 4.29,
+      "r2": 0.868,
+      "pearson_r": 0.932,
+      "aami_pass": true,
+      "bhs_grade": "A",
+      "pct_le_5": 85.1,
+      "pct_le_10": 97.1,
+      "pct_le_15": 99.1
+    },
+    "test_segments": 657,
+    "test_subjects": [
+      "p000001",
+      "p000003",
+      "p000005",
+      "p000006",
+      "p000008",
+      "p000010",
+      "p000012",
+      "p000013",
+      "p000016",
+      "p000019",
+      "p000022",
+      "p000023",
+      "p000024",
+      "p000027",
+      "p000028",
+      "p000030",
+      "p000033",
+      "p000035",
+      "p000037",
+      "p000038",
+      "p000041",
+      "p000043",
+      "p000047",
+      "p000050",
+      "p000051",
+      "p000052",
+      "p000053",
+      "p000056",
+      "p000058",
+      "p000059",
+      "p000061",
+      "p000063",
+      "p000064",
+      "p000066",
+      "p000068",
+      "p000071",
+      "p000074",
+      "p000079",
+      "p000085",
+      "p000088",
+      "p000089",
+      "p000093",
+      "p000097",
+      "p000101",
+      "p000102",
+      "p000103",
+      "p000107",
+      "p000109",
+      "p000110",
+      "p000111",
+      "p000113",
+      "p000116",
+      "p000119",
+      "p000120",
+      "p000121",
+      "p000122",
+      "p000124",
+      "p000128",
+      "p000129",
+      "p000130",
+      "p000160",
+      "p000333",
+      "p000543",
+      "p000618",
+      "p000946",
+      "p001038",
+      "p001158",
+      "p001606",
+      "p001791",
+      "p001840",
+      "p001949",
+      "p002045",
+      "p002063",
+      "p002343",
+      "p002369",
+      "p002458",
+      "p002513",
+      "p002636",
+      "p002639",
+      "p002906",
+      "p003039",
+      "p003617",
+      "p003695",
+      "p003744",
+      "p003866",
+      "p004053",
+      "p004113",
+      "p004324",
+      "p004405",
+      "p004588",
+      "p004679",
+      "p004804",
+      "p004837",
+      "p004906",
+      "p004966",
+      "p005193"
+    ]
+  },
+  "comparison_summary": {
+    "mae_sbp": {
+      "calfree": 13.73,
+      "calbased": 4.76,
+      "improvement_mmhg": 8.97
+    },
+    "mae_dbp": {
+      "calfree": 8.88,
+      "calbased": 2.86,
+      "improvement_mmhg": 6.02
+    },
+    "mae_overall": {
+      "calfree": 11.3,
+      "calbased": 3.81,
+      "improvement_mmhg": 7.49
+    },
+    "rmse_sbp": {
+      "calfree": 18.62,
+      "calbased": 7.07,
+      "improvement_mmhg": 11.55
+    },
+    "rmse_dbp": {
+      "calfree": 10.96,
+      "calbased": 4.3,
+      "improvement_mmhg": 6.66
+    },
+    "me_std_sbp": {
+      "calfree": "+1.11 +/- 18.59",
+      "calbased": "-0.20 +/- 7.06"
+    },
+    "me_std_dbp": {
+      "calfree": "-0.35 +/- 10.95",
+      "calbased": "-0.31 +/- 4.29"
+    },
+    "r2_sbp": {
+      "calfree": 0.017,
+      "calbased": 0.868
+    },
+    "r2_dbp": {
+      "calfree": -0.039,
+      "calbased": 0.868
+    },
+    "pearson_r_sbp": {
+      "calfree": 0.356,
+      "calbased": 0.932
+    },
+    "pearson_r_dbp": {
+      "calfree": 0.4,
+      "calbased": 0.932
+    },
+    "bhs_grade_sbp": {
+      "calfree": "D",
+      "calbased": "B"
+    },
+    "bhs_grade_dbp": {
+      "calfree": "D",
+      "calbased": "A"
+    },
+    "aami_pass_sbp": {
+      "calfree": false,
+      "calbased": true
+    },
+    "aami_pass_dbp": {
+      "calfree": false,
+      "calbased": true
+    },
+    "aami_pass_overall": {
+      "calfree": false,
+      "calbased": true
+    },
+    "best_epoch": {
+      "calfree": 9,
+      "calbased": 129
+    },
+    "stopped_epoch": {
+      "calfree": 34,
+      "calbased": 154
+    }
+  }
+}

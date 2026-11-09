@@ -1,0 +1,15 @@
+{
+  "model_name": "TriaGO_BPNet_v53_Precision",
+  "total_parameters": 374850,
+  "train_segments": 617,
+  "val_segments": 115,
+  "train_patients": 60,
+  "val_patients": 15,
+  "best_epoch": 1,
+  "val_sbp_mae": 8.02,
+  "val_dbp_mae": 6.14,
+  "val_sbp_rmse": 10.44,
+  "val_dbp_rmse": 8.06,
+  "aami_sbp_pass": false,
+  "aami_dbp_pass": false
+}

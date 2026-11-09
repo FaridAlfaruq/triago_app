@@ -1,0 +1,28 @@
+{
+  "epoch": 75,
+  "sbp": {
+    "mae": 4.04,
+    "std": 6.26,
+    "pct_le_5": 75.61,
+    "pct_le_10": 92.41,
+    "pct_le_15": 95.66,
+    "bhs_grade": "A",
+    "aami_pass": true
+  },
+  "dbp": {
+    "mae": 2.5,
+    "std": 3.8,
+    "pct_le_5": 86.72,
+    "pct_le_10": 97.02,
+    "pct_le_15": 98.64,
+    "bhs_grade": "A",
+    "aami_pass": true
+  },
+  "train_sbp_mae": 3.0,
+  "train_dbp_mae": 1.93,
+  "sqi_kept_segments": 3869,
+  "sqi_total_segments": 4726,
+  "train_segments": 3496,
+  "test_segments": 369,
+  "param_count": 408354
+}

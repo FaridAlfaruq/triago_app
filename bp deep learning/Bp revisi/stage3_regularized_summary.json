@@ -1,0 +1,18 @@
+{
+  "model_name": "RegularizedBPNet_v1",
+  "total_parameters": 52498,
+  "baseline_parameters": 374850,
+  "parameter_reduction_pct": 85.99,
+  "train_segments": 617,
+  "val_segments": 115,
+  "train_patients": 60,
+  "val_patients": 15,
+  "best_epoch": 2,
+  "val_loss": 1.1812,
+  "val_sbp_mae": 6.58,
+  "val_dbp_mae": 6.39,
+  "val_sbp_rmse": 9.14,
+  "val_dbp_rmse": 7.58,
+  "aami_sbp_pass": false,
+  "aami_dbp_pass": false
+}

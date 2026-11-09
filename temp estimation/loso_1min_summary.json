@@ -1,0 +1,286 @@
+{
+  "n_windows": 10314,
+  "train_subjects": [
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13,
+    14,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    24,
+    25,
+    26,
+    29,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    40,
+    42,
+    43,
+    44,
+    46,
+    48,
+    49,
+    50,
+    51,
+    52,
+    54,
+    60,
+    61,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    73,
+    74,
+    75,
+    77,
+    78,
+    79,
+    80,
+    82,
+    83,
+    84,
+    85,
+    87,
+    88,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    103,
+    106,
+    108,
+    109,
+    110,
+    115
+  ],
+  "test_subjects": [
+    1,
+    5,
+    16,
+    27,
+    28,
+    30,
+    38,
+    41,
+    45,
+    47,
+    57,
+    58,
+    62,
+    72,
+    81,
+    89,
+    90,
+    104,
+    105,
+    107
+  ],
+  "stage_a": {
+    "S0 Linear Rational + c0 (static)": {
+      "pooled_mae": 0.224,
+      "macro_mae": 0.2577,
+      "bias": -0.0028,
+      "sd": 0.3354,
+      "pass": 66,
+      "n": 79,
+      "worst": 1.2927
+    },
+    "S1 Basic power-law (static)": {
+      "pooled_mae": 0.2273,
+      "macro_mae": 0.2639,
+      "bias": -0.0123,
+      "sd": 0.3543,
+      "pass": 64,
+      "n": 79,
+      "worst": 1.3184
+    },
+    "W1 + 60 s slope (additive)": {
+      "pooled_mae": 0.1669,
+      "macro_mae": 0.1781,
+      "bias": -0.0026,
+      "sd": 0.2183,
+      "pass": 76,
+      "n": 79,
+      "worst": 0.4753
+    },
+    "W2 slope-corrected skin inside bioheat": {
+      "pooled_mae": 0.1631,
+      "macro_mae": 0.1742,
+      "bias": -0.0019,
+      "sd": 0.2128,
+      "pass": 78,
+      "n": 79,
+      "worst": 0.4761
+    },
+    "W3 + slope + slope x PI": {
+      "pooled_mae": 0.1609,
+      "macro_mae": 0.1713,
+      "bias": -0.0016,
+      "sd": 0.2113,
+      "pass": 78,
+      "n": 79,
+      "worst": 0.412
+    }
+  },
+  "selected": "W3 + slope + slope x PI",
+  "stage_b": {
+    "S0 Linear Rational + c0 (static)": {
+      "loso_all": {
+        "pooled_mae": 0.2334,
+        "macro_mae": 0.2529,
+        "bias": -0.001,
+        "sd": 0.3494,
+        "pass": 81,
+        "n": 99,
+        "worst": 1.2875
+      },
+      "loso_test20": {
+        "macro_mae": 0.2388,
+        "pass": 15,
+        "worst": 0.4638
+      },
+      "fixed_80_20": {
+        "pooled_mae": 0.2646,
+        "pass": 16,
+        "params": [
+          0.82991,
+          0.97126,
+          1.0649
+        ]
+      }
+    },
+    "S1 Basic power-law (static)": {
+      "loso_all": {
+        "pooled_mae": 0.2351,
+        "macro_mae": 0.2571,
+        "bias": -0.01,
+        "sd": 0.3668,
+        "pass": 79,
+        "n": 99,
+        "worst": 1.3164
+      },
+      "loso_test20": {
+        "macro_mae": 0.2374,
+        "pass": 15,
+        "worst": 0.4925
+      },
+      "fixed_80_20": {
+        "pooled_mae": 0.2638,
+        "pass": 15,
+        "params": [
+          0.48267,
+          1.00933,
+          0.70996
+        ]
+      }
+    },
+    "W1 + 60 s slope (additive)": {
+      "loso_all": {
+        "pooled_mae": 0.1702,
+        "macro_mae": 0.1755,
+        "bias": -0.0009,
+        "sd": 0.2213,
+        "pass": 98,
+        "n": 99,
+        "worst": 0.4401
+      },
+      "loso_test20": {
+        "macro_mae": 0.1685,
+        "pass": 20,
+        "worst": 0.2737
+      },
+      "fixed_80_20": {
+        "pooled_mae": 0.1787,
+        "pass": 20,
+        "params": [
+          0.84923,
+          0.81874,
+          129.36281,
+          0.77894
+        ]
+      }
+    },
+    "W2 slope-corrected skin inside bioheat": {
+      "loso_all": {
+        "pooled_mae": 0.1655,
+        "macro_mae": 0.1712,
+        "bias": -0.0006,
+        "sd": 0.2151,
+        "pass": 98,
+        "n": 99,
+        "worst": 0.4504
+      },
+      "loso_test20": {
+        "macro_mae": 0.1626,
+        "pass": 20,
+        "worst": 0.2699
+      },
+      "fixed_80_20": {
+        "pooled_mae": 0.1722,
+        "pass": 20,
+        "params": [
+          0.83533,
+          0.82335,
+          107.3348,
+          0.78603
+        ]
+      }
+    },
+    "W3 + slope + slope x PI": {
+      "loso_all": {
+        "pooled_mae": 0.1613,
+        "macro_mae": 0.167,
+        "bias": -0.0004,
+        "sd": 0.2119,
+        "pass": 98,
+        "n": 99,
+        "worst": 0.3886
+      },
+      "loso_test20": {
+        "macro_mae": 0.155,
+        "pass": 20,
+        "worst": 0.2586
+      },
+      "fixed_80_20": {
+        "pooled_mae": 0.1657,
+        "pass": 20,
+        "params": [
+          0.83539,
+          0.82493,
+          183.66767,
+          -9.00638,
+          0.79514
+        ]
+      }
+    }
+  }
+}

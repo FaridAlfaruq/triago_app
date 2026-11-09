@@ -1,0 +1,237 @@
+{
+  "pipeline_stage": "Stage 4: Synthetic Inversion Feasibility Study (Surrogate Inversion, Not Clinical Validation)",
+  "study_type": "Synthetic Model Inversion Feasibility (VitalDB Semi-Synthetic)",
+  "leakage_audit": {
+    "train_patients": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "test_patients": [
+      8,
+      9,
+      10
+    ],
+    "intersection": [],
+    "zero_leakage_verified": true,
+    "n_train_epochs": 5277,
+    "n_test_epochs": 2267,
+    "total_epochs": 7544
+  },
+  "fitted_parameters": {
+    "a": 0.6144759720452789,
+    "b": 0.8257423201663524,
+    "alpha": 0.8072046397604661,
+    "a_std_err": 0.012335666311662356,
+    "b_std_err": 0.013999965532495358,
+    "alpha_std_err": 0.006964523005645196,
+    "a_ci_95": [
+      0.5902980660744207,
+      0.6386538780161372
+    ],
+    "b_ci_95": [
+      0.7983023877226615,
+      0.8531822526100433
+    ],
+    "alpha_ci_95": [
+      0.7935541746694015,
+      0.8208551048515307
+    ],
+    "covariance_matrix": [
+      [
+        0.00015216866335268157,
+        -0.00017080574416819384,
+        8.361874800257604e-05
+      ],
+      [
+        -0.00017080574416819384,
+        0.00019599903491105804,
+        -9.609387379709396e-05
+      ],
+      [
+        8.361874800257606e-05,
+        -9.609387379709396e-05,
+        4.8504580696161195e-05
+      ]
+    ]
+  },
+  "train_metrics": {
+    "n_samples": 5277,
+    "mae_degC": 0.2116,
+    "rmse_degC": 0.333,
+    "mean_bias_degC": -0.0107,
+    "sd_bias_degC": 0.3329,
+    "upper_loa_95_degC": 0.6418,
+    "lower_loa_95_degC": -0.6632,
+    "accuracy_within_0_50C_pct": 90.3,
+    "accuracy_within_0_35C_pct": 82.21,
+    "accuracy_within_0_20C_pct": 65.57,
+    "baseline_skin_mae_degC": 3.3505,
+    "baseline_skin_rmse_degC": 3.8205,
+    "error_reduction_pct": 93.68,
+    "pearson_r": 0.8354,
+    "r2_score": 0.6042
+  },
+  "test_metrics": {
+    "n_samples": 2267,
+    "mae_degC": 0.2456,
+    "rmse_degC": 0.3929,
+    "mean_bias_degC": -0.0875,
+    "sd_bias_degC": 0.3831,
+    "upper_loa_95_degC": 0.6634,
+    "lower_loa_95_degC": -0.8384,
+    "accuracy_within_0_50C_pct": 86.85,
+    "accuracy_within_0_35C_pct": 79.18,
+    "accuracy_within_0_20C_pct": 62.33,
+    "baseline_skin_mae_degC": 2.6296,
+    "baseline_skin_rmse_degC": 2.6877,
+    "error_reduction_pct": 90.66,
+    "pearson_r": 0.7641,
+    "r2_score": 0.296
+  },
+  "macro_metrics": {
+    "macro_mae_degC": 0.2376,
+    "macro_rmse_degC": 0.4022,
+    "macro_mean_bias_degC": -0.1076,
+    "macro_r2_score": -2.2033,
+    "macro_error_reduction_pct": 90.78
+  },
+  "per_case_test_metrics": {
+    "case_8": {
+      "n_samples": 450,
+      "mae_degC": 0.1528,
+      "rmse_degC": 0.2494,
+      "mean_bias_degC": -0.031,
+      "sd_bias_degC": 0.2478,
+      "upper_loa_95_degC": 0.4546,
+      "lower_loa_95_degC": -0.5167,
+      "accuracy_within_0_50C_pct": 93.33,
+      "accuracy_within_0_35C_pct": 88.44,
+      "accuracy_within_0_20C_pct": 80.67,
+      "baseline_skin_mae_degC": 2.3062,
+      "baseline_skin_rmse_degC": 2.3135,
+      "error_reduction_pct": 93.38,
+      "pearson_r": 0.5197,
+      "r2_score": -0.9828
+    },
+    "case_9": {
+      "n_samples": 272,
+      "mae_degC": 0.2964,
+      "rmse_degC": 0.568,
+      "mean_bias_degC": -0.2094,
+      "sd_bias_degC": 0.5289,
+      "upper_loa_95_degC": 0.8273,
+      "lower_loa_95_degC": -1.2461,
+      "accuracy_within_0_50C_pct": 85.66,
+      "accuracy_within_0_35C_pct": 80.51,
+      "accuracy_within_0_20C_pct": 65.44,
+      "baseline_skin_mae_degC": 2.6089,
+      "baseline_skin_rmse_degC": 2.6658,
+      "error_reduction_pct": 88.64,
+      "pearson_r": 0.4804,
+      "r2_score": -4.6308
+    },
+    "case_10": {
+      "n_samples": 1545,
+      "mae_degC": 0.2637,
+      "rmse_degC": 0.3893,
+      "mean_bias_degC": -0.0824,
+      "sd_bias_degC": 0.3806,
+      "upper_loa_95_degC": 0.6636,
+      "lower_loa_95_degC": -0.8285,
+      "accuracy_within_0_50C_pct": 85.18,
+      "accuracy_within_0_35C_pct": 76.25,
+      "accuracy_within_0_20C_pct": 56.44,
+      "baseline_skin_mae_degC": 2.7274,
+      "baseline_skin_rmse_degC": 2.7909,
+      "error_reduction_pct": 90.33,
+      "pearson_r": 0.66,
+      "r2_score": -0.9963
+    }
+  },
+  "benchmark_compliance": {
+    "cohort_pooled_compliance": {
+      "clinical_gold_standard_mae_le_0_35": {
+        "target": "<= 0.35 C",
+        "achieved": 0.2456,
+        "passed": true
+      },
+      "lightness_target_mae_le_0_50": {
+        "target": "<= 0.50 C",
+        "achieved": 0.2456,
+        "passed": true
+      },
+      "rmse_le_0_65": {
+        "target": "<= 0.65 C",
+        "achieved": 0.3929,
+        "passed": true
+      },
+      "bland_altman_bias_within_pm_0_20": {
+        "target": "|Bias| <= 0.20 C",
+        "achieved": -0.0875,
+        "passed": true
+      },
+      "bland_altman_loa_within_pm_0_90": {
+        "target": "[-0.90, +0.90] C",
+        "achieved": [
+          -0.8384,
+          0.6634
+        ],
+        "passed": true
+      },
+      "error_reduction_gt_75_pct": {
+        "target": "> 75.00%",
+        "achieved": "90.66%",
+        "passed": true
+      }
+    },
+    "per_case_compliance": {
+      "case_8": {
+        "status": "FAIL",
+        "bias_pass": true,
+        "lower_loa_pass": true,
+        "upper_loa_pass": true,
+        "r2_pass": false,
+        "mae_pass": true,
+        "failure_reasons": [
+          "Negative R2 (-0.98)"
+        ]
+      },
+      "case_9": {
+        "status": "FAIL",
+        "bias_pass": false,
+        "lower_loa_pass": false,
+        "upper_loa_pass": true,
+        "r2_pass": false,
+        "mae_pass": true,
+        "failure_reasons": [
+          "Bias (-0.21 C) exceeds +-0.20 C",
+          "Lower LoA (-1.25 C) exceeds -0.90 C",
+          "Negative R2 (-4.63)"
+        ]
+      },
+      "case_10": {
+        "status": "FAIL",
+        "bias_pass": true,
+        "lower_loa_pass": true,
+        "upper_loa_pass": true,
+        "r2_pass": false,
+        "mae_pass": true,
+        "failure_reasons": [
+          "Negative R2 (-1.00)"
+        ]
+      }
+    },
+    "case_level_summary": {
+      "cases_evaluated": 3,
+      "cases_passed": 0,
+      "cases_failed": 3,
+      "pass_rate_pct": 0.0,
+      "case_9_audit_note": "Case 9 FAILED individual thresholds due to dynamic thermal lag (tau=180s) under rapid rewarming (+3.2C in 45m)."
+    }
+  }
+}

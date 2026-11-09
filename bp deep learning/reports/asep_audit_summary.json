@@ -1,0 +1,25 @@
+{
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "auditor": "Asep (QA & Metric Auditor)",
+  "task_id": "TASK-AUDIT-VERIFY-01",
+  "timestamp": "2026-10-27T17:40:00Z",
+  "verified_metrics": {
+    "total_subject_ids": 123,
+    "clone_groups": 24,
+    "redundant_clones": 25,
+    "unique_recordings": 98,
+    "longitudinal_subjects": 4,
+    "unique_biological_humans": 94,
+    "subject094_mislabeled": true,
+    "optimal_seed": 71,
+    "cross_split_leakage_groups": 10,
+    "test_subjects_total": 12,
+    "test_subjects_contaminated": 5,
+    "test_segments_total": 112,
+    "test_segments_contaminated": 64,
+    "test_segment_contamination_pct": 57.14
+  },
+  "limitations": [
+    "Amin's markdown table hardcoded 0% SpO2 and 0 mg/dL Glucose delta for longitudinal subjects despite actual ground truth variation (e.g. Olivia Glucose 114 to 85 mg/dL)."
+  ]
+}

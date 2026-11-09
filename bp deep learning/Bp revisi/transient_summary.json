@@ -1,0 +1,37 @@
+{
+  "task_id": "TASK-TRANSIENT-AUDIT-02",
+  "total_subjects": 94,
+  "transient_detected": true,
+  "metrics": {
+    "sample0_step": {
+      "ppg_median": 440.32,
+      "ppg_mean": 585.93,
+      "ecg_median": 0.41,
+      "ecg_mean": 0.52,
+      "ppg_outlier_pct": 97.9
+    },
+    "dc_drift_rate": {
+      "ecg_0_1s_v_per_s": 0.1282,
+      "ecg_0_5s_v_per_s": 0.0088,
+      "ecg_ss_v_per_s": 0.0022,
+      "ppg_0_1s_adc_per_s": 354.6,
+      "ppg_0_5s_adc_per_s": 160.71,
+      "ppg_ss_adc_per_s": 84.76
+    },
+    "stabilization_time_s": {
+      "ecg_median": 0.0,
+      "ecg_p95": 0.35,
+      "ppg_median": 0.0,
+      "ppg_p95": 3.35,
+      "max_settle": 10.0
+    }
+  },
+  "root_causes": {
+    "ppg": "MAX30105 ambient/DAC loop settling & finger pressure coupling",
+    "ecg": "Electrode-skin contact equilibration & AFE RC filter charging"
+  },
+  "recommendation": {
+    "crop_duration_s": 5.0,
+    "rationale": "Removes sample-0 DAC step & 95th pct settling before Stage 2 filter"
+  }
+}

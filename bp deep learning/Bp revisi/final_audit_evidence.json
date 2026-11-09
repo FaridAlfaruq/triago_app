@@ -1,0 +1,941 @@
+{
+  "metadata": {
+    "audit_title": "FINAL EVIDENCE AUDIT: TRANSFER LEARNING VALIDATION",
+    "audit_timestamp": "2026-10-28T03:05:37.996220",
+    "target_script": "scratch/gemastik/checklist_eval.py",
+    "golden_script": "scratch/gemastik/run_transfer_learning.py",
+    "dataset_file": "scratch/gemastik/Bp revisi/dataset_7ch.npz",
+    "model_weights": "scratch/gemastik/Bp revisi/model_best.pt",
+    "overall_status": "VERIFIED_WITH_LIMITATIONS"
+  },
+  "section_1_sample_accounting": {
+    "raw_cohort": {
+      "segments": 732,
+      "subjects": 75
+    },
+    "sqi_filtering_stages": {
+      "stage1_physiological_hr_45_135_bpm": {
+        "segments_pass": 731,
+        "subjects": 75
+      },
+      "stage2_ecg_ppg_peak_coherence": {
+        "segments_pass": 554,
+        "subjects": 63
+      },
+      "stage3_ibi_regularity_cv_015": {
+        "segments_pass": 472,
+        "subjects": 57
+      },
+      "stage4_cardiac_psd_purity_065": {
+        "segments_pass": 472,
+        "subjects": 57
+      }
+    },
+    "clean_cohort": {
+      "total_clean_segments": 472,
+      "total_clean_subjects": 57,
+      "single_segment_subjects": 16,
+      "single_segment_total": 16,
+      "multi_segment_subjects": 41,
+      "multi_segment_total": 456
+    },
+    "calibration_accounting": {
+      "anchors_selected": 41,
+      "anchors_excluded_from_evaluation": 41,
+      "single_segment_excluded_from_calibration": 16,
+      "disjoint_eval_segments": 415,
+      "eval_subjects": 41,
+      "arithmetic_reconciliation": "472 (clean) - 16 (single-seg) - 41 (anchors) = 415 (evaluated segments)"
+    }
+  },
+  "section_2_cross_validation_leakage": {
+    "n_folds": 3,
+    "folds_detail": [
+      {
+        "fold": 1,
+        "train_subjects_count": 38,
+        "test_subjects_count": 19,
+        "train_segments_count": 314,
+        "test_segments_count": 158,
+        "train_subjects": [
+          "P003",
+          "P006",
+          "P007",
+          "P016",
+          "P017",
+          "P018",
+          "P019",
+          "P020",
+          "P021",
+          "P024",
+          "P026",
+          "P027",
+          "P029",
+          "P030",
+          "P031",
+          "P036",
+          "P038",
+          "P039",
+          "P041",
+          "P043",
+          "P045",
+          "P050",
+          "P051",
+          "P053",
+          "P056",
+          "P061",
+          "P063",
+          "P065",
+          "P068",
+          "P069",
+          "P073",
+          "P077",
+          "P081",
+          "P083",
+          "P086",
+          "P087",
+          "P088",
+          "P093"
+        ],
+        "test_subjects": [
+          "P004",
+          "P005",
+          "P009",
+          "P010",
+          "P012",
+          "P013",
+          "P023",
+          "P025",
+          "P028",
+          "P034",
+          "P048",
+          "P052",
+          "P054",
+          "P059",
+          "P060",
+          "P080",
+          "P085",
+          "P090",
+          "P092"
+        ],
+        "overlap_count": 0,
+        "train_target_stats": {
+          "sbp_mean": 114.4204,
+          "sbp_std": 14.2134,
+          "dbp_mean": 76.2803,
+          "dbp_std": 8.7155
+        }
+      },
+      {
+        "fold": 2,
+        "train_subjects_count": 38,
+        "test_subjects_count": 19,
+        "train_segments_count": 315,
+        "test_segments_count": 157,
+        "train_subjects": [
+          "P004",
+          "P005",
+          "P009",
+          "P010",
+          "P012",
+          "P013",
+          "P019",
+          "P023",
+          "P025",
+          "P026",
+          "P028",
+          "P029",
+          "P030",
+          "P034",
+          "P036",
+          "P038",
+          "P041",
+          "P045",
+          "P048",
+          "P052",
+          "P053",
+          "P054",
+          "P056",
+          "P059",
+          "P060",
+          "P063",
+          "P065",
+          "P068",
+          "P069",
+          "P080",
+          "P081",
+          "P085",
+          "P086",
+          "P087",
+          "P088",
+          "P090",
+          "P092",
+          "P093"
+        ],
+        "test_subjects": [
+          "P003",
+          "P006",
+          "P007",
+          "P016",
+          "P017",
+          "P018",
+          "P020",
+          "P021",
+          "P024",
+          "P027",
+          "P031",
+          "P039",
+          "P043",
+          "P050",
+          "P051",
+          "P061",
+          "P073",
+          "P077",
+          "P083"
+        ],
+        "overlap_count": 0,
+        "train_target_stats": {
+          "sbp_mean": 114.2635,
+          "sbp_std": 16.174,
+          "dbp_mean": 76.2857,
+          "dbp_std": 8.8977
+        }
+      },
+      {
+        "fold": 3,
+        "train_subjects_count": 38,
+        "test_subjects_count": 19,
+        "train_segments_count": 315,
+        "test_segments_count": 157,
+        "train_subjects": [
+          "P003",
+          "P004",
+          "P005",
+          "P006",
+          "P007",
+          "P009",
+          "P010",
+          "P012",
+          "P013",
+          "P016",
+          "P017",
+          "P018",
+          "P020",
+          "P021",
+          "P023",
+          "P024",
+          "P025",
+          "P027",
+          "P028",
+          "P031",
+          "P034",
+          "P039",
+          "P043",
+          "P048",
+          "P050",
+          "P051",
+          "P052",
+          "P054",
+          "P059",
+          "P060",
+          "P061",
+          "P073",
+          "P077",
+          "P080",
+          "P083",
+          "P085",
+          "P090",
+          "P092"
+        ],
+        "test_subjects": [
+          "P019",
+          "P026",
+          "P029",
+          "P030",
+          "P036",
+          "P038",
+          "P041",
+          "P045",
+          "P053",
+          "P056",
+          "P063",
+          "P065",
+          "P068",
+          "P069",
+          "P081",
+          "P086",
+          "P087",
+          "P088",
+          "P093"
+        ],
+        "overlap_count": 0,
+        "train_target_stats": {
+          "sbp_mean": 116.3587,
+          "sbp_std": 14.1406,
+          "dbp_mean": 76.8444,
+          "dbp_std": 8.7119
+        }
+      }
+    ],
+    "leakage_audit_summary": {
+      "subject_overlap_all_folds": 0,
+      "train_target_zscoring_isolated": true,
+      "test_labels_in_model_training": false,
+      "test_labels_in_model_selection": false,
+      "test_anchor_use_scope": "Exclusively for additive test-time offset: y_true[anc] - y_pred[anc]"
+    }
+  },
+  "section_3_reproduced_metrics": {
+    "comparison": {
+      "Zero-Shot (Uncal)": {
+        "reported_mae": 16.67,
+        "recomputed_mae": 16.67,
+        "diff": 0.0
+      },
+      "Zero-Shot (Cal)": {
+        "reported_mae": 8.8,
+        "recomputed_mae": 8.8,
+        "diff": 0.0
+      },
+      "Naive TL (Uncal)": {
+        "reported_mae": 11.9,
+        "recomputed_mae": 11.9,
+        "diff": 0.0
+      },
+      "Naive TL (Cal)": {
+        "reported_mae": 5.51,
+        "recomputed_mae": 5.51,
+        "diff": 0.0
+      },
+      "Modified TL v2 (Uncal)": {
+        "reported_mae": 11.76,
+        "recomputed_mae": 11.76,
+        "diff": 0.0
+      },
+      "Modified TL v2 (Cal)": {
+        "reported_mae": 4.9,
+        "recomputed_mae": 4.9,
+        "diff": 0.0
+      },
+      "Ablation A: No L2-SP (Cal)": {
+        "reported_mae": 4.64,
+        "recomputed_mae": 4.64,
+        "diff": 0.0
+      },
+      "Ablation B: No Cal-Loss (Cal)": {
+        "reported_mae": 6.48,
+        "recomputed_mae": 6.48,
+        "diff": 0.0
+      },
+      "Ablation C: Fresh Head (Cal)": {
+        "reported_mae": 3.67,
+        "recomputed_mae": 3.67,
+        "diff": 0.0
+      }
+    },
+    "detailed_conditions": {
+      "zero_shot": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 16.67,
+          "rmse": 19.76,
+          "signed_mean_bias": 12.92,
+          "error_std": 14.95,
+          "pct_le_5": 15.89,
+          "pct_le_10": 32.63,
+          "pct_le_15": 46.82,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 8.06,
+          "rmse": 9.99,
+          "signed_mean_bias": -3.07,
+          "error_std": 9.5,
+          "pct_le_5": 36.86,
+          "pct_le_10": 67.58,
+          "pct_le_15": 86.65,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 8.8,
+          "rmse": 11.16,
+          "signed_mean_bias": 1.2,
+          "error_std": 11.1,
+          "pct_le_5": 34.7,
+          "pct_le_10": 66.27,
+          "pct_le_15": 82.17,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 5.49,
+          "rmse": 7.35,
+          "signed_mean_bias": -0.03,
+          "error_std": 7.35,
+          "pct_le_5": 59.52,
+          "pct_le_10": 84.1,
+          "pct_le_15": 95.18,
+          "bhs_grade": "B",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 16.36,
+          "rmse": 19.36,
+          "signed_mean_bias": 12.8,
+          "error_std": 14.52,
+          "pct_le_5": 17.35,
+          "pct_le_10": 33.01,
+          "pct_le_15": 46.99,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 7.95,
+          "rmse": 9.88,
+          "signed_mean_bias": -3.34,
+          "error_std": 9.29,
+          "pct_le_5": 37.35,
+          "pct_le_10": 68.43,
+          "pct_le_15": 87.23,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "train_time_s": 0.004
+      },
+      "naive_tl": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 11.9,
+          "rmse": 14.74,
+          "signed_mean_bias": -0.35,
+          "error_std": 14.73,
+          "pct_le_5": 24.58,
+          "pct_le_10": 46.61,
+          "pct_le_15": 66.1,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 7.12,
+          "rmse": 8.6,
+          "signed_mean_bias": 0.06,
+          "error_std": 8.6,
+          "pct_le_5": 37.29,
+          "pct_le_10": 74.36,
+          "pct_le_15": 93.22,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 5.51,
+          "rmse": 7.12,
+          "signed_mean_bias": 1.4,
+          "error_std": 6.99,
+          "pct_le_5": 57.11,
+          "pct_le_10": 83.37,
+          "pct_le_15": 94.94,
+          "bhs_grade": "B",
+          "aami_pass": true
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 2.67,
+          "rmse": 3.65,
+          "signed_mean_bias": 0.17,
+          "error_std": 3.65,
+          "pct_le_5": 84.58,
+          "pct_le_10": 98.07,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 11.87,
+          "rmse": 14.53,
+          "signed_mean_bias": -0.32,
+          "error_std": 14.53,
+          "pct_le_5": 22.89,
+          "pct_le_10": 46.27,
+          "pct_le_15": 66.27,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 7.06,
+          "rmse": 8.52,
+          "signed_mean_bias": -0.07,
+          "error_std": 8.52,
+          "pct_le_5": 37.59,
+          "pct_le_10": 75.18,
+          "pct_le_15": 93.25,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "train_time_s": 2.175
+      },
+      "modified_tl_v2": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 11.76,
+          "rmse": 14.57,
+          "signed_mean_bias": -0.09,
+          "error_std": 14.57,
+          "pct_le_5": 25.64,
+          "pct_le_10": 47.88,
+          "pct_le_15": 67.58,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 7.07,
+          "rmse": 8.55,
+          "signed_mean_bias": 0.37,
+          "error_std": 8.54,
+          "pct_le_5": 40.47,
+          "pct_le_10": 75.85,
+          "pct_le_15": 93.22,
+          "bhs_grade": "C",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 4.9,
+          "rmse": 6.34,
+          "signed_mean_bias": 1.22,
+          "error_std": 6.22,
+          "pct_le_5": 59.76,
+          "pct_le_10": 87.23,
+          "pct_le_15": 97.35,
+          "bhs_grade": "B",
+          "aami_pass": true
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 2.3,
+          "rmse": 3.22,
+          "signed_mean_bias": 0.05,
+          "error_std": 3.22,
+          "pct_le_5": 89.4,
+          "pct_le_10": 98.07,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 11.71,
+          "rmse": 14.35,
+          "signed_mean_bias": -0.1,
+          "error_std": 14.35,
+          "pct_le_5": 24.34,
+          "pct_le_10": 47.71,
+          "pct_le_15": 68.19,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 7.03,
+          "rmse": 8.49,
+          "signed_mean_bias": 0.24,
+          "error_std": 8.49,
+          "pct_le_5": 40.72,
+          "pct_le_10": 76.39,
+          "pct_le_15": 93.49,
+          "bhs_grade": "C",
+          "aami_pass": false
+        },
+        "train_time_s": 0.378
+      },
+      "ablation_a_no_l2sp": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 11.78,
+          "rmse": 14.6,
+          "signed_mean_bias": -0.1,
+          "error_std": 14.6,
+          "pct_le_5": 25.64,
+          "pct_le_10": 47.25,
+          "pct_le_15": 67.58,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 7.07,
+          "rmse": 8.56,
+          "signed_mean_bias": 0.35,
+          "error_std": 8.56,
+          "pct_le_5": 40.47,
+          "pct_le_10": 74.58,
+          "pct_le_15": 93.01,
+          "bhs_grade": "C",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 4.64,
+          "rmse": 6.01,
+          "signed_mean_bias": 1.22,
+          "error_std": 5.88,
+          "pct_le_5": 61.45,
+          "pct_le_10": 89.16,
+          "pct_le_15": 98.55,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 2.2,
+          "rmse": 3.01,
+          "signed_mean_bias": 0.12,
+          "error_std": 3.0,
+          "pct_le_5": 90.6,
+          "pct_le_10": 98.55,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 11.74,
+          "rmse": 14.4,
+          "signed_mean_bias": -0.1,
+          "error_std": 14.4,
+          "pct_le_5": 24.34,
+          "pct_le_10": 46.99,
+          "pct_le_15": 67.95,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 7.04,
+          "rmse": 8.52,
+          "signed_mean_bias": 0.23,
+          "error_std": 8.52,
+          "pct_le_5": 40.72,
+          "pct_le_10": 75.18,
+          "pct_le_15": 93.25,
+          "bhs_grade": "C",
+          "aami_pass": false
+        },
+        "train_time_s": 0.286
+      },
+      "ablation_b_no_cal_loss": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 11.97,
+          "rmse": 14.8,
+          "signed_mean_bias": 0.22,
+          "error_std": 14.8,
+          "pct_le_5": 24.58,
+          "pct_le_10": 46.19,
+          "pct_le_15": 67.16,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 7.15,
+          "rmse": 8.62,
+          "signed_mean_bias": 0.4,
+          "error_std": 8.61,
+          "pct_le_5": 37.5,
+          "pct_le_10": 74.58,
+          "pct_le_15": 93.22,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 6.48,
+          "rmse": 8.39,
+          "signed_mean_bias": 1.39,
+          "error_std": 8.27,
+          "pct_le_5": 51.33,
+          "pct_le_10": 77.83,
+          "pct_le_15": 91.08,
+          "bhs_grade": "B",
+          "aami_pass": false
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 2.94,
+          "rmse": 4.1,
+          "signed_mean_bias": 0.01,
+          "error_std": 4.1,
+          "pct_le_5": 81.69,
+          "pct_le_10": 97.11,
+          "pct_le_15": 98.8,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 11.88,
+          "rmse": 14.53,
+          "signed_mean_bias": 0.18,
+          "error_std": 14.52,
+          "pct_le_5": 23.13,
+          "pct_le_10": 45.78,
+          "pct_le_15": 68.43,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 7.09,
+          "rmse": 8.52,
+          "signed_mean_bias": 0.24,
+          "error_std": 8.52,
+          "pct_le_5": 37.59,
+          "pct_le_10": 75.42,
+          "pct_le_15": 93.73,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "train_time_s": 0.341
+      },
+      "ablation_c_fresh_head": {
+        "uncal_s": {
+          "n_samples": 472,
+          "mae": 14.42,
+          "rmse": 18.22,
+          "signed_mean_bias": -6.34,
+          "error_std": 17.08,
+          "pct_le_5": 23.31,
+          "pct_le_10": 42.16,
+          "pct_le_15": 59.32,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "uncal_d": {
+          "n_samples": 472,
+          "mae": 8.73,
+          "rmse": 10.74,
+          "signed_mean_bias": -5.1,
+          "error_std": 9.46,
+          "pct_le_5": 34.11,
+          "pct_le_10": 66.74,
+          "pct_le_15": 88.14,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "cal_s": {
+          "n_samples": 415,
+          "mae": 3.67,
+          "rmse": 4.65,
+          "signed_mean_bias": -0.36,
+          "error_std": 4.63,
+          "pct_le_5": 71.33,
+          "pct_le_10": 97.11,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "cal_d": {
+          "n_samples": 415,
+          "mae": 2.25,
+          "rmse": 2.91,
+          "signed_mean_bias": -0.18,
+          "error_std": 2.91,
+          "pct_le_5": 90.84,
+          "pct_le_10": 100.0,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "disjoint_uncal_s": {
+          "n_samples": 415,
+          "mae": 14.58,
+          "rmse": 18.31,
+          "signed_mean_bias": -6.42,
+          "error_std": 17.15,
+          "pct_le_5": 23.13,
+          "pct_le_10": 41.93,
+          "pct_le_15": 57.35,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "disjoint_uncal_d": {
+          "n_samples": 415,
+          "mae": 8.8,
+          "rmse": 10.82,
+          "signed_mean_bias": -5.12,
+          "error_std": 9.53,
+          "pct_le_5": 33.98,
+          "pct_le_10": 66.75,
+          "pct_le_15": 88.19,
+          "bhs_grade": "D",
+          "aami_pass": false
+        },
+        "train_time_s": 0.262
+      }
+    }
+  },
+  "section_4_calibration_protocol": {
+    "formula": "y_cal[i] = y_pred[i] + (y_true[anc] - y_pred[anc])",
+    "quantity_adjusted": "prediction_output_level_only (zero weight/parameter adjustment)",
+    "anchor_strategies": {
+      "first_segment": {
+        "sbp": {
+          "n_samples": 415,
+          "mae": 4.9,
+          "rmse": 6.34,
+          "signed_mean_bias": 1.22,
+          "error_std": 6.22,
+          "pct_le_5": 59.76,
+          "pct_le_10": 87.23,
+          "pct_le_15": 97.35,
+          "bhs_grade": "B",
+          "aami_pass": true
+        },
+        "dbp": {
+          "n_samples": 415,
+          "mae": 2.3,
+          "rmse": 3.22,
+          "signed_mean_bias": 0.05,
+          "error_std": 3.22,
+          "pct_le_5": 89.4,
+          "pct_le_10": 98.07,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "n_eval": 415
+      },
+      "middle_segment": {
+        "sbp": {
+          "n_samples": 415,
+          "mae": 3.31,
+          "rmse": 4.43,
+          "signed_mean_bias": -0.77,
+          "error_std": 4.36,
+          "pct_le_5": 75.66,
+          "pct_le_10": 97.35,
+          "pct_le_15": 99.76,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "dbp": {
+          "n_samples": 415,
+          "mae": 1.95,
+          "rmse": 2.55,
+          "signed_mean_bias": 0.09,
+          "error_std": 2.55,
+          "pct_le_5": 94.7,
+          "pct_le_10": 100.0,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "n_eval": 415
+      },
+      "max_cardiac_psd": {
+        "sbp": {
+          "n_samples": 415,
+          "mae": 4.02,
+          "rmse": 5.4,
+          "signed_mean_bias": 1.58,
+          "error_std": 5.16,
+          "pct_le_5": 70.6,
+          "pct_le_10": 92.53,
+          "pct_le_15": 98.07,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "dbp": {
+          "n_samples": 415,
+          "mae": 2.14,
+          "rmse": 2.93,
+          "signed_mean_bias": 0.63,
+          "error_std": 2.86,
+          "pct_le_5": 90.6,
+          "pct_le_10": 99.52,
+          "pct_le_15": 100.0,
+          "bhs_grade": "A",
+          "aami_pass": true
+        },
+        "n_eval": 415
+      }
+    },
+    "pre_specification_status": {
+      "first_segment": "Pre-specified causal baseline",
+      "middle_segment": "Post-hoc exploratory optimization",
+      "max_cardiac_psd": "Post-hoc exploratory optimization"
+    }
+  },
+  "section_5_ablation_verdict": {
+    "linear_probing_fresh_head_sbp_mae": 3.67,
+    "modified_tl_v2_sbp_mae": 4.9,
+    "empirical_finding": "Fresh head outperforms pre-trained head on target in-domain data because small dataset (N=472) allows unconstrained adaptation, whereas PulseDB prior (L2-SP) exerts pull towards ICU hospital distribution.",
+    "justification": "Cal-loss is strictly justified (removes within-subject drift, reduces error from 6.48 to 4.90 mmHg). L2-SP acts as a domain anchor whose clinical justification is preventing catastrophic collapse on novel sensors, but empirically degrades in-domain TriaGO fit by +0.26 mmHg compared to No L2-SP."
+  },
+  "section_6_label_limitation": {
+    "ground_truth_cuff_sbp_std_max": 0.0,
+    "ground_truth_cuff_dbp_std_max": 0.0,
+    "predicted_sbp_within_subj_std": {
+      "mean": 2.51,
+      "median": 2.57,
+      "min": 0.22,
+      "max": 6.26
+    },
+    "predicted_dbp_within_subj_std": {
+      "mean": 1.52,
+      "median": 1.38,
+      "min": 0.16,
+      "max": 4.3
+    }
+  },
+  "section_7_training_stability": {
+    "seed_42": {
+      "uncal_sbp_mae": 11.76,
+      "uncal_dbp_mae": 7.07,
+      "cal_sbp_mae": 4.9,
+      "cal_dbp_mae": 2.3
+    },
+    "seed_123": {
+      "uncal_sbp_mae": 11.76,
+      "uncal_dbp_mae": 7.07,
+      "cal_sbp_mae": 4.9,
+      "cal_dbp_mae": 2.3
+    },
+    "seed_999": {
+      "uncal_sbp_mae": 11.76,
+      "uncal_dbp_mae": 7.07,
+      "cal_sbp_mae": 4.89,
+      "cal_dbp_mae": 2.31
+    }
+  },
+  "section_8_computational_performance": {
+    "hardware_platform": "Windows 11 AMD64 / Intel Core CPU",
+    "threads": 6,
+    "feature_extraction_seconds": 0.988,
+    "head_training_seconds": 0.378,
+    "inference_latency_ms": 13.81,
+    "parameter_counts": {
+      "total": 408354,
+      "backbone_frozen": 358432,
+      "heads_trainable": 49922,
+      "pct_trainable": 12.23
+    }
+  },
+  "conclusions": {
+    "question_1_reproducible": "YES. All metrics recompute with 0.00 mmHg discrepancy from checklist_results.json.",
+    "question_2_leakage_free": "YES. GroupKFold enforces 0 subject overlap, train-only normalization, and 41 anchor segments strictly excluded from evaluation.",
+    "question_3_claim_boundaries": "Numerical compliance with AAMI and BHS Grade B/A is supported. Physiological beat-to-beat BP tracking claim is LIMITED/UNSUPPORTED due to static cuff reference (std=0.00 mmHg). Claim that L2-SP improves in-domain accuracy is FAILED (Ablation C achieves 3.67 mmHg vs 4.90 mmHg for L2-SP)."
+  }
+}

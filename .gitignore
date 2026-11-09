@@ -6,11 +6,22 @@ venv/
 # Mengabaikan Cache Python
 **/__pycache__/
 *.pyc
-# *.csv
-*.json
 
-# Mengabaikan file log data pasien sementara
+# Mengabaikan file log
 *.log
 
 # Mengabaikan dataset BIDMC lokal
 /draft_filter/bidmc/
+
+# Mengabaikan Dataset dan Cache Deep Learning
+**/cache/
+*.npz
+*.npy
+
+# Mengabaikan Model dan Checkpoint Deep Learning
+*.pt
+*.pth
+*.ckpt
+
+# Mengabaikan file sementara
+*.tmp

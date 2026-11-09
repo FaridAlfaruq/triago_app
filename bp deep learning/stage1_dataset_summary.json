@@ -1,0 +1,21 @@
+{
+  "n_subjects": 100,
+  "n_vital_subjects": 60,
+  "n_mimic_subjects": 40,
+  "total_segments": 6601,
+  "tensor_shape": [
+    6601,
+    1250,
+    7
+  ],
+  "sbp_mean": 117.94,
+  "sbp_std": 20.4,
+  "sbp_min": 70.05,
+  "sbp_max": 196.64,
+  "dbp_mean": 62.68,
+  "dbp_std": 11.93,
+  "dbp_min": 40.02,
+  "dbp_max": 115.84,
+  "file_size_mb": 204.83,
+  "sha256": "96da2bdd7908aa0cb03372c00b6b7ec05a5ca116f25c63de12220250c9f0025e"
+}

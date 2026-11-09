@@ -1,0 +1,17 @@
+{
+  "id": "faridalfaruq/pulsedb-regularized-bpnet-training",
+  "title": "PulseDB Regularized BPNet Training",
+  "code_file": "train_pulsedb.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "faridalfaruq/pulsedb-vital-mimic-7ch"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

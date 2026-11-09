@@ -1,0 +1,35 @@
+{
+  "protocol": "calbased",
+  "overall_mae": 4.5,
+  "sbp": {
+    "mae": 5.84,
+    "rmse": 6.27,
+    "me": 1.01,
+    "std": 6.18,
+    "r2": -0.019,
+    "pearson_r": 0.568,
+    "aami_pass": true,
+    "bhs_grade": "D",
+    "pct_le_5": 25.0,
+    "pct_le_10": 100.0,
+    "pct_le_15": 100.0
+  },
+  "dbp": {
+    "mae": 3.15,
+    "rmse": 3.44,
+    "me": 0.14,
+    "std": 3.44,
+    "r2": 0.007,
+    "pearson_r": 0.742,
+    "aami_pass": true,
+    "bhs_grade": "A",
+    "pct_le_5": 95.0,
+    "pct_le_10": 100.0,
+    "pct_le_15": 100.0
+  },
+  "test_segments": 20,
+  "test_subjects": [
+    "p000001",
+    "p000003"
+  ]
+}

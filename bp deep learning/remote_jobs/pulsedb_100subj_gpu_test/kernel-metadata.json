@@ -1,0 +1,17 @@
+{
+  "id": "faridalfaruq/pulsedb-100-subject-gpu-1-epoch",
+  "title": "PulseDB 100-Subject GPU 1-Epoch",
+  "code_file": "train.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "faridalfaruq/pulsedb-vital-mimic-7ch"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

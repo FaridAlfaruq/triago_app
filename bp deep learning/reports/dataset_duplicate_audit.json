@@ -1,0 +1,884 @@
+{
+  "metadata": {
+    "dataset_name": "TriaGo PPG/ECG Multimodal BP Dataset",
+    "audit_timestamp": "2026-10-27T17:33:10.003250",
+    "total_subject_ids": 123,
+    "total_exact_clone_rows": 25,
+    "total_unique_recordings": 98,
+    "total_unique_human_subjects": 94
+  },
+  "subject_counts": {
+    "total_subject_ids": 123,
+    "unique_recordings": 98,
+    "exact_duplicate_pairs": 23,
+    "exact_duplicate_triplets": 1,
+    "longitudinal_repeated_subjects": 4,
+    "unique_human_subjects_lower_bound": 94,
+    "unique_human_subjects_upper_bound": 98
+  },
+  "exact_clones_summary": [
+    {
+      "group": "Inas",
+      "hash": "015a24237e22",
+      "subject_ids": [
+        "subject055",
+        "subject093"
+      ],
+      "timestamps": [
+        "20260501_152933",
+        "20260501_152933"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 100.0,
+        "DBP": 70.0,
+        "HR": 87.0
+      }
+    },
+    {
+      "group": "Raasyid",
+      "hash": "06a9229f02f6",
+      "subject_ids": [
+        "subject074",
+        "subject115"
+      ],
+      "timestamps": [
+        "20260513_134631",
+        "20260513_134631"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 139.0,
+        "DBP": 86.0,
+        "HR": 76.0
+      }
+    },
+    {
+      "group": "Zai",
+      "hash": "09b918c11d17",
+      "subject_ids": [
+        "subject072",
+        "subject121"
+      ],
+      "timestamps": [
+        "20260513_130141",
+        "20260513_130141"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 98.0,
+        "DBP": 68.0,
+        "HR": 90.0
+      }
+    },
+    {
+      "group": "Bryant",
+      "hash": "0e709e446f4b",
+      "subject_ids": [
+        "subject073",
+        "subject081"
+      ],
+      "timestamps": [
+        "20260513_131755",
+        "20260513_131755"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 118.0,
+        "DBP": 73.0,
+        "HR": 70.0
+      }
+    },
+    {
+      "group": "Dira",
+      "hash": "16d52065f347",
+      "subject_ids": [
+        "subject047",
+        "subject086"
+      ],
+      "timestamps": [
+        "20260429_130926",
+        "20260429_130926"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 112.0,
+        "DBP": 75.0,
+        "HR": 94.0
+      }
+    },
+    {
+      "group": "Gladis",
+      "hash": "1a9fd3085031",
+      "subject_ids": [
+        "subject050",
+        "subject090"
+      ],
+      "timestamps": [
+        "20260429_141906",
+        "20260429_141906"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 100.0,
+        "DBP": 68.0,
+        "HR": 95.0
+      }
+    },
+    {
+      "group": "Reagan",
+      "hash": "1b34a40131fb",
+      "subject_ids": [
+        "subject075",
+        "subject116"
+      ],
+      "timestamps": [
+        "20260429_121049",
+        "20260429_121049"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 118.0,
+        "DBP": 76.0,
+        "HR": 63.0
+      }
+    },
+    {
+      "group": "Azzan",
+      "hash": "32a2dac11d6f",
+      "subject_ids": [
+        "subject053",
+        "subject079"
+      ],
+      "timestamps": [
+        "20260430_132644",
+        "20260430_132644"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 132.0,
+        "DBP": 88.0,
+        "HR": 103.0
+      }
+    },
+    {
+      "group": "Sylvina",
+      "hash": "5322ff735179",
+      "subject_ids": [
+        "subject045",
+        "subject119"
+      ],
+      "timestamps": [
+        "20260428_141444",
+        "20260428_141444"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 113.0,
+        "DBP": 87.0,
+        "HR": 95.0
+      }
+    },
+    {
+      "group": "Helga",
+      "hash": "74020e6a239d",
+      "subject_ids": [
+        "subject048",
+        "subject092"
+      ],
+      "timestamps": [
+        "20260429_132507",
+        "20260429_132507"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 95.0,
+        "DBP": 75.0,
+        "HR": 76.0
+      }
+    },
+    {
+      "group": "Mei",
+      "hash": "7b054a2aed0c",
+      "subject_ids": [
+        "subject069",
+        "subject104"
+      ],
+      "timestamps": [
+        "20260508_141930",
+        "20260508_141930"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 114.0,
+        "DBP": 92.0,
+        "HR": 100.0
+      }
+    },
+    {
+      "group": "Amanda",
+      "hash": "7b1e7fa56e90",
+      "subject_ids": [
+        "subject051",
+        "subject077"
+      ],
+      "timestamps": [
+        "20260429_161014",
+        "20260429_161014"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 103.0,
+        "DBP": 67.0,
+        "HR": 90.0
+      }
+    },
+    {
+      "group": "Zana",
+      "hash": "9e4eb3df876e",
+      "subject_ids": [
+        "subject056",
+        "subject094",
+        "subject122"
+      ],
+      "timestamps": [
+        "20260501_154957",
+        "20260501_154937",
+        "20260501_154957"
+      ],
+      "delta_seconds": [
+        0.0,
+        -20.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 96.0,
+        "DBP": 65.0,
+        "HR": 90.0
+      }
+    },
+    {
+      "group": "Davira",
+      "hash": "aa3458dabdef",
+      "subject_ids": [
+        "subject068",
+        "subject084"
+      ],
+      "timestamps": [
+        "20260508_133755",
+        "20260508_133755"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 99.0,
+        "DBP": 70.0,
+        "HR": 75.0
+      }
+    },
+    {
+      "group": "Owen",
+      "hash": "b6ffa99abab7",
+      "subject_ids": [
+        "subject071",
+        "subject111"
+      ],
+      "timestamps": [
+        "20260513_122757",
+        "20260513_122757"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 129.0,
+        "DBP": 77.0,
+        "HR": 75.0
+      }
+    },
+    {
+      "group": "Mey",
+      "hash": "c248ee4edc19",
+      "subject_ids": [
+        "subject058",
+        "subject105"
+      ],
+      "timestamps": [
+        "20260501_175935",
+        "20260501_175935"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 104.0,
+        "DBP": 76.0,
+        "HR": 90.0
+      }
+    },
+    {
+      "group": "Dinda",
+      "hash": "d2fe95836457",
+      "subject_ids": [
+        "subject057",
+        "subject085"
+      ],
+      "timestamps": [
+        "20260501_160527",
+        "20260501_160527"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 103.0,
+        "DBP": 65.0,
+        "HR": 84.0
+      }
+    },
+    {
+      "group": "Syamil",
+      "hash": "d51c0545656b",
+      "subject_ids": [
+        "subject046",
+        "subject118"
+      ],
+      "timestamps": [
+        "20260429_124906",
+        "20260429_124906"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 139.0,
+        "DBP": 76.0,
+        "HR": 100.0
+      }
+    },
+    {
+      "group": "Ivan",
+      "hash": "d9b0b4d0f5cb",
+      "subject_ids": [
+        "subject054",
+        "subject095"
+      ],
+      "timestamps": [
+        "20260430_134559",
+        "20260430_134559"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 139.0,
+        "DBP": 82.0,
+        "HR": 83.0
+      }
+    },
+    {
+      "group": "Lia",
+      "hash": "e83c4fcd591c",
+      "subject_ids": [
+        "subject065",
+        "subject100"
+      ],
+      "timestamps": [
+        "20260506_125348",
+        "20260506_125348"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 94.0,
+        "DBP": 67.0,
+        "HR": 95.0
+      }
+    },
+    {
+      "group": "Maula",
+      "hash": "e86b9b4d1212",
+      "subject_ids": [
+        "subject059",
+        "subject103"
+      ],
+      "timestamps": [
+        "20260501_181748",
+        "20260501_181748"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 101.0,
+        "DBP": 81.0,
+        "HR": 110.0
+      }
+    },
+    {
+      "group": "Kaisa",
+      "hash": "eb368274502f",
+      "subject_ids": [
+        "subject070",
+        "subject098"
+      ],
+      "timestamps": [
+        "20260512_100041",
+        "20260512_100041"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 92.0,
+        "DBP": 65.0,
+        "HR": 94.0
+      }
+    },
+    {
+      "group": "Nadhif",
+      "hash": "ef2937886b1f",
+      "subject_ids": [
+        "subject049",
+        "subject107"
+      ],
+      "timestamps": [
+        "20260429_135216",
+        "20260429_135216"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 91.0,
+        "DBP": 60.0,
+        "HR": 80.0
+      }
+    },
+    {
+      "group": "Sansan",
+      "hash": "f40b2c448dec",
+      "subject_ids": [
+        "subject052",
+        "subject117"
+      ],
+      "timestamps": [
+        "20260430_122941",
+        "20260430_122941"
+      ],
+      "delta_seconds": [
+        0.0,
+        0.0
+      ],
+      "vitals": {
+        "SBP": 113.0,
+        "DBP": 66.0,
+        "HR": 112.0
+      }
+    }
+  ],
+  "longitudinal_candidates": [
+    {
+      "normalized_name": "mei",
+      "distinct_recordings_count": 2,
+      "total_subject_rows": 4,
+      "sessions": [
+        {
+          "subject_id": "subject058",
+          "original_name": "Mey",
+          "timestamp": "20260501_175935",
+          "delta_days": 0.0,
+          "ppg_hash_short": "c248ee4edc",
+          "SBP": 104.0,
+          "DBP": 76.0,
+          "HR": 90.0,
+          "RR": 18.0,
+          "SpO2": 96.0,
+          "Glucose": 106.0
+        },
+        {
+          "subject_id": "subject105",
+          "original_name": "Mey",
+          "timestamp": "20260501_175935",
+          "delta_days": 0.0,
+          "ppg_hash_short": "c248ee4edc",
+          "SBP": 104.0,
+          "DBP": 76.0,
+          "HR": 90.0,
+          "RR": 18.0,
+          "SpO2": 96.0,
+          "Glucose": 106.0
+        },
+        {
+          "subject_id": "subject069",
+          "original_name": "Mei",
+          "timestamp": "20260508_141930",
+          "delta_days": 6.85,
+          "ppg_hash_short": "7b054a2aed",
+          "SBP": 114.0,
+          "DBP": 92.0,
+          "HR": 100.0,
+          "RR": 22.0,
+          "SpO2": 100.0,
+          "Glucose": 101.0
+        },
+        {
+          "subject_id": "subject104",
+          "original_name": "Mei",
+          "timestamp": "20260508_141930",
+          "delta_days": 6.85,
+          "ppg_hash_short": "7b054a2aed",
+          "SBP": 114.0,
+          "DBP": 92.0,
+          "HR": 100.0,
+          "RR": 22.0,
+          "SpO2": 100.0,
+          "Glucose": 101.0
+        }
+      ]
+    },
+    {
+      "normalized_name": "nabila",
+      "distinct_recordings_count": 2,
+      "total_subject_rows": 2,
+      "sessions": [
+        {
+          "subject_id": "subject106",
+          "original_name": "Nabila",
+          "timestamp": "20260526_081846",
+          "delta_days": 0.0,
+          "ppg_hash_short": "4f111c530d",
+          "SBP": 125.0,
+          "DBP": 84.0,
+          "HR": 76.0,
+          "RR": 19.0,
+          "SpO2": 99.0,
+          "Glucose": 87.0
+        },
+        {
+          "subject_id": "subject082",
+          "original_name": "Bu Nabila",
+          "timestamp": "20260526_122537",
+          "delta_days": 0.17,
+          "ppg_hash_short": "3822bbbfaf",
+          "SBP": 111.0,
+          "DBP": 78.0,
+          "HR": 73.0,
+          "RR": 21.0,
+          "SpO2": 97.0,
+          "Glucose": 91.0
+        }
+      ]
+    },
+    {
+      "normalized_name": "nashwa",
+      "distinct_recordings_count": 2,
+      "total_subject_rows": 2,
+      "sessions": [
+        {
+          "subject_id": "subject020",
+          "original_name": "021_Nashwa",
+          "timestamp": "20260421_114326",
+          "delta_days": 0.0,
+          "ppg_hash_short": "a91e307a9f",
+          "SBP": 101.0,
+          "DBP": 74.0,
+          "HR": 95.0,
+          "RR": 15.0,
+          "SpO2": 97.0,
+          "Glucose": 132.0
+        },
+        {
+          "subject_id": "subject108",
+          "original_name": "Nasywa",
+          "timestamp": "20260521_131148",
+          "delta_days": 30.06,
+          "ppg_hash_short": "b13dc58734",
+          "SBP": 100.0,
+          "DBP": 72.0,
+          "HR": 90.0,
+          "RR": 24.0,
+          "SpO2": 100.0,
+          "Glucose": 109.0
+        }
+      ]
+    },
+    {
+      "normalized_name": "olivia",
+      "distinct_recordings_count": 2,
+      "total_subject_rows": 2,
+      "sessions": [
+        {
+          "subject_id": "subject015",
+          "original_name": "016_Olyvia",
+          "timestamp": "20260428_133440",
+          "delta_days": 0.0,
+          "ppg_hash_short": "e397ba08e2",
+          "SBP": 117.0,
+          "DBP": 82.0,
+          "HR": 95.0,
+          "RR": 19.0,
+          "SpO2": 95.0,
+          "Glucose": 114.0
+        },
+        {
+          "subject_id": "subject110",
+          "original_name": "Olivia",
+          "timestamp": "20260526_080119",
+          "delta_days": 27.77,
+          "ppg_hash_short": "90881aeec0",
+          "SBP": 102.0,
+          "DBP": 78.0,
+          "HR": 91.0,
+          "RR": 23.0,
+          "SpO2": 99.0,
+          "Glucose": 85.0
+        }
+      ]
+    }
+  ],
+  "leakage_in_bp_ipynb": {
+    "optimal_seed_selected": 71,
+    "train_subjects_count": 55,
+    "val_subjects_count": 12,
+    "test_subjects_count": 12,
+    "total_duplicate_groups_leaking_across_splits": 10,
+    "test_set_contamination": {
+      "total_test_subjects": 12,
+      "contaminated_test_subjects": 5,
+      "subject_contamination_rate_pct": 41.67,
+      "total_test_segments": 112,
+      "contaminated_test_segments": 64,
+      "segment_contamination_rate_pct": 57.14,
+      "leaked_subjects_in_test": [
+        "subject048",
+        "subject104",
+        "subject122",
+        "subject095",
+        "subject100"
+      ]
+    },
+    "detailed_cross_split_cases": [
+      {
+        "group_name": "Inas",
+        "num_records": 2,
+        "subject_ids": [
+          "subject055",
+          "subject093"
+        ],
+        "split_assignments": {
+          "subject055": "Val",
+          "subject093": "Train"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Val",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Sylvina",
+        "num_records": 2,
+        "subject_ids": [
+          "subject045",
+          "subject119"
+        ],
+        "split_assignments": {
+          "subject045": "Train",
+          "subject119": "Val"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Val",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Helga",
+        "num_records": 2,
+        "subject_ids": [
+          "subject048",
+          "subject092"
+        ],
+        "split_assignments": {
+          "subject048": "Test",
+          "subject092": "Val"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Test",
+          "Val"
+        ]
+      },
+      {
+        "group_name": "Mei",
+        "num_records": 2,
+        "subject_ids": [
+          "subject069",
+          "subject104"
+        ],
+        "split_assignments": {
+          "subject069": "Train",
+          "subject104": "Test"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Test",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Zana",
+        "num_records": 3,
+        "subject_ids": [
+          "subject056",
+          "subject094",
+          "subject122"
+        ],
+        "split_assignments": {
+          "subject056": "Train",
+          "subject094": "Train",
+          "subject122": "Test"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Test",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Davira",
+        "num_records": 2,
+        "subject_ids": [
+          "subject068",
+          "subject084"
+        ],
+        "split_assignments": {
+          "subject068": "Train",
+          "subject084": "Val"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Val",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Ivan",
+        "num_records": 2,
+        "subject_ids": [
+          "subject054",
+          "subject095"
+        ],
+        "split_assignments": {
+          "subject054": "Train",
+          "subject095": "Test"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Test",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Lia",
+        "num_records": 2,
+        "subject_ids": [
+          "subject065",
+          "subject100"
+        ],
+        "split_assignments": {
+          "subject065": "Train",
+          "subject100": "Test"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Test",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Maula",
+        "num_records": 2,
+        "subject_ids": [
+          "subject059",
+          "subject103"
+        ],
+        "split_assignments": {
+          "subject059": "Val",
+          "subject103": "Train"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Val",
+          "Train"
+        ]
+      },
+      {
+        "group_name": "Sansan",
+        "num_records": 2,
+        "subject_ids": [
+          "subject052",
+          "subject117"
+        ],
+        "split_assignments": {
+          "subject052": "Val",
+          "subject117": "Train"
+        },
+        "is_cross_split_leakage": true,
+        "active_splits": [
+          "Val",
+          "Train"
+        ]
+      }
+    ]
+  }
+}

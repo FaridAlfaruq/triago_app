@@ -1,0 +1,31 @@
+{
+  "model_name": "RegularizedBPNet_PulseDB_v2",
+  "total_parameters": 52498,
+  "epochs_trained": 40,
+  "train_segments": 3803,
+  "val_segments": 923,
+  "train_patients": 31,
+  "val_patients": 8,
+  "best_epoch": 36,
+  "val_loss": 1.6883,
+  "val_sbp_mae": 11.5,
+  "val_dbp_mae": 8.85,
+  "val_sbp_rmse": 14.76,
+  "val_dbp_rmse": 11.38,
+  "sbp_sd": 14.06,
+  "dbp_sd": 11.1,
+  "bhs_sbp": {
+    "le_5": 29.5,
+    "le_10": 53.6,
+    "le_15": 72.4,
+    "grade": "Grade D"
+  },
+  "bhs_dbp": {
+    "le_5": 37.8,
+    "le_10": 63.1,
+    "le_15": 81.8,
+    "grade": "Grade D"
+  },
+  "aami_sbp_pass": false,
+  "aami_dbp_pass": false
+}

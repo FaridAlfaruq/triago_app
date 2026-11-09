@@ -1,0 +1,9 @@
+{
+  "total_unique_patients": 94,
+  "ecg_files_count": 94,
+  "ppg_files_count": 94,
+  "dropped_bitwise_clones_count": 25,
+  "secondary_longitudinal_sessions_count": 4,
+  "source_path": "G:\\My Drive\\TriaGO_Project\\Dataset",
+  "destination_path": "scratch\\gemastik\\Bp revisi\\Data"
+}

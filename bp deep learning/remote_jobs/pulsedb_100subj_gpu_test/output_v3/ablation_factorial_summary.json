@@ -1,0 +1,134 @@
+{
+  "unseen_raw_calfree": {
+    "overall_mae": 11.3,
+    "sbp": {
+      "mae": 13.73,
+      "rmse": 18.62,
+      "me": 1.11,
+      "std": 18.59,
+      "r2": 0.017,
+      "pearson_r": 0.356,
+      "aami_pass": false,
+      "bhs_grade": "D",
+      "pct_le_5": 24.8,
+      "pct_le_10": 50.3,
+      "pct_le_15": 66.1
+    },
+    "dbp": {
+      "mae": 8.88,
+      "rmse": 10.96,
+      "me": -0.35,
+      "std": 10.95,
+      "r2": -0.039,
+      "pearson_r": 0.4,
+      "aami_pass": false,
+      "bhs_grade": "D",
+      "pct_le_5": 33.4,
+      "pct_le_10": 61.2,
+      "pct_le_15": 82.3
+    },
+    "aami_pass": false
+  },
+  "unseen_with_anchor_ablation1": {
+    "overall_mae": 9.54,
+    "overall_rmse": 12.58,
+    "sbp": {
+      "mae": 11.66,
+      "rmse": 15.33,
+      "me": 1.41,
+      "std": 15.27,
+      "r2": 0.331,
+      "pearson_r": 0.639,
+      "aami_pass": false,
+      "bhs_grade": "D",
+      "pct_le_5": 30.1,
+      "pct_le_10": 52.4,
+      "pct_le_15": 70.5
+    },
+    "dbp": {
+      "mae": 7.42,
+      "rmse": 9.83,
+      "me": -0.47,
+      "std": 9.82,
+      "r2": 0.151,
+      "pearson_r": 0.656,
+      "aami_pass": false,
+      "bhs_grade": "C",
+      "pct_le_5": 44.7,
+      "pct_le_10": 72.6,
+      "pct_le_15": 88.9
+    },
+    "aami_pass": false,
+    "eval_segments": 1300,
+    "unseen_test_subjects": 20
+  },
+  "seen_raw_no_anchor_ablation2": {
+    "overall_mae": 3.9,
+    "overall_rmse": 5.75,
+    "sbp": {
+      "mae": 4.97,
+      "rmse": 7.21,
+      "me": -1.63,
+      "std": 7.03,
+      "r2": 0.863,
+      "pearson_r": 0.933,
+      "aami_pass": true,
+      "bhs_grade": "B",
+      "pct_le_5": 65.9,
+      "pct_le_10": 87.7,
+      "pct_le_15": 94.5
+    },
+    "dbp": {
+      "mae": 2.84,
+      "rmse": 4.28,
+      "me": -0.81,
+      "std": 4.2,
+      "r2": 0.869,
+      "pearson_r": 0.935,
+      "aami_pass": true,
+      "bhs_grade": "A",
+      "pct_le_5": 84.8,
+      "pct_le_10": 97.1,
+      "pct_le_15": 98.9
+    },
+    "aami_pass": true,
+    "test_segments": 657,
+    "subjects": 96
+  },
+  "seen_with_anchor_calbased": {
+    "overall_mae": 3.81,
+    "sbp": {
+      "mae": 4.76,
+      "rmse": 7.07,
+      "me": -0.2,
+      "std": 7.06,
+      "r2": 0.868,
+      "pearson_r": 0.932,
+      "aami_pass": true,
+      "bhs_grade": "B",
+      "pct_le_5": 68.0,
+      "pct_le_10": 89.0,
+      "pct_le_15": 94.4
+    },
+    "dbp": {
+      "mae": 2.86,
+      "rmse": 4.3,
+      "me": -0.31,
+      "std": 4.29,
+      "r2": 0.868,
+      "pearson_r": 0.932,
+      "aami_pass": true,
+      "bhs_grade": "A",
+      "pct_le_5": 85.1,
+      "pct_le_10": 97.1,
+      "pct_le_15": 99.1
+    },
+    "aami_pass": true
+  },
+  "variance_decomposition": {
+    "total_gap_mmhg": 7.49,
+    "pure_calibration_gain_on_unseen_mmhg": 1.76,
+    "subject_familiarity_gain_raw_mmhg": 7.4,
+    "anchor_gain_on_seen_mmhg": 0.09
+  }
+}

@@ -1,0 +1,322 @@
+[
+  {
+    "caseid": 1,
+    "file_size_mb": 16.75,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 2,
+    "raw_stats": {
+      "duration_min": 192.37,
+      "ppg_total_samples": 5771049,
+      "ppg_nan_pct": 0.02,
+      "ppg_min": -198.25,
+      "ppg_max": 95.62,
+      "ppg_mean": 37.82,
+      "ppg_std": 15.09,
+      "bt_total_samples": 5772,
+      "bt_nan_pct": 0.21,
+      "bt_out_of_bounds_low (<33C)": 1210,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 2.53,
+      "valid_duration_min": 151.6,
+      "ppg_proc_samples": 4548002,
+      "bt_proc_samples": 4550,
+      "bt_min_c": 33.0,
+      "bt_max_c": 36.3,
+      "bt_mean_c": 35.73,
+      "bt_median_c": 35.7,
+      "bt_std_c": 0.32,
+      "physio_valid_pct": 78.99
+    }
+  },
+  {
+    "caseid": 2,
+    "file_size_mb": 16.71,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 262.35,
+      "ppg_total_samples": 7870385,
+      "ppg_nan_pct": 0.01,
+      "ppg_min": -198.25,
+      "ppg_max": 92.46,
+      "ppg_mean": 36.36,
+      "ppg_std": 14.23,
+      "bt_total_samples": 7871,
+      "bt_nan_pct": 4.8,
+      "bt_out_of_bounds_low (<33C)": 516,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 3.88,
+      "valid_duration_min": 232.57,
+      "ppg_proc_samples": 6977001,
+      "bt_proc_samples": 6977,
+      "bt_min_c": 33.1,
+      "bt_max_c": 36.3,
+      "bt_mean_c": 35.41,
+      "bt_median_c": 35.3,
+      "bt_std_c": 0.28,
+      "physio_valid_pct": 93.11
+    }
+  },
+  {
+    "caseid": 3,
+    "file_size_mb": 5.16,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 73.24,
+      "ppg_total_samples": 2197087,
+      "ppg_nan_pct": 0.0,
+      "ppg_min": -16.95,
+      "ppg_max": 25686.95,
+      "ppg_mean": 142.75,
+      "ppg_std": 1643.74,
+      "bt_total_samples": 2198,
+      "bt_nan_pct": 47.82,
+      "bt_out_of_bounds_low (<33C)": 87,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 0.63,
+      "valid_duration_min": 37.63,
+      "ppg_proc_samples": 1129001,
+      "bt_proc_samples": 1060,
+      "bt_min_c": 33.0,
+      "bt_max_c": 35.5,
+      "bt_mean_c": 35.34,
+      "bt_median_c": 35.5,
+      "bt_std_c": 0.36,
+      "physio_valid_pct": 92.41
+    }
+  },
+  {
+    "caseid": 4,
+    "file_size_mb": 21.42,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 2,
+    "raw_stats": {
+      "duration_min": 349.83,
+      "ppg_total_samples": 10494885,
+      "ppg_nan_pct": 0.0,
+      "ppg_min": -198.25,
+      "ppg_max": 25686.95,
+      "ppg_mean": 62.39,
+      "ppg_std": 773.45,
+      "bt_total_samples": 10495,
+      "bt_nan_pct": 15.56,
+      "bt_out_of_bounds_low (<33C)": 1186,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 4.27,
+      "valid_duration_min": 256.13,
+      "ppg_proc_samples": 7684002,
+      "bt_proc_samples": 7676,
+      "bt_min_c": 33.0,
+      "bt_max_c": 36.7,
+      "bt_mean_c": 35.17,
+      "bt_median_c": 35.2,
+      "bt_std_c": 0.23,
+      "physio_valid_pct": 86.62
+    }
+  },
+  {
+    "caseid": 5,
+    "file_size_mb": 31.45,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 358.86,
+      "ppg_total_samples": 10765737,
+      "ppg_nan_pct": 0.01,
+      "ppg_min": -198.25,
+      "ppg_max": 97.2,
+      "ppg_mean": 39.59,
+      "ppg_std": 9.01,
+      "bt_total_samples": 10766,
+      "bt_nan_pct": 7.21,
+      "bt_out_of_bounds_low (<33C)": 969,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 5.01,
+      "valid_duration_min": 300.7,
+      "ppg_proc_samples": 9021001,
+      "bt_proc_samples": 9021,
+      "bt_min_c": 33.0,
+      "bt_max_c": 36.9,
+      "bt_mean_c": 36.37,
+      "bt_median_c": 36.4,
+      "bt_std_c": 0.24,
+      "physio_valid_pct": 90.3
+    }
+  },
+  {
+    "caseid": 6,
+    "file_size_mb": 3.74,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 85.75,
+      "ppg_total_samples": 2572382,
+      "ppg_nan_pct": 0.04,
+      "ppg_min": -198.25,
+      "ppg_max": 25686.95,
+      "ppg_mean": 34.08,
+      "ppg_std": 45.44,
+      "bt_total_samples": 2573,
+      "bt_nan_pct": 24.91,
+      "bt_out_of_bounds_low (<33C)": 21,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 1.07,
+      "valid_duration_min": 64.03,
+      "ppg_proc_samples": 1921001,
+      "bt_proc_samples": 1911,
+      "bt_min_c": 33.2,
+      "bt_max_c": 36.7,
+      "bt_mean_c": 36.21,
+      "bt_median_c": 36.2,
+      "bt_std_c": 0.22,
+      "physio_valid_pct": 98.91
+    }
+  },
+  {
+    "caseid": 7,
+    "file_size_mb": 14.22,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 262.83,
+      "ppg_total_samples": 7884967,
+      "ppg_nan_pct": 0.0,
+      "ppg_min": -198.25,
+      "ppg_max": 25686.95,
+      "ppg_mean": 59.68,
+      "ppg_std": 796.1,
+      "bt_total_samples": 7885,
+      "bt_nan_pct": 38.38,
+      "bt_out_of_bounds_low (<33C)": 0,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 2.71,
+      "valid_duration_min": 162.53,
+      "ppg_proc_samples": 4876001,
+      "bt_proc_samples": 4859,
+      "bt_min_c": 34.8,
+      "bt_max_c": 37.0,
+      "bt_mean_c": 36.28,
+      "bt_median_c": 36.3,
+      "bt_std_c": 0.2,
+      "physio_valid_pct": 100.0
+    }
+  },
+  {
+    "caseid": 8,
+    "file_size_mb": 6.05,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 98.64,
+      "ppg_total_samples": 2959093,
+      "ppg_nan_pct": 0.03,
+      "ppg_min": -19.32,
+      "ppg_max": 92.46,
+      "ppg_mean": 34.62,
+      "ppg_std": 15.26,
+      "bt_total_samples": 2960,
+      "bt_nan_pct": 23.18,
+      "bt_out_of_bounds_low (<33C)": 22,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 1.25,
+      "valid_duration_min": 75.03,
+      "ppg_proc_samples": 2251001,
+      "bt_proc_samples": 2252,
+      "bt_min_c": 33.3,
+      "bt_max_c": 35.9,
+      "bt_mean_c": 35.62,
+      "bt_median_c": 35.6,
+      "bt_std_c": 0.19,
+      "physio_valid_pct": 99.03
+    }
+  },
+  {
+    "caseid": 9,
+    "file_size_mb": 5.12,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 1,
+    "raw_stats": {
+      "duration_min": 74.68,
+      "ppg_total_samples": 2240475,
+      "ppg_nan_pct": 0.03,
+      "ppg_min": -198.25,
+      "ppg_max": 95.62,
+      "ppg_mean": 35.66,
+      "ppg_std": 17.65,
+      "bt_total_samples": 2241,
+      "bt_nan_pct": 37.53,
+      "bt_out_of_bounds_low (<33C)": 33,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 0.76,
+      "valid_duration_min": 45.53,
+      "ppg_proc_samples": 1366001,
+      "bt_proc_samples": 1367,
+      "bt_min_c": 33.0,
+      "bt_max_c": 37.0,
+      "bt_mean_c": 36.84,
+      "bt_median_c": 36.9,
+      "bt_std_c": 0.24,
+      "physio_valid_pct": 97.64
+    }
+  },
+  {
+    "caseid": 10,
+    "file_size_mb": 21.78,
+    "status": "OK",
+    "verdict": "USABLE_VALID",
+    "n_segments": 3,
+    "raw_stats": {
+      "duration_min": 349.87,
+      "ppg_total_samples": 10496246,
+      "ppg_nan_pct": 0.02,
+      "ppg_min": -198.25,
+      "ppg_max": 94.83,
+      "ppg_mean": 38.94,
+      "ppg_std": 12.16,
+      "bt_total_samples": 10497,
+      "bt_nan_pct": 3.21,
+      "bt_out_of_bounds_low (<33C)": 2195,
+      "bt_out_of_bounds_high (>45C)": 0
+    },
+    "proc_stats": {
+      "valid_hours": 4.42,
+      "valid_duration_min": 265.4,
+      "ppg_proc_samples": 7962003,
+      "bt_proc_samples": 7965,
+      "bt_min_c": 33.0,
+      "bt_max_c": 36.0,
+      "bt_mean_c": 35.63,
+      "bt_median_c": 35.6,
+      "bt_std_c": 0.29,
+      "physio_valid_pct": 78.4
+    }
+  }
+]

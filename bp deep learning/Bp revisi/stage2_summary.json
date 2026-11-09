@@ -1,0 +1,34 @@
+{
+  "task_id": "STAGE2-7CHANNEL-FEATURE-EXTRACTION",
+  "tensor_shape": [
+    732,
+    1250,
+    7
+  ],
+  "target_shapes": {
+    "y_sbp": [
+      732
+    ],
+    "y_dbp": [
+      732
+    ]
+  },
+  "channels": [
+    "ECG_Norm",
+    "PPG_Norm",
+    "VPG_Norm",
+    "APG_Norm",
+    "Cross_Interaction_Norm",
+    "ECG_Hilbert_Env",
+    "PPG_Hilbert_Env"
+  ],
+  "total_valid_segments": 732,
+  "unique_patients_covered": 75,
+  "dataset_npz_bytes": 23872244,
+  "target_stats": {
+    "sbp_mean": 115.09,
+    "sbp_std": 14.42,
+    "dbp_mean": 75.75,
+    "dbp_std": 8.44
+  }
+}
