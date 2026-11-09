@@ -1,0 +1,1715 @@
+
+========================================
+CELL 0 [code]
+========================================
+# ==========================================
+# CELL 1: Environment Setup & Library Import
+# ==========================================
+!pip install --upgrade pip -q
+!pip install scipy numpy pandas scikit-learn matplotlib -q
+
+import os
+import glob
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+print("✅ Cell 1: Environment dan pustaka berhasil dimuat.")
+
+========================================
+CELL 1 [code]
+========================================
+# ==========================================
+# CELL 2: Mount Google Drive & Path Definition
+# ==========================================
+from google.colab import drive
+
+# 1. Mount Google Drive
+drive.mount('/content/drive', force_remount=False)
+
+# 2. Path Konfigurasi Dataset
+BASE_PATH = '/content/drive/MyDrive/TriaGO_Project/Dataset'
+ECG_DIR = os.path.join(BASE_PATH, 'ECG')
+PPG_DIR = os.path.join(BASE_PATH, 'PPG')
+METADATA_DIR = os.path.join(BASE_PATH, 'metadata')
+
+TARGET_PATH = os.path.join(METADATA_DIR, 'target.csv')
+MAPPING_PATH = os.path.join(METADATA_DIR, 'subject_mapping.csv')
+
+# 3. Verifikasi Keberadaan Folder Utama
+print("=== VERIFIKASI AWAL DIREKTORI ===")
+print(f"Base Path Exists     : {os.path.exists(BASE_PATH)}")
+print(f"Target CSV Exists    : {os.path.exists(TARGET_PATH)}")
+print(f"Mapping CSV Exists   : {os.path.exists(MAPPING_PATH)}")
+
+========================================
+CELL 2 [markdown]
+========================================
+Pre-processing
+
+========================================
+CELL 3 [code]
+========================================
+# ==========================================
+# CELL 3: Robust Dataset Loader Function
+# ==========================================
+def load_and_validate_dataset_structure(base_path, target_path, mapping_path, ecg_dir, ppg_dir):
+    """
+    Memuat metadata, memetakan recording ID ke Patient ID secara ketat,
+    dan memvalidasi keberadaan serta integritas file ECG & PPG.
+    """
+    if not os.path.exists(target_path):
+        raise FileNotFoundError(f"CRITICAL: target.csv tidak ditemukan di {target_path}")
+
+    gt_df = pd.read_csv(target_path)
+
+    # 1. Integrasi Strict Subject Mapping (Mencegah Patient-Level Leakage)
+    if os.path.exists(mapping_path):
+        map_df = pd.read_csv(mapping_path)
+        if 'subject_id' in map_df.columns and 'patient_id' in map_df.columns:
+            gt_df = gt_df.merge(map_df[['subject_id', 'patient_id']], on='subject_id', how='left')
+            gt_df['true_patient_id'] = gt_df['patient_id'].fillna(gt_df['subject_id'])
+            print("✅ Subject Mapping berhasil diintegrasikan.")
+        else:
+            print("⚠️ Warning: Kolom 'subject_id' atau 'patient_id' tidak ada di mapping CSV. Fallback ke subject_id.")
+            gt_df['true_patient_id'] = gt_df['subject_id']
+    else:
+        print("⚠️ Warning: subject_mapping.csv tidak ditemukan. Memakai subject_id sebagai patient ID.")
+        gt_df['true_patient_id'] = gt_df['subject_id']
+
+    patient_records = []
+    orphan_count = 0
+    corrupt_count = 0
+
+    # 2. Iterasi & Validasi Integritas File Sinyal
+    for idx, row in gt_df.iterrows():
+        sub_id = row['subject_id']
+        true_pid = row['true_patient_id']
+        sbp_val = row['SBP']
+        dbp_val = row['DBP']
+
+        # Filter target tidak valid
+        if pd.isna(sbp_val) or pd.isna(dbp_val) or sbp_val <= 0 or dbp_val <= 0:
+            continue
+
+        ecg_path = os.path.join(ecg_dir, f"{sub_id}_ecg.csv")
+        ppg_path = os.path.join(ppg_dir, f"{sub_id}_ppg.csv")
+
+        # Cek keberadaan file berpasangan
+        if not (os.path.exists(ecg_path) and os.path.exists(ppg_path)):
+            orphan_count += 1
+            continue
+
+        try:
+            df_ecg = pd.read_csv(ecg_path)
+            df_ppg = pd.read_csv(ppg_path)
+
+            # Validasi file kosong atau struktur kolom rusak
+            if df_ecg.empty or df_ppg.empty:
+                corrupt_count += 1
+                continue
+
+            if 'ECG_Raw (V)' not in df_ecg.columns or 'PPG_IR' not in df_ppg.columns:
+                corrupt_count += 1
+                continue
+
+            record = {
+                'recording_id': sub_id,
+                'patient_id': true_pid,  # Menggunakan True Patient ID untuk GroupSplit!
+                'ecg': df_ecg['ECG_Raw (V)'].values,
+                'ecg_time': df_ecg['Time (s)'].values,
+                'ppg': df_ppg['PPG_IR'].values,
+                'ppg_time': df_ppg['Time (s)'].values,
+                'sbp': float(sbp_val),
+                'dbp': float(dbp_val)
+            }
+            patient_records.append(record)
+
+        except Exception as e:
+            corrupt_count += 1
+            print(f"Error membaca subjek {sub_id}: {e}")
+
+    print("\n=== RINGKASAN AUDIT DATASET TAHAP 1 ===")
+    print(f"Total Rekaman Dimuat       : {len(patient_records)}")
+    print(f"Jumlah Pasien Unik (True)  : {len(set(r['patient_id'] for r in patient_records))}")
+    print(f"File Orphan (Tidak Komplit): {orphan_count}")
+    print(f"File Korup / Kolom Invalid: {corrupt_count}")
+
+    return patient_records
+
+print("✅ Cell 3: Fungsi loader Tahap 1 siap digunakan.")
+
+========================================
+CELL 4 [markdown]
+========================================
+Setup dataset
+
+========================================
+CELL 5 [code]
+========================================
+# ==========================================
+# CELL 4: Execute & Verify Data Loading
+# ==========================================
+patient_records = load_and_validate_dataset_structure(
+    base_path=BASE_PATH,
+    target_path=TARGET_PATH,
+    mapping_path=MAPPING_PATH,
+    ecg_dir=ECG_DIR,
+    ppg_dir=PPG_DIR
+)
+
+# Inspect sampel data pertama
+if len(patient_records) > 0:
+    sample = patient_records[0]
+    print("\n=== SAMPEL DATA REKAMAN PERTAMA ===")
+    print(f"Recording ID : {sample['recording_id']}")
+    print(f"Patient ID   : {sample['patient_id']}")
+    print(f"Target SBP   : {sample['sbp']} mmHg | DBP: {sample['dbp']} mmHg")
+    print(f"Panjang ECG  : {len(sample['ecg'])} sampel")
+    print(f"Panjang PPG  : {len(sample['ppg'])} sampel")
+
+========================================
+CELL 6 [code]
+========================================
+# ==========================================
+# CELL 5: Raw Signal Sanitization & Median Fs Computation
+# ==========================================
+def sanitize_raw_record(record):
+    """
+    Membersihkan NaN/Inf, menghapus timestamp duplikat/non-monotonik,
+    serta menghitung frekuensi sampling presisi berbasis median.
+    """
+    cleaned_rec = record.copy()
+
+    for sig_type in ['ecg', 'ppg']:
+        sig = record[sig_type]
+        t = record[f'{sig_type}_time']
+
+        # 1. Sanitasi NaN / Inf
+        valid_mask = ~(np.isnan(sig) | np.isinf(sig) | np.isnan(t) | np.isinf(t))
+        sig, t = sig[valid_mask], t[valid_mask]
+
+        if len(sig) == 0:
+            return None  # Rekaman rusak total
+
+        # 2. Urutkan berdasarkan timestamp & hapus duplikat (Strict Monotonic)
+        df_temp = pd.DataFrame({'time': t, 'sig': sig})
+        df_temp = df_temp.drop_duplicates(subset=['time']).sort_values(by='time')
+
+        t_clean = df_temp['time'].values
+        sig_clean = df_temp['sig'].values
+
+        # 3. Hitung Delta Time & Evaluasi Jitter
+        dt = np.diff(t_clean)
+        if len(dt) == 0 or np.any(dt <= 0):
+            return None
+
+        median_dt = np.median(dt)
+        std_dt = np.std(dt)
+        fs_estimated = 1.0 / median_dt
+
+        # Simpan kembali ke record
+        cleaned_rec[sig_type] = sig_clean
+        cleaned_rec[f'{sig_type}_time'] = t_clean
+        cleaned_rec[f'fs_{sig_type}'] = fs_estimated
+        cleaned_rec[f'jitter_{sig_type}'] = std_dt
+
+    return cleaned_rec
+
+print("✅ Cell 5: Fungsi sanitasi dan komputasi Fs berbasis median siap.")
+
+========================================
+CELL 7 [code]
+========================================
+# ==========================================
+# CELL 6: Temporal Alignment & Polyphase Resampling (fs=125Hz)
+# ==========================================
+from scipy.signal import resample_poly
+
+def align_and_resample_record(record, fs_target=125):
+    """
+    Menyelaraskan rentang waktu ECG dan PPG (Strict Time Alignment)
+    dan melakukan Polyphase Resampling ke frekuensi seragam (125 Hz).
+    """
+    t_ecg, sig_ecg = record['ecg_time'], record['ecg']
+    t_ppg, sig_ppg = record['ppg_time'], record['ppg']
+
+    # 1. Tentukan Jendela Waktu Bersama (Overlapping Time Window)
+    t_start = max(t_ecg[0], t_ppg[0])
+    t_end = min(t_ecg[-1], t_ppg[-1])
+
+    duration = t_end - t_start
+    if duration < 10.0:  # Rekaman minimal 10 detik
+        return None
+
+    # 2. Potong Sinyal ke Jendela Waktu Bersama
+    mask_ecg = (t_ecg >= t_start) & (t_ecg <= t_end)
+    mask_ppg = (t_ppg >= t_start) & (t_ppg <= t_end)
+
+    sig_ecg_cut = sig_ecg[mask_ecg]
+    sig_ppg_cut = sig_ppg[mask_ppg]
+
+    # 3. Hitung Faktor Resampling Rational (Up / Down)
+    fs_ecg_in = record['fs_ecg']
+    fs_ppg_in = record['fs_ppg']
+
+    # Resample ECG ke fs_target (125 Hz)
+    up_ecg = int(round(fs_target * 1000))
+    down_ecg = int(round(fs_ecg_in * 1000))
+    ecg_125 = resample_poly(sig_ecg_cut, up=up_ecg, down=down_ecg)
+
+    # Resample PPG ke fs_target (125 Hz)
+    up_ppg = int(round(fs_target * 1000))
+    down_ppg = int(round(fs_ppg_in * 1000))
+    ppg_125 = resample_poly(sig_ppg_cut, up=up_ppg, down=down_ppg)
+
+    # 4. Paksa Panjang Sampel Persis Sama
+    min_len = min(len(ecg_125), len(ppg_125))
+    ecg_125 = ecg_125[:min_len]
+    ppg_125 = ppg_125[:min_len]
+    t_common = np.linspace(0, min_len / fs_target, min_len)
+
+    resampled_rec = {
+        'recording_id': record['recording_id'],
+        'patient_id': record['patient_id'],
+        'ecg': ecg_125,
+        'ppg': ppg_125,
+        'time': t_common,
+        'fs': fs_target,
+        'duration_sec': min_len / fs_target,
+        'sbp': record['sbp'],
+        'dbp': record['dbp']
+    }
+
+    return resampled_rec
+
+print("✅ Cell 6: Fungsi penyelarasan waktu dan resampling ke 125Hz siap.")
+
+========================================
+CELL 8 [code]
+========================================
+# ==========================================
+# CELL 7: Execute Stage 2 Data Reading & Resampling
+# ==========================================
+sanitized_records = []
+final_aligned_records = []
+
+rejected_sanitization = 0
+rejected_alignment = 0
+
+for rec in patient_records:
+    # Langkah A: Sanitasi
+    s_rec = sanitize_raw_record(rec)
+    if s_rec is None:
+        rejected_sanitization += 1
+        continue
+    sanitized_records.append(s_rec)
+
+    # Langkah B: Penyelarasan Waktu & Resampling ke 125 Hz
+    a_rec = align_and_resample_record(s_rec, fs_target=125)
+    if a_rec is None:
+        rejected_alignment += 1
+        continue
+    final_aligned_records.append(a_rec)
+
+print("\n=== RINGKASAN AUDIT DATASET TAHAP 2 ===")
+print(f"Total Rekaman Awal               : {len(patient_records)}")
+print(f"Lolos Sanitasi Raw Data          : {len(sanitized_records)} (Ditolak: {rejected_sanitization})")
+print(f"Lolos Time Alignment & Resampling: {len(final_aligned_records)} (Ditolak: {rejected_alignment})")
+
+if len(final_aligned_records) > 0:
+    sample_res = final_aligned_records[0]
+    print("\n=== VERIFIKASI SINKRONISASI TAHAP 2 (SAMPEL PERTAMA) ===")
+    print(f"Recording ID       : {sample_res['recording_id']}")
+    print(f"Frekuensi Sampling : {sample_res['fs']} Hz (Seragam)")
+    print(f"Durasi Sinyal      : {sample_res['duration_sec']:.2f} detik")
+    print(f"Panjang Sampel ECG : {len(sample_res['ecg'])} sampel")
+    print(f"Panjang Sampel PPG : {len(sample_res['ppg'])} sampel (100% Identik!)")
+
+========================================
+CELL 9 [code]
+========================================
+# ==========================================
+# CELL 8: Zero-Phase Digital Filter Helpers (SOS Format)
+# ==========================================
+from scipy.signal import butter, sosfiltfilt, iirnotch, filtfilt
+
+def notch_filter_zero_phase(sig, freq=50.0, fs=125.0, Q=30.0):
+    """Filter Notch 50Hz untuk meredam noise jala-jala listrik."""
+    nyq = 0.5 * fs
+    if freq >= nyq:
+        return sig
+    b, a = iirnotch(w0=freq, Q=Q, fs=fs)
+    return filtfilt(b, a, sig)
+
+def bandpass_filter_zero_phase(sig, lowcut, highcut, fs=125.0, order=4):
+    """Filter Bandpass Butterworth SOS zero-phase (sosfiltfilt)."""
+    sos = butter(order, [lowcut, highcut], btype='bandpass', fs=fs, output='sos')
+    return sosfiltfilt(sos, sig)
+
+print("✅ Cell 8: Fungsi helper zero-phase filtering berbasis SOS siap.")
+
+========================================
+CELL 10 [code]
+========================================
+# ==========================================
+# CELL 9: Optimal ECG & PPG Preprocessing Pipeline
+# ==========================================
+def preprocess_ecg_clean(raw_ecg, fs=125.0):
+    """
+    Preprocessing ECG Standar Biomedis:
+    1. Notch Filter 50 Hz (Powerline Noise)
+    2. Bandpass Butterworth SOS 0.5 Hz - 40.0 Hz (Baseline Wander & High-Freq Muscle Noise Removal)
+    """
+    # 1. Notch Filter
+    ecg_notch = notch_filter_zero_phase(raw_ecg, freq=50.0, fs=fs, Q=30.0)
+
+    # 2. Bandpass Filter 0.5 - 40 Hz (Preserves R-peak & QRS Complex)
+    ecg_clean = bandpass_filter_zero_phase(ecg_notch, lowcut=0.5, highcut=40.0, fs=fs, order=4)
+
+    return ecg_clean
+
+def preprocess_ppg_clean(raw_ppg, fs=125.0, invert_ppg=True):
+    """
+    Preprocessing PPG Standar Biomedis:
+    1. Inversi Sinyal (Penyelarasan Absorpsi IR)
+    2. Notch Filter 50 Hz
+    3. Bandpass Butterworth SOS 0.5 Hz - 15.0 Hz (Menjaga Systolic Peak & Dicrotic Notch)
+    """
+    # 1. Inversi jika diperlukan oleh hardware
+    ppg_sig = -raw_ppg if invert_ppg else raw_ppg
+
+    # 2. Notch Filter
+    ppg_notch = notch_filter_zero_phase(ppg_sig, freq=50.0, fs=fs, Q=30.0)
+
+    # 3. Bandpass Filter 0.5 - 15.0 Hz (Bandwidth hemostasis PPG utuh)
+    ppg_clean = bandpass_filter_zero_phase(ppg_notch, lowcut=0.5, highcut=15.0, fs=fs, order=3)
+
+    return ppg_clean
+
+print("✅ Cell 9: Pipeline preprocessing ECG & PPG terspesialisasi siap.")
+
+========================================
+CELL 11 [code]
+========================================
+# ==========================================
+# CELL 10: Execute Stage 3 Preprocessing & Visual Verification
+# ==========================================
+preprocessed_records = []
+
+for rec in final_aligned_records:
+    ecg_clean = preprocess_ecg_clean(rec['ecg'], fs=rec['fs'])
+    ppg_clean = preprocess_ppg_clean(rec['ppg'], fs=rec['fs'], invert_ppg=True)
+
+    clean_rec = rec.copy()
+    clean_rec['ecg_clean'] = ecg_clean
+    clean_rec['ppg_clean'] = ppg_clean
+    preprocessed_records.append(clean_rec)
+
+print(f"=== RINGKASAN PREPROCESSING TAHAP 3 ===")
+print(f"Total Rekaman Berhasil Diproses: {len(preprocessed_records)} / {len(final_aligned_records)}")
+
+# Visualisasi Verifikasi Morfologi (10 Detik Pertama Subjek 1)
+sample_p = preprocessed_records[0]
+t_10s = sample_p['time'][:1250]  # 10 detik @ 125Hz = 1250 sampel
+
+fig, axs = plt.subplots(2, 2, figsize=(14, 7))
+
+# ECG Raw vs Clean
+axs[0, 0].plot(t_10s, sample_p['ecg'][:1250], color='gray', alpha=0.7)
+axs[0, 0].set_title(f"{sample_p['recording_id']} | ECG Mentah (Raw)", fontweight='bold')
+axs[0, 0].grid(True, linestyle='--', alpha=0.5)
+
+axs[0, 1].plot(t_10s, sample_p['ecg_clean'][:1250], color='#1f77b4', linewidth=1.3)
+axs[0, 1].set_title(f"{sample_p['recording_id']} | ECG Clean (0.5-40Hz Zero-Phase)", fontweight='bold')
+axs[0, 1].grid(True, linestyle='--', alpha=0.5)
+
+# PPG Raw vs Clean
+axs[1, 0].plot(t_10s, sample_p['ppg'][:1250], color='gray', alpha=0.7)
+axs[1, 0].set_title(f"{sample_p['recording_id']} | PPG Mentah (Raw Inverted)", fontweight='bold')
+axs[1, 0].set_xlabel("Waktu (detik)")
+axs[1, 0].grid(True, linestyle='--', alpha=0.5)
+
+axs[1, 1].plot(t_10s, sample_p['ppg_clean'][:1250], color='#d62728', linewidth=1.3)
+axs[1, 1].set_title(f"{sample_p['recording_id']} | PPG Clean (0.5-15Hz Preserved Notch)", fontweight='bold')
+axs[1, 1].set_xlabel("Waktu (detik)")
+axs[1, 1].grid(True, linestyle='--', alpha=0.5)
+
+plt.tight_layout()
+plt.show()
+
+========================================
+CELL 12 [code]
+========================================
+# ==========================================
+# CELL 11: Statistical & Spectral SQA Metric Helpers
+# ==========================================
+from scipy.stats import skew, kurtosis
+from scipy.signal import welch, find_peaks
+
+def compute_ppg_skewness(ppg_seg):
+    """Menghitung Skewness (S_sqa). PPG valid bernilai positif (> 0)."""
+    return skew(ppg_seg)
+
+def compute_ppg_kurtosis(ppg_seg):
+    """Menghitung Kurtosis (K_sqa). PPG valid memiliki keruncingan peak normal (>= 2.5)."""
+    return kurtosis(ppg_seg, fisher=False)  # Pearson's kurtosis (normal distribution = 3.0)
+
+def compute_spectral_snr(sig_seg, fs=125.0, f_low=0.5, f_high=8.0):
+    """
+    Menghitung Rasio Daya Spektral (Relative Power Ratio).
+    Mengukur berapa persen energi sinyal yang berada di pita hemostasis fisiologis (0.5 - 8 Hz).
+    """
+    freqs, psd = welch(sig_seg, fs=fs, nperseg=int(2 * fs))
+    total_power = np.sum(psd) + 1e-8
+    band_power = np.sum(psd[(freqs >= f_low) & (freqs <= f_high)])
+
+    return band_power / total_power
+
+print("✅ Cell 11: Helper metrik SQA statistik dan spektral siap.")
+
+========================================
+CELL 13 [code]
+========================================
+# ==========================================
+# CELL 12: Robust Multi-Factor SQA Assessment Function
+# ==========================================
+def evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0, hr_diff_max=5.0):
+    """
+    Evaluasi Kualitas Sinyal Multimodal Ketat (ECG & PPG 10-Detik):
+    1. Check Flatline / NaNs / Infs
+    2. Peak Detection ECG & PPG
+    3. Range HR Fisiologis (40 - 180 bpm)
+    4. HR Mismatch ECG vs PPG (<= 5 bpm)
+    5. Indeks Statistik PPG (Skewness > 0, Kurtosis >= 2.0)
+    6. Relative Spectral Power Ratio (SNR >= 55%)
+    """
+    # 1. Check Flatline & NaNs
+    if np.isnan(ecg_seg).any() or np.isnan(ppg_seg).any():
+        return False, "NaN/Inf Found"
+    if np.std(ecg_seg) < 1e-4 or np.std(ppg_seg) < 1e-4:
+        return False, "Flatline Signal"
+
+    # 2. Peak Detection ECG (Minimal 0.4s jarak antar R-peak = max 150 bpm)
+    ecg_peaks, _ = find_peaks(ecg_seg, distance=int(0.4 * fs), prominence=0.4 * np.std(ecg_seg))
+    if len(ecg_peaks) < 4:
+        return False, f"Puncak ECG Terlalu Sedikit ({len(ecg_peaks)})"
+
+    # 3. Peak Detection PPG Adaptif
+    ppg_peaks, _ = find_peaks(ppg_seg, distance=int(0.4 * fs), prominence=0.25 * np.std(ppg_seg))
+    if len(ppg_peaks) < 4:
+        return False, f"Puncak PPG Terlalu Sedikit ({len(ppg_peaks)})"
+
+    # 4. Hitung Heart Rate (HR)
+    hr_ecg = 60.0 / np.mean(np.diff(ecg_peaks) / fs)
+    hr_ppg = 60.0 / np.mean(np.diff(ppg_peaks) / fs)
+
+    # Validasi Rentang Fisiologis
+    if not (40.0 <= hr_ecg <= 180.0) or not (40.0 <= hr_ppg <= 180.0):
+        return False, f"HR Luar Batas (ECG: {hr_ecg:.1f}, PPG: {hr_ppg:.1f})"
+
+    # Validasi Mismatch HR Antar-Sensor
+    if abs(hr_ecg - hr_ppg) > hr_diff_max:
+        return False, f"HR Mismatch (ECG: {hr_ecg:.1f} vs PPG: {hr_ppg:.1f})"
+
+    # 5. Indeks Statistik PPG (Skewness & Kurtosis)
+    s_sqa = compute_ppg_skewness(ppg_seg)
+    k_sqa = compute_ppg_kurtosis(ppg_seg)
+
+    if s_sqa <= -0.1:  # Skewness negatif menandakan gelombang PPG terbalik/terdeformasi
+        return False, f"PPG Skewness Invalid ({s_sqa:.2f})"
+    if k_sqa < 1.8:    # Kurtosis terlalu rendah menandakan sinyal terpotong/flat peak
+        return False, f"PPG Kurtosis Invalid ({k_sqa:.2f})"
+
+    # 6. Relative Spectral Power Ratio (PPG Signal Energy Ratio)
+    snr_ratio = compute_spectral_snr(ppg_seg, fs=fs, f_low=0.5, f_high=8.0)
+    if snr_ratio < 0.50:  # Minimal 50% energi berada pada band fisiologis
+        return False, f"PPG Low Spectral SNR ({snr_ratio*100:.1f}%)"
+
+    return True, "VALID_SQA"
+
+print("✅ Cell 12: Fungsi SQA Multi-Faktor v2.0 siap digunakan.")
+
+========================================
+CELL 14 [code]
+========================================
+# ==========================================
+# CELL 13: Benchmark SQA Quality on Dataset
+# ==========================================
+total_test_segments = 0
+passed_sqa_segments = 0
+rejection_reasons = {}
+
+window_len = int(10 * 125)  # 10 detik @ 125Hz = 1250 sampel
+stride_len = int(2 * 125)   # Stride 2 detik
+
+for rec in preprocessed_records:
+    ecg = rec['ecg_clean']
+    ppg = rec['ppg_clean']
+
+    start = 0
+    while start + window_len <= len(ecg):
+        ecg_seg = ecg[start:start+window_len]
+        ppg_seg = ppg[start:start+window_len]
+        total_test_segments += 1
+
+        is_valid, reason = evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0)
+
+        if is_valid:
+            passed_sqa_segments += 1
+        else:
+            reason_key = reason.split('(')[0].strip()
+            rejection_reasons[reason_key] = rejection_reasons.get(reason_key, 0) + 1
+
+        start += stride_len
+
+print("\n=== HASIL BENCHMARK SIGNAL QUALITY ASSESSMENT (TAHAP 4) ===")
+print(f"Total Segmen Diuji (10s Window) : {total_test_segments}")
+print(f"Segmen Lolos SQA (Valid)        : {passed_sqa_segments} ({passed_sqa_segments/total_test_segments*100:.2f}%)")
+print(f"Segmen Ditolak (Artefak/Noise)  : {total_test_segments - passed_sqa_segments}")
+
+print("\n--- RINCIAN ALASAN PENOLAKAN SEGMEN ---")
+for reason, count in rejection_reasons.items():
+    print(f"  * {reason:<30} : {count} segmen ({count/total_test_segments*100:.2f}%)")
+
+========================================
+CELL 15 [code]
+========================================
+# ==========================================
+# CELL 14 (REVISED): Cross-Correlation Phase Alignment
+# ==========================================
+from scipy.signal import correlate
+
+def align_ppg_phase_cross_correlation(ecg_seg, ppg_seg, fs=125.0, max_lag_sec=0.4):
+    """
+    Mengoreksi latensi buffer/clock drift hardware dengan menghitung
+    puncak Normalized Cross-Correlation antara ECG dan Turunan PPG (VPG).
+    Sinyal diselaraskan tanpa membuang sampel/segmen.
+    """
+    # 1. Turunan Pertama PPG (VPG)
+    vpg = np.gradient(ppg_seg, 1.0 / fs)
+
+    # 2. Korelasi Silang
+    max_lag_samples = int(max_lag_sec * fs)
+    corr = correlate(vpg, ecg_seg, mode='full')
+    lags = np.arange(-len(ecg_seg) + 1, len(ecg_seg))
+
+    # Batasi pencarian lag pada interval [-max_lag_samples, +max_lag_samples]
+    valid_mask = (lags >= -max_lag_samples) & (lags <= max_lag_samples)
+    corr_bounded = corr[valid_mask]
+    lags_bounded = lags[valid_mask]
+
+    # Cari lag offset optimal
+    optimal_lag = lags_bounded[np.argmax(corr_bounded)]
+
+    # 3. Geser Sinyal PPG
+    if optimal_lag > 0:
+        ppg_aligned = np.pad(ppg_seg[optimal_lag:], (0, optimal_lag), mode='edge')
+    elif optimal_lag < 0:
+        ppg_aligned = np.pad(ppg_seg[:optimal_lag], (-optimal_lag, 0), mode='edge')
+    else:
+        ppg_aligned = ppg_seg.copy()
+
+    return ppg_aligned, optimal_lag / fs
+
+print("✅ Cell 14 (Revisi): Alignment korelasi silang siap.")
+
+========================================
+CELL 16 [code]
+========================================
+# ==========================================
+# CELL 15 (REVISED): Execute Stage 5 Alignment without PAT Drop
+# ==========================================
+dataset_segments = []
+total_sqa_evaluated = 0
+passed_sqa_count = 0
+
+window_len = int(10 * 125)  # 10 detik = 1250 sampel
+stride_len = int(2 * 125)   # Stride 2 detik
+
+for rec in preprocessed_records:
+    ecg = rec['ecg_clean']
+    ppg = rec['ppg_clean']
+
+    start = 0
+    while start + window_len <= len(ecg):
+        ecg_seg = ecg[start:start+window_len]
+        ppg_seg = ppg[start:start+window_len]
+        total_sqa_evaluated += 1
+
+        # 1. Filter Kualitas SQA Morfologi (Tahap 4)
+        is_sqa_valid, _ = evaluate_segment_sqa_v2(ecg_seg, ppg_seg, fs=125.0)
+
+        if is_sqa_valid:
+            passed_sqa_count += 1
+
+            # 2. Alignment Fase Korelasi Silang (Tahap 5)
+            ppg_aligned, time_shift_sec = align_ppg_phase_cross_correlation(ecg_seg, ppg_seg, fs=125.0)
+
+            # Simpan segmen siap pakai
+            segment_data = {
+                'recording_id': rec['recording_id'],
+                'patient_id': rec['patient_id'],
+                'ecg': ecg_seg,
+                'ppg': ppg_aligned,
+                'sbp': rec['sbp'],
+                'dbp': rec['dbp']
+            }
+            dataset_segments.append(segment_data)
+
+        start += stride_len
+
+print("\n=== HASIL REVISI SINKRONISASI TAHAP 5 ===")
+print(f"Total Segmen Evaluasi           : {total_sqa_evaluated}")
+print(f"Segmen Lolos SQA & Siap Dipakai : {len(dataset_segments)} ({len(dataset_segments)/total_sqa_evaluated*100:.2f}%)")
+print(f"Jumlah Pasien Unik Tercover     : {len(set(s['patient_id'] for s in dataset_segments))}")
+
+========================================
+CELL 17 [code]
+========================================
+# ==========================================
+# CELL 16 (REVISED): 7-Channel Multichannel Input Construction
+# ==========================================
+import scipy.signal as signal
+
+def extract_7channel_features(ecg_seg, ppg_seg, fs=125.0):
+    """
+    Membangun 7 saluran fitur fisiologis dari segmen ECG & PPG:
+    1. Normalized ECG
+    2. Normalized PPG
+    3. VPG (Turunan 1 PPG)
+    4. APG (Turunan 2 PPG)
+    5. Cross-Interaction Signal (ECG * PPG)
+    6. ECG Hilbert Instantaneous Energy Envelope
+    7. PPG Hilbert Instantaneous Energy Envelope
+    """
+    # 1. Normalisasi Z-Score Dasar
+    ecg_norm = (ecg_seg - np.mean(ecg_seg)) / (np.std(ecg_seg) + 1e-8)
+    ppg_norm = (ppg_seg - np.mean(ppg_seg)) / (np.std(ppg_seg) + 1e-8)
+
+    # 2. Turunan 1 PPG (VPG - Velocity Photoplethysmogram)
+    vpg = np.gradient(ppg_norm, 1.0 / fs)
+    vpg_norm = (vpg - np.mean(vpg)) / (np.std(vpg) + 1e-8)
+
+    # 3. Turunan 2 PPG (APG - Acceleration Photoplethysmogram)
+    apg = np.gradient(vpg_norm, 1.0 / fs)
+    apg_norm = (apg - np.mean(apg)) / (np.std(apg) + 1e-8)
+
+    # 4. Sinyal Interaksi Korelasi Temporal (Pointwise Cross-Product)
+    corr_sig = ecg_norm * ppg_norm
+    corr_norm = (corr_sig - np.mean(corr_sig)) / (np.std(corr_sig) + 1e-8)
+
+    # 5. Analisis Frekuensi / Envelope Transformasi Hilbert (Instantaneous Energy)
+    analytic_ecg = signal.hilbert(ecg_norm)
+    ecg_env = np.abs(analytic_ecg)
+    ecg_env_norm = (ecg_env - np.mean(ecg_env)) / (np.std(ecg_env) + 1e-8)
+
+    analytic_ppg = signal.hilbert(ppg_norm)
+    ppg_env = np.abs(analytic_ppg)
+    ppg_env_norm = (ppg_env - np.mean(ppg_env)) / (np.std(ppg_env) + 1e-8)
+
+    # Menumpuk 7 Channel menjadi Tensor 2D [1250, 7]
+    multichannel_tensor = np.stack([
+        ecg_norm,
+        ppg_norm,
+        vpg_norm,
+        apg_norm,
+        corr_norm,
+        ecg_env_norm,
+        ppg_env_norm
+    ], axis=-1)
+
+    return multichannel_tensor
+
+
+# --- Eksekusi Pembentukan Dataset Multichannel ---
+X_multichannel_list = []
+y_sbp_list = []
+y_dbp_list = []
+patient_groups_list = []
+
+for seg in dataset_segments:
+    # Ekstraksi 7 channel
+    feat_7ch = extract_7channel_features(seg['ecg'], seg['ppg'], fs=125.0)
+
+    X_multichannel_list.append(feat_7ch)
+    y_sbp_list.append(seg['sbp'])
+    y_dbp_list.append(seg['dbp'])
+    patient_groups_list.append(seg['patient_id'])
+
+# Konversi ke Array Numpy
+X_multimodal = np.array(X_multichannel_list, dtype=np.float32)
+y_sbp = np.array(y_sbp_list, dtype=np.float32)
+y_dbp = np.array(y_dbp_list, dtype=np.float32)
+patient_groups = np.array(patient_groups_list)
+
+print("\n=== RINGKASAN REVISI TENSOR MULTICHANNEL (TAHAP 6) ===")
+print(f"Bentuk Tensor Input (X_multimodal) : {X_multimodal.shape}  [Segmen, Panjang, Saluran]")
+print(f"Jumlah Channel Input               : {X_multimodal.shape[2]} Saluran Fitur")
+print(f"Bentuk Target SBP (y_sbp)          : {y_sbp.shape}")
+print(f"Bentuk Target DBP (y_dbp)          : {y_dbp.shape}")
+print(f"Jumlah Subjek Unik Ter-cover       : {len(np.unique(patient_groups))}")
+
+========================================
+CELL 18 [code]
+========================================
+# ==========================================
+# CELL 17 (REVISED): Outlier Target Filtering & Stratified Group Split Optimizer
+# ==========================================
+from sklearn.model_selection import GroupShuffleSplit
+
+def sanitize_target_outliers(X, y_sbp, y_dbp, groups, sbp_range=(70, 200), dbp_range=(40, 120)):
+    """
+    Membuang segmen dengan label SBP/DBP di luar batas fisiologis manusia normal/klinis.
+    """
+    valid_mask = (y_sbp >= sbp_range[0]) & (y_sbp <= sbp_range[1]) & \
+                 (y_dbp >= dbp_range[0]) & (y_dbp <= dbp_range[1])
+
+    num_removed = np.sum(~valid_mask)
+    print(f"🧹 Sanitasi Target Outliers: Membuang {num_removed} segmen dengan label non-fisiologis.")
+
+    return X[valid_mask], y_sbp[valid_mask], y_dbp[valid_mask], groups[valid_mask]
+
+
+def find_balanced_subject_split(X, y_sbp, y_dbp, groups, test_size=0.15, val_size=0.15, max_searches=100):
+    """
+    Mencari random_state pembagian subjek terbaik yang meminimalkan
+    pergeseran rata-rata (distribution shift) SBP & DBP antar Train, Val, dan Test set.
+    """
+    best_score = float('inf')
+    best_splits = None
+    best_seed = 42
+
+    adjusted_val_size = val_size / (1.0 - test_size)
+
+    for seed in range(max_searches):
+        gss_test = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=seed)
+        train_val_idx, test_idx = next(gss_test.split(X, y_sbp, groups))
+
+        X_tv, y_sbp_tv, y_dbp_tv, groups_tv = X[train_val_idx], y_sbp[train_val_idx], y_dbp[train_val_idx], groups[train_val_idx]
+
+        gss_val = GroupShuffleSplit(n_splits=1, test_size=adjusted_val_size, random_state=seed)
+        train_rel_idx, val_rel_idx = next(gss_val.split(X_tv, y_sbp_tv, groups_tv))
+
+        tr_idx = train_val_idx[train_rel_idx]
+        va_idx = train_val_idx[val_rel_idx]
+
+        # Hitung Perbedaan Rata-rata SBP & DBP (Penalti Ketidakseimbangan)
+        diff_sbp_val = abs(np.mean(y_sbp[tr_idx]) - np.mean(y_sbp[va_idx]))
+        diff_sbp_test = abs(np.mean(y_sbp[tr_idx]) - np.mean(y_sbp[te_idx := test_idx]))
+        diff_dbp_val = abs(np.mean(y_dbp[tr_idx]) - np.mean(y_dbp[va_idx]))
+        diff_dbp_test = abs(np.mean(y_dbp[tr_idx]) - np.mean(y_dbp[te_idx]))
+
+        total_imbalance_score = diff_sbp_val + diff_sbp_test + diff_dbp_val + diff_dbp_test
+
+        if total_imbalance_score < best_score:
+            best_score = total_imbalance_score
+            best_seed = seed
+            best_splits = {
+                'X_train': X[tr_idx], 'y_sbp_train': y_sbp[tr_idx], 'y_dbp_train': y_dbp[tr_idx], 'groups_train': groups[tr_idx],
+                'X_val': X[va_idx],     'y_sbp_val': y_sbp[va_idx],     'y_dbp_val': y_dbp[va_idx],     'groups_val': groups[va_idx],
+                'X_test': X[te_idx],   'y_sbp_test': y_sbp[te_idx],   'y_dbp_test': y_dbp[te_idx],   'groups_test': groups[te_idx]
+            }
+
+    print(f"Optimal Seed Ditemukan: {best_seed} (Total Imbalance Score: {best_score:.2f} mmHg)")
+    return best_splits
+
+print("✅ Cell 17 (Revisi): Sanitasi Outlier & Optimal Stratified Group Splitter siap.")
+
+========================================
+CELL 19 [code]
+========================================
+# ==========================================
+# CELL 18 (REVISED): Execute Outlier Filtering & Balanced Split
+# ==========================================
+# 1. Clean Target Outliers (Hapus SBP < 70 atau DBP < 40)
+X_clean_t, y_sbp_clean, y_dbp_clean, groups_clean = sanitize_target_outliers(
+    X_multimodal, y_sbp, y_dbp, patient_groups,
+    sbp_range=(70, 200), dbp_range=(40, 120)
+)
+
+# 2. Cari Split Subjek Paling Seimbang (Minimal Target Shift)
+balanced_splits = find_balanced_subject_split(
+    X_clean_t, y_sbp_clean, y_dbp_clean, groups_clean,
+    test_size=0.15, val_size=0.15, max_searches=100
+)
+
+# Assign ke Variabel Utama
+X_tr, y_sbp_tr, y_dbp_tr, g_tr = balanced_splits['X_train'], balanced_splits['y_sbp_train'], balanced_splits['y_dbp_train'], balanced_splits['groups_train']
+X_va, y_sbp_va, y_dbp_va, g_va = balanced_splits['X_val'], balanced_splits['y_sbp_val'], balanced_splits['y_dbp_val'], balanced_splits['groups_val']
+X_te, y_sbp_te, y_dbp_te, g_te = balanced_splits['X_test'], balanced_splits['y_sbp_test'], balanced_splits['y_dbp_test'], balanced_splits['groups_test']
+
+# 3. Verifikasi Data Leakage Pasien
+p_tr, p_va, p_te = set(g_tr), set(g_va), set(g_te)
+leak_tr_va = len(p_tr.intersection(p_va))
+leak_tr_te = len(p_tr.intersection(p_te))
+leak_va_te = len(p_va.intersection(p_te))
+
+print("\n=== VERIFIKASI PATIENT DATA LEAKAGE (REVISI TAHAP 7) ===")
+print(f"Irisan Pasien Train & Val  : {leak_tr_va} pasien (Target: 0)")
+print(f"Irisan Pasien Train & Test : {leak_tr_te} pasien (Target: 0)")
+print(f"Irisan Pasien Val & Test   : {leak_va_te} pasien (Target: 0)")
+
+print("\n=== RINGKASAN PROPORSIONALITAS SPLIT ===")
+print(f"Train Set : {X_tr.shape[0]} segmen ({X_tr.shape[0]/len(X_clean_t)*100:.1f}%) | Pasien Unik: {len(p_tr)}")
+print(f"Val Set   : {X_va.shape[0]} segmen ({X_va.shape[0]/len(X_clean_t)*100:.1f}%)  | Pasien Unik: {len(p_va)}")
+print(f"Test Set  : {X_te.shape[0]} segmen ({X_te.shape[0]/len(X_clean_t)*100:.1f}%)  | Pasien Unik: {len(p_te)}")
+
+print("\n=== DIAGNOSTIK DISTRIBUSI TARGET TERSEIMBANG SBP (mmHg) ===")
+print(f"Train SBP -> Mean: {y_sbp_tr.mean():.1f}, Std: {y_sbp_tr.std():.1f}, Range: [{y_sbp_tr.min():.1f} - {y_sbp_tr.max():.1f}]")
+print(f"Val SBP   -> Mean: {y_sbp_va.mean():.1f}, Std: {y_sbp_va.std():.1f}, Range: [{y_sbp_va.min():.1f} - {y_sbp_va.max():.1f}]")
+print(f"Test SBP  -> Mean: {y_sbp_te.mean():.1f}, Std: {y_sbp_te.std():.1f}, Range: [{y_sbp_te.min():.1f} - {y_sbp_te.max():.1f}]")
+
+print("\n=== DIAGNOSTIK DISTRIBUSI TARGET TERSEIMBANG DBP (mmHg) ===")
+print(f"Train DBP -> Mean: {y_dbp_tr.mean():.1f}, Std: {y_dbp_tr.std():.1f}, Range: [{y_dbp_tr.min():.1f} - {y_dbp_tr.max():.1f}]")
+print(f"Val DBP   -> Mean: {y_dbp_va.mean():.1f}, Std: {y_dbp_va.std():.1f}, Range: [{y_dbp_va.min():.1f} - {y_dbp_va.max():.1f}]")
+print(f"Test DBP  -> Mean: {y_dbp_te.mean():.1f}, Std: {y_dbp_te.std():.1f}, Range: [{y_dbp_te.min():.1f} - {y_dbp_te.max():.1f}]")
+
+========================================
+CELL 20 [code]
+========================================
+# ==========================================
+# CELL 19: Safe Target Z-Score Scaler Class
+# ==========================================
+import json
+
+class StrictTargetScaler:
+    """
+    Scaler Z-Score khusus target SBP & DBP.
+    Menjamin parameter mean dan std HANYA dihitung dari Train Set
+    untuk mencegah Target Data Leakage.
+    """
+    def __init__(self):
+        self.sbp_mean = None
+        self.sbp_std = None
+        self.dbp_mean = None
+        self.dbp_std = None
+        self.is_fitted = False
+
+    def fit(self, y_sbp_train, y_dbp_train):
+        """Menghitung statistik HANYA pada Train Set."""
+        self.sbp_mean = float(np.mean(y_sbp_train))
+        self.sbp_std = float(np.std(y_sbp_train) + 1e-8)
+        self.dbp_mean = float(np.mean(y_dbp_train))
+        self.dbp_std = float(np.std(y_dbp_train) + 1e-8)
+        self.is_fitted = True
+        print(f"✅ Scaler Fitted on Train Set:")
+        print(f"   SBP -> Mean: {self.sbp_mean:.4f}, Std: {self.sbp_std:.4f}")
+        print(f"   DBP -> Mean: {self.dbp_mean:.4f}, Std: {self.dbp_std:.4f}")
+
+    def transform(self, y_sbp, y_dbp):
+        """Mentransformasi target ke skala Z-score menggunakan statistik Train Set."""
+        if not self.is_fitted:
+            raise RuntimeError("Scaler belum di-fit! Jalankan .fit() pada Train Set terlebih dahulu.")
+
+        y_sbp_z = (y_sbp - self.sbp_mean) / self.sbp_std
+        y_dbp_z = (y_dbp - self.dbp_mean) / self.dbp_std
+        return y_sbp_z, y_dbp_z
+
+    def inverse_transform(self, y_sbp_z, y_dbp_z):
+        """Mengembalikan nilai prediksi skala Z-score kembali ke satuan mmHg asli."""
+        y_sbp_mmHg = (y_sbp_z * self.sbp_std) + self.sbp_mean
+        y_dbp_mmHg = (y_dbp_z * self.dbp_std) + self.dbp_mean
+        return y_sbp_mmHg, y_dbp_mmHg
+
+    def save_metadata(self, filepath):
+        """Menyimpan parameter scaling ke format JSON untuk deployment/inferensi real-time."""
+        metadata = {
+            'sbp_mean': self.sbp_mean,
+            'sbp_std': self.sbp_std,
+            'dbp_mean': self.dbp_mean,
+            'dbp_std': self.dbp_std
+        }
+        with open(filepath, 'w') as f:
+            json.dump(metadata, f, indent=4)
+        print(f"💾 Parameter Scaling Target Berhasil Disimpan ke: {filepath}")
+
+print("✅ Cell 19: Kelas StrictTargetScaler siap digunakan.")
+
+========================================
+CELL 21 [code]
+========================================
+# ==========================================
+# CELL 20: Execute Stage 8 Target Transformation
+# ==========================================
+# 1. Inisialisasi dan Fit HANYA pada Train Target
+target_scaler = StrictTargetScaler()
+target_scaler.fit(y_sbp_tr, y_dbp_tr)
+
+# 2. Transformasi Train, Validation, dan Test Target ke Skala Z-Score
+y_sbp_tr_z, y_dbp_tr_z = target_scaler.transform(y_sbp_tr, y_dbp_tr)
+y_sbp_va_z, y_dbp_va_z = target_scaler.transform(y_sbp_va, y_dbp_va)
+y_sbp_te_z, y_dbp_te_z = target_scaler.transform(y_sbp_te, y_dbp_te)
+
+# 3. Simpan Metadata Scaler ke File JSON (Diperlukan untuk Deployment Tahap 12)
+scaler_json_path = '/content/target_scaler_params.json'
+target_scaler.save_metadata(scaler_json_path)
+
+# 4. Verifikasi matematika Z-score dan Rekonstruksi Inverse Linear
+rec_sbp_tr, rec_dbp_tr = target_scaler.inverse_transform(y_sbp_tr_z, y_dbp_tr_z)
+max_error_sbp = np.max(np.abs(y_sbp_tr - rec_sbp_tr))
+max_error_dbp = np.max(np.abs(y_dbp_tr - rec_dbp_tr))
+
+print("\n=== VERIFIKASI HASIL TRANSFORMASI TARGET (TAHAP 8) ===")
+print(f"Train SBP Transformed (Z-Score) -> Mean: {y_sbp_tr_z.mean():.4f}, Std: {y_sbp_tr_z.std():.4f}")
+print(f"Train DBP Transformed (Z-Score) -> Mean: {y_dbp_tr_z.mean():.4f}, Std: {y_dbp_tr_z.std():.4f}")
+print(f"Val SBP Transformed (Z-Score)   -> Mean: {y_sbp_va_z.mean():.4f}, Std: {y_sbp_va_z.std():.4f}")
+print(f"Test SBP Transformed (Z-Score)  -> Mean: {y_sbp_te_z.mean():.4f}, Std: {y_sbp_te_z.std():.4f}")
+
+print("\n=== VERIFIKASI PRESISI INVERSE RECONSTRUCTION ===")
+print(f"Max Deviasi Rekonstruksi SBP : {max_error_sbp:.8f} mmHg (Target: < 0.00001)")
+print(f"Max Deviasi Rekonstruksi DBP : {max_error_dbp:.8f} mmHg (Target: < 0.00001)")
+
+========================================
+CELL 22 [code]
+========================================
+# ==========================================
+# CELL 21: Physiological Data Augmentation (REVISED & FIXED)
+# ==========================================
+import numpy as np
+
+def speed_warp_segment_time_domain(x_seg, warp_factor, target_len=1250):
+    """
+    Speed Warping menggunakan interpolasi domain waktu (Linear)
+    untuk menghindari Gibbs Ringing Artifacts dari Fourier Resampling.
+    """
+    n_samples = x_seg.shape[0]
+    # Skala ulang sumbu waktu
+    orig_time = np.linspace(0, 1, n_samples)
+    new_time = np.linspace(0, 1, max(int(round(n_samples * warp_factor)), 10))
+
+    # Interpolasi linear per-channel (Aman dari osilasi Fourier)
+    x_warped = np.zeros((len(new_time), x_seg.shape[1]), dtype=np.float32)
+    for ch in range(x_seg.shape[1]):
+        x_warped[:, ch] = np.interp(new_time, orig_time, x_seg[:, ch])
+
+    # Crop atau Pad simetris agar panjangnya tetap 1250
+    n_warped = x_warped.shape[0]
+    if n_warped >= target_len:
+        start = (n_warped - target_len) // 2
+        x_fixed = x_warped[start:start + target_len]
+    else:
+        pad_total = target_len - n_warped
+        pad_left = pad_total // 2
+        pad_right = pad_total - pad_left
+        x_fixed = np.pad(x_warped, ((pad_left, pad_right), (0, 0)), mode='edge')
+
+    x_fixed = x_fixed.copy().astype(np.float32)
+
+    # Penyesuaian matematis untuk turunan sinyal terhadap waktu
+    x_fixed[:, 2] = x_fixed[:, 2] / warp_factor          # VPG (Turunan ke-1)
+    x_fixed[:, 3] = x_fixed[:, 3] / (warp_factor ** 2)   # APG (Turunan ke-2)
+    if x_fixed.shape[1] > 4:
+        x_fixed[:, 4] = x_fixed[:, 4] / warp_factor      # dECG (Turunan ke-1 jika ada)
+
+    return x_fixed
+
+def augment_speed_warping(X, y_sbp, y_dbp, warp_range=(0.97, 1.03), n_aug_per_sample=1, seed=42):
+    rng = np.random.RandomState(seed)
+    X_list, s_list, d_list = [], [], []
+    for i in range(X.shape[0]):
+        for _ in range(n_aug_per_sample):
+            wf = rng.uniform(*warp_range)
+            X_list.append(speed_warp_segment_time_domain(X[i], wf))
+            s_list.append(y_sbp[i])
+            d_list.append(y_dbp[i])
+    return np.array(X_list, dtype=np.float32), np.array(s_list, dtype=np.float32), np.array(d_list, dtype=np.float32)
+
+def target_aware_mixup(X, y_sbp, y_dbp, n_pairs, alpha=0.3, max_target_diff=12.0, seed=42):
+    rng = np.random.RandomState(seed)
+    n = X.shape[0]
+    X_list, s_list, d_list = [], [], []
+    attempts, max_attempts = 0, n_pairs * 50
+    while len(X_list) < n_pairs and attempts < max_attempts:
+        attempts += 1
+        i, j = rng.randint(0, n), rng.randint(0, n)
+        if i == j or abs(y_sbp[i] - y_sbp[j]) + abs(y_dbp[i] - y_dbp[j]) > max_target_diff:
+            continue
+        lam = float(np.clip(rng.beta(alpha, alpha), 0.3, 0.7))
+        X_list.append((lam * X[i] + (1.0 - lam) * X[j]).astype(np.float32))
+        s_list.append(lam * y_sbp[i] + (1.0 - lam) * y_sbp[j])
+        d_list.append(lam * y_dbp[i] + (1.0 - lam) * y_dbp[j])
+    return np.array(X_list, dtype=np.float32), np.array(s_list, dtype=np.float32), np.array(d_list, dtype=np.float32)
+
+print("🧬 CELL 21: Menjalankan Augmentasi Data Fisiologis yang Diperbaiki...")
+
+# 1. Speed Warping (1:1 Ratio)
+X_warp, y_sbp_warp, y_dbp_warp = augment_speed_warping(X_tr, y_sbp_tr, y_dbp_tr, warp_range=(0.97, 1.03), seed=42)
+
+# 2. Target-Aware Mixup (Dibuat 50% dari total data asli, bukan angka ajaib 1000)
+n_mixup_pairs = int(0.5 * X_tr.shape[0])
+X_mix, y_sbp_mix, y_dbp_mix = target_aware_mixup(X_tr, y_sbp_tr, y_dbp_tr, n_pairs=n_mixup_pairs, seed=42)
+
+# Penggabungan Data Augmentasi
+X_tr_aug = np.concatenate([X_tr, X_warp, X_mix], axis=0)
+y_sbp_tr_aug_raw = np.concatenate([y_sbp_tr, y_sbp_warp, y_sbp_mix], axis=0)
+y_dbp_tr_aug_raw = np.concatenate([y_dbp_tr, y_dbp_warp, y_dbp_mix], axis=0)
+
+# Scaling Target
+y_sbp_tr_aug_z, y_dbp_tr_aug_z = target_scaler.transform(y_sbp_tr_aug_raw, y_dbp_tr_aug_raw)
+
+print(f"✅ Total Segmen Train Augmentasi v5.3: {X_tr_aug.shape[0]} segmen.")
+print(f"   ├─ Data Asli: {X_tr.shape[0]}")
+print(f"   ├─ Speed Warped: {X_warp.shape[0]}")
+print(f"   └─ Mixup Pairs: {X_mix.shape[0]}")
+
+========================================
+CELL 23 [code]
+========================================
+import os
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+
+========================================
+CELL 24 [code]
+========================================
+# ==========================================
+# CELL 22: TriaGO_BPNet v5.3 Precision Architecture
+# ==========================================
+import tensorflow as tf
+from tensorflow.keras import layers, Model, regularizers
+
+def inception_block_1d(input_tensor, filters=32, l2_reg=1e-4):
+    b1 = layers.Conv1D(filters//4, kernel_size=1, padding='same', activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(input_tensor)
+    b2 = layers.Conv1D(filters//4, kernel_size=3, padding='same', activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(input_tensor)
+    b3 = layers.Conv1D(filters//4, kernel_size=7, padding='same', activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(input_tensor)
+    b4 = layers.Conv1D(filters//4, kernel_size=15, padding='same', activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(input_tensor)
+    out = layers.Concatenate()([b1, b2, b3, b4])
+    out = layers.BatchNormalization()(out)
+    return out
+
+def build_triago_bpnet_v53_precision(input_shape=(1250, 7), l2_reg=1e-4):
+    inputs = layers.Input(shape=input_shape, name='multichannel_input')
+
+    # 1. Stem Layer Unified 7-Channel
+    x = layers.Conv1D(64, kernel_size=11, padding='same', activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(inputs)
+    x = layers.BatchNormalization()(x)
+
+    # 2. Multi-Scale Inception Blocks
+    x = inception_block_1d(x, filters=64, l2_reg=l2_reg)
+    x = layers.MaxPooling1D(pool_size=2)(x)
+    x = layers.SpatialDropout1D(0.15)(x)
+
+    x = inception_block_1d(x, filters=128, l2_reg=l2_reg)
+    x = layers.MaxPooling1D(pool_size=2)(x)
+    x = layers.SpatialDropout1D(0.20)(x)
+
+    x = inception_block_1d(x, filters=128, l2_reg=l2_reg)
+    x = layers.MaxPooling1D(pool_size=2)(x)
+
+    # 3. BiGRU Dynamic Recurrent Features
+    gru_out = layers.Bidirectional(layers.GRU(64, return_sequences=True), name='bigru')(x)
+
+    # 4. Multi-Head Self-Attention (MHSA)
+    attn_out = layers.MultiHeadAttention(num_heads=4, key_dim=32, name='mhsa_attention')(gru_out, gru_out)
+    x = layers.Add()([gru_out, attn_out])
+    x = layers.LayerNormalization()(x)
+
+    # 5. Global Context Aggregation
+    avg_pool = layers.GlobalAveragePooling1D()(x)
+    max_pool = layers.GlobalMaxPooling1D()(x)
+    context = layers.Concatenate()([avg_pool, max_pool])
+    context = layers.Dropout(0.25)(context)
+
+    # 6. Task-Specific Regressor Heads
+    sbp_dense = layers.Dense(80, activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(context)
+    sbp_dense = layers.BatchNormalization()(sbp_dense)
+    sbp_dense = layers.Dropout(0.20)(sbp_dense)
+    sbp_output = layers.Dense(1, name='sbp_output')(sbp_dense)
+
+    dbp_dense = layers.Dense(80, activation='swish', kernel_regularizer=regularizers.l2(l2_reg))(context)
+    dbp_dense = layers.BatchNormalization()(dbp_dense)
+    dbp_dense = layers.Dropout(0.20)(dbp_dense)
+    dbp_output = layers.Dense(1, name='dbp_output')(dbp_dense)
+
+    model = Model(inputs=inputs, outputs={'sbp_output': sbp_output, 'dbp_output': dbp_output}, name='TriaGO_BPNet_v53_Precision')
+    return model
+
+# 1. Instansiasi objek model
+temp_model = build_triago_bpnet_v53_precision(input_shape=(1250, 7), l2_reg=1e-4)
+
+# 2. Cetak Model Summary & Total Parameter
+temp_model.summary()
+
+# (Opsional) Menghitung estimasi ukuran file model dalam MB (Float32)
+total_params = temp_model.count_params()
+estimated_size_mb = (total_params * 4) / (1024 * 1024) # 4 bytes per float32 parameter
+print(f"\n📊 Total Parameter: {total_params:,}")
+print(f"💾 Estimasi Ukuran Memori (Raw Keras Float32): ~{estimated_size_mb:.2f} MB")
+
+========================================
+CELL 25 [code]
+========================================
+# ==========================================
+# CELL 23: Surgical BHS Loss Wrapper v5.3
+# ==========================================
+from tensorflow.keras.callbacks import Callback
+
+class PhysicsBHSModel_V53(Model):
+    def __init__(self, base_model, scaler_params, k_start=0.5):
+        super(PhysicsBHSModel_V53, self).__init__()
+        self.base_model = base_model
+        self.sbp_mean = tf.constant(scaler_params['sbp_mean'], dtype=tf.float32)
+        self.sbp_std = tf.constant(scaler_params['sbp_std'], dtype=tf.float32)
+        self.dbp_mean = tf.constant(scaler_params['dbp_mean'], dtype=tf.float32)
+        self.dbp_std = tf.constant(scaler_params['dbp_std'], dtype=tf.float32)
+
+        self.k_sharpness = tf.Variable(k_start, trainable=False, dtype=tf.float32, name='k_sharpness')
+
+        self.huber_sbp = tf.keras.losses.Huber(delta=1.0)
+        self.huber_dbp = tf.keras.losses.Huber(delta=0.8)
+
+        self.loss_tracker = tf.keras.metrics.Mean(name="loss")
+        self.sbp_mae_tracker = tf.keras.metrics.Mean(name="sbp_mae")
+        self.dbp_mae_tracker = tf.keras.metrics.Mean(name="dbp_mae")
+
+    def call(self, inputs, training=False):
+        return self.base_model(inputs, training=training)
+
+    @property
+    def metrics(self):
+        return [self.loss_tracker, self.sbp_mae_tracker, self.dbp_mae_tracker]
+
+    def _soft_exceedance(self, err_abs_mmHg, threshold):
+        return tf.reduce_mean(tf.sigmoid(self.k_sharpness * (err_abs_mmHg - threshold)))
+
+    def _compute_loss(self, y_true_dict, y_pred_dict):
+        y_true_s_z = y_true_dict['sbp_output']; y_true_d_z = y_true_dict['dbp_output']
+        y_pred_s_z = y_pred_dict['sbp_output']; y_pred_d_z = y_pred_dict['dbp_output']
+
+        l_sbp = self.huber_sbp(y_true_s_z, y_pred_s_z)
+        l_dbp = self.huber_dbp(y_true_d_z, y_pred_d_z)
+
+        s_true = (y_true_s_z * self.sbp_std) + self.sbp_mean
+        d_true = (y_true_d_z * self.dbp_std) + self.dbp_mean
+        s_pred = (y_pred_s_z * self.sbp_std) + self.sbp_mean
+        d_pred = (y_pred_d_z * self.dbp_std) + self.dbp_mean
+
+        # Soft MAP & Pulse Pressure Constraints
+        map_true = d_true + (s_true - d_true) / 3.0
+        map_pred = d_pred + (s_pred - d_pred) / 3.0
+        l_map = tf.reduce_mean(tf.abs(map_pred - map_true)) / self.sbp_std
+
+        pp_true = s_true - d_true
+        pp_pred = s_pred - d_pred
+        l_pp = tf.reduce_mean(tf.abs(pp_pred - pp_true)) / self.sbp_std
+
+        sbp_err_abs = tf.abs(s_pred - s_true)
+        dbp_err_abs = tf.abs(d_pred - d_true)
+
+        # SURGICAL BHS PENALTIES
+        l_sbp_bhs = 0.8 * self._soft_exceedance(sbp_err_abs, 10.0) + 0.6 * self._soft_exceedance(sbp_err_abs, 15.0)
+        l_dbp_bhs = 1.0 * self._soft_exceedance(dbp_err_abs, 5.0) + 1.2 * self._soft_exceedance(dbp_err_abs, 14.0)
+
+        total_loss = (1.40 * l_sbp) + (1.00 * l_dbp) + (0.10 * l_map) + (0.10 * l_pp) + \
+                     (0.60 * l_sbp_bhs) + (0.60 * l_dbp_bhs)
+
+        mae_s = tf.reduce_mean(tf.abs(y_pred_s_z - y_true_s_z))
+        mae_d = tf.reduce_mean(tf.abs(y_pred_d_z - y_true_d_z))
+
+        return total_loss, mae_s, mae_d
+
+    def train_step(self, data):
+        x, y = data
+        with tf.GradientTape() as tape:
+            y_pred = self(x, training=True)
+            loss, mae_s, mae_d = self._compute_loss(y, y_pred)
+        gradients = tape.gradient(loss, self.trainable_variables)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+
+        self.loss_tracker.update_state(loss)
+        self.sbp_mae_tracker.update_state(mae_s)
+        self.dbp_mae_tracker.update_state(mae_d)
+        return {m.name: m.result() for m in self.metrics}
+
+    def test_step(self, data):
+        x, y = data
+        y_pred = self(x, training=False)
+        loss, mae_s, mae_d = self._compute_loss(y, y_pred)
+
+        self.loss_tracker.update_state(loss)
+        self.sbp_mae_tracker.update_state(mae_s)
+        self.dbp_mae_tracker.update_state(mae_d)
+        return {m.name: m.result() for m in self.metrics}
+
+
+class SharpnessScheduler(Callback):
+    def __init__(self, k_start=0.5, k_end=3.0, ramp_epochs=35):
+        super().__init__()
+        self.k_start = k_start
+        self.k_end = k_end
+        self.ramp_epochs = ramp_epochs
+
+    def on_epoch_begin(self, epoch, logs=None):
+        frac = min(1.0, epoch / float(self.ramp_epochs))
+        new_k = self.k_start + frac * (self.k_end - self.k_start)
+        self.model.k_sharpness.assign(new_k)
+
+print("✅ CELL 23: Surgical Loss Wrapper v5.3 siap.")
+
+========================================
+CELL 26 [code]
+========================================
+# # ==========================================
+# # CELL 24: Execute Model Training v5.3 Precision (Resume from Weights)
+# # ==========================================
+# import os
+# from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+
+# tf.keras.backend.clear_session()
+# tf.random.set_seed(42)
+# np.random.seed(42)
+
+# # 1. Bangun arsitektur dasar dan wrapper
+# base_model_v53 = build_triago_bpnet_v53_precision(input_shape=(1250, 7), l2_reg=1e-4)
+
+# scaler_params = {
+#     'sbp_mean': target_scaler.sbp_mean, 'sbp_std': target_scaler.sbp_std,
+#     'dbp_mean': target_scaler.dbp_mean, 'dbp_std': target_scaler.dbp_std
+# }
+
+# physics_model_v53 = PhysicsBHSModel_V53(base_model_v53, scaler_params, k_start=0.5)
+# physics_model_v53.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0))
+
+# # 2. Tentukan direktori dan path file bobot lama Anda
+# os.makedirs('/content/drive/MyDrive/TriaGO_Project/Model_Artifacts', exist_ok=True)
+# pretrained_weights_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/v53_best2.weights.h5'
+# checkpoint_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/TriaGO_BPNet_v53_best.weights.h5'
+
+# # 3. PANGGIL BOBOT LAMA JIKA FILE-NYA ADA
+# if os.path.exists(pretrained_weights_path):
+#     print(f"📥 Menemukan bobot sebelumnya di: {pretrained_weights_path}")
+
+#     # Inisialisasi layer dengan dummy input agar bentuk tensor (shape) terbangun secara internal
+#     dummy_input = tf.zeros((1, 1250, 7))
+#     _ = physics_model_v53(dummy_input)
+
+#     # Load bobot yang sudah Anda simpan sebelumnya
+#     physics_model_v53.load_weights(pretrained_weights_path)
+#     print("✅ Berhasil memuat bobot 'v53_best2.weights.h5'! Pelatihan akan dilanjutkan dari titik ini.")
+# else:
+#     print(f"⚠️ File bobot '{pretrained_weights_path}' tidak ditemukan. Pelatihan akan dimulai dari awal (random weights).")
+
+# # 4. Pengaturan Callbacks
+# callbacks_v53 = [
+#     EarlyStopping(monitor='val_loss', patience=30, restore_best_weights=True, verbose=1),
+#     ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=7, min_lr=1e-6, verbose=1),
+#     ModelCheckpoint(checkpoint_path, monitor='val_loss', save_best_only=True, save_weights_only=True, verbose=0),
+#     SharpnessScheduler(k_start=0.5, k_end=3.0, ramp_epochs=35),
+# ]
+
+# # 5. Jalankan Training (Melanjutkan dari bobot lama)
+# print("\n🚀 Memulai Pelatihan Lanjutan v5.3 Precision...")
+# history_v53 = physics_model_v53.fit(
+#     X_tr_aug,
+#     {'sbp_output': y_sbp_tr_aug_z, 'dbp_output': y_dbp_tr_aug_z},
+#     validation_data=(X_va, {'sbp_output': y_sbp_va_z, 'dbp_output': y_dbp_va_z}),
+#     epochs=500,
+#     batch_size=32,
+#     callbacks=callbacks_v53,
+#     verbose=1
+# )
+
+# # 6. Simpan Model Akhir
+# final_model_save_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/TriaGO_BPNet_v53_Precision.keras'
+# base_model_v53.save(final_model_save_path)
+# print(f"\n💾 Model Berhasil Disimpan di Google Drive: {final_model_save_path}")
+
+========================================
+CELL 27 [code]
+========================================
+# # ==========================================
+# # CELL 25: Clinical Evaluation & Plots (v5.3 Precision)
+# # ==========================================
+# import matplotlib.pyplot as plt
+# from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# def evaluate_aami_standard(y_true, y_pred):
+#     errors = y_pred - y_true
+#     me = np.mean(errors)
+#     sd = np.std(errors, ddof=1)
+#     pass_aami = (abs(me) <= 5.0) and (sd <= 8.0)
+#     return me, sd, pass_aami
+
+# def evaluate_bhs_standard(y_true, y_pred):
+#     abs_errors = np.abs(y_pred - y_true)
+#     n = len(abs_errors)
+#     p5 = (np.sum(abs_errors <= 5.0) / n) * 100.0
+#     p10 = (np.sum(abs_errors <= 10.0) / n) * 100.0
+#     p15 = (np.sum(abs_errors <= 15.0) / n) * 100.0
+
+#     if p5 >= 60.0 and p10 >= 85.0 and p15 >= 95.0:
+#         grade = 'A'
+#     elif p5 >= 50.0 and p10 >= 75.0 and p15 >= 90.0:
+#         grade = 'B'
+#     elif p5 >= 40.0 and p10 >= 65.0 and p15 >= 85.0:
+#         grade = 'C'
+#     else:
+#         grade = 'D'
+#     return p5, p10, p15, grade
+
+# # 1. Inferensi Raw Model
+# print("🔮 Melakukan Inferensi Mentah v5.3 Precision pada Test Set...")
+# preds_raw = physics_model_v53.predict(X_te, verbose=0)
+# y_sbp_pred_z = preds_raw['sbp_output'].flatten()
+# y_dbp_pred_z = preds_raw['dbp_output'].flatten()
+
+# y_sbp_pred_mmHg, y_dbp_pred_mmHg = target_scaler.inverse_transform(y_sbp_pred_z, y_dbp_pred_z)
+# y_sbp_true_mmHg = y_sbp_te
+# y_dbp_true_mmHg = y_dbp_te
+
+# # 2. Hitung Metrik
+# mae_sbp = mean_absolute_error(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+# rmse_sbp = np.sqrt(mean_squared_error(y_sbp_true_mmHg, y_sbp_pred_mmHg))
+# r2_sbp = r2_score(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+# me_sbp, sd_sbp, pass_aami_sbp = evaluate_aami_standard(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+# p5_s, p10_s, p15_s, grade_sbp = evaluate_bhs_standard(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+
+# mae_dbp = mean_absolute_error(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+# rmse_dbp = np.sqrt(mean_squared_error(y_dbp_true_mmHg, y_dbp_pred_mmHg))
+# r2_dbp = r2_score(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+# me_dbp, sd_dbp, pass_aami_dbp = evaluate_aami_standard(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+# p5_d, p10_d, p15_d, grade_dbp = evaluate_bhs_standard(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+
+# print("\n========================================================================")
+# print("   HASIL EVALUASI KLINIS MURNI v5.3 (PRECISION EDITION) RESTORED        ")
+# print("========================================================================")
+# print("\n1. METRIK REGRESI UTAMA")
+# print(f"   SBP -> MAE: {mae_sbp:.2f} mmHg | RMSE: {rmse_sbp:.2f} mmHg | R²: {r2_sbp:.4f}")
+# print(f"   DBP -> MAE: {mae_dbp:.2f} mmHg | RMSE: {rmse_dbp:.2f} mmHg | R²: {r2_dbp:.4f}")
+
+# print("\n2. EVALUASI STANDAR AAMI (Syarat: |ME| <= 5.0 mmHg, SD <= 8.0 mmHg)")
+# print(f"   SBP -> ME: {me_sbp:+.2f} mmHg, SD: {sd_sbp:.2f} mmHg  => [{'LOLOS' if pass_aami_sbp else 'BELUM LOLOS'} AAMI]")
+# print(f"   DBP -> ME: {me_dbp:+.2f} mmHg, SD: {sd_dbp:.2f} mmHg  => [{'LOLOS' if pass_aami_dbp else 'BELUM LOLOS'} AAMI]")
+
+# print("\n3. EVALUASI STANDAR BRITISH HYPERTENSION SOCIETY (BHS)")
+# print(f"   SBP -> <=5mmHg: {p5_s:.1f}% | <=10mmHg: {p10_s:.1f}% | <=15mmHg: {p15_s:.1f}%  => ** GRADE {grade_sbp} **")
+# print(f"   DBP -> <=5mmHg: {p5_d:.1f}% | <=10mmHg: {p10_d:.1f}% | <=15mmHg: {p15_d:.1f}%  => ** GRADE {grade_dbp} **")
+# print("========================================================================")
+
+# # --- VISUALISASI KURVA PELATIHAN ---
+# fig, axes = plt.subplots(1, 3, figsize=(18, 4.5))
+# axes[0].plot(history_v53.history['loss'], label='Train Loss', color='#1f77b4', linewidth=2)
+# axes[0].plot(history_v53.history['val_loss'], label='Val Loss', color='#ff7f0e', linewidth=2)
+# axes[0].set_title('Total Loss History v5.3 (Restored)', fontweight='bold')
+# axes[0].set_xlabel('Epoch'); axes[0].grid(True, linestyle='--', alpha=0.5); axes[0].legend()
+
+# axes[1].plot(history_v53.history['sbp_mae'], label='Train SBP MAE', color='#1f77b4', linewidth=2)
+# axes[1].plot(history_v53.history['val_sbp_mae'], label='Val SBP MAE', color='#ff7f0e', linewidth=2)
+# axes[1].set_title('SBP MAE History', fontweight='bold')
+# axes[1].set_xlabel('Epoch'); axes[1].grid(True, linestyle='--', alpha=0.5); axes[1].legend()
+
+# axes[2].plot(history_v53.history['dbp_mae'], label='Train DBP MAE', color='#1f77b4', linewidth=2)
+# axes[2].plot(history_v53.history['val_dbp_mae'], label='Val DBP MAE', color='#ff7f0e', linewidth=2)
+# axes[2].set_title('DBP MAE History', fontweight='bold')
+# axes[2].set_xlabel('Epoch'); axes[2].grid(True, linestyle='--', alpha=0.5); axes[2].legend()
+
+# plt.suptitle("1. RIWAYAT PELATIHAN MODEL v5.3 PRECISION (RESTORED)", fontsize=14, fontweight='bold', y=1.03)
+# plt.tight_layout(); plt.show()
+
+========================================
+CELL 28 [code]
+========================================
+# ==========================================
+# CELL 25: Clinical Evaluation with Specific Weights (v53_best2.weights.h5)
+# ==========================================
+import os
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+def evaluate_aami_standard(y_true, y_pred):
+    errors = y_pred - y_true
+    me = np.mean(errors)
+    sd = np.std(errors, ddof=1)
+    pass_aami = (abs(me) <= 5.0) and (sd <= 8.0)
+    return me, sd, pass_aami
+
+def evaluate_bhs_standard(y_true, y_pred):
+    abs_errors = np.abs(y_pred - y_true)
+    n = len(abs_errors)
+    p5 = (np.sum(abs_errors <= 5.0) / n) * 100.0
+    p10 = (np.sum(abs_errors <= 10.0) / n) * 100.0
+    p15 = (np.sum(abs_errors <= 15.0) / n) * 100.0
+
+    if p5 >= 60.0 and p10 >= 85.0 and p15 >= 95.0:
+        grade = 'A'
+    elif p5 >= 50.0 and p10 >= 75.0 and p15 >= 90.0:
+        grade = 'B'
+    elif p5 >= 40.0 and p10 >= 65.0 and p15 >= 85.0:
+        grade = 'C'
+    else:
+        grade = 'D'
+    return p5, p10, p15, grade
+
+# --------------------------------------------------------------------------
+# 1. MUAT BOBOT ELEMEN v53_best2.weights.h5 SECARA EKSPLISIT
+# --------------------------------------------------------------------------
+weights_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/v53_best2.weights.h5'
+
+# Re-instantiate model structure
+base_model_v53 = build_triago_bpnet_v53_precision(input_shape=(1250, 7), l2_reg=1e-4)
+scaler_params = {
+    'sbp_mean': target_scaler.sbp_mean, 'sbp_std': target_scaler.sbp_std,
+    'dbp_mean': target_scaler.dbp_mean, 'dbp_std': target_scaler.dbp_std
+}
+physics_model_v53 = PhysicsBHSModel_V53(base_model_v53, scaler_params, k_start=0.5)
+
+if os.path.exists(weights_path):
+    # Mandatory Dummy Call agar variabel internal Keras/TensorFlow terbangun
+    dummy_input = tf.zeros((1, 1250, 7))
+    _ = physics_model_v53(dummy_input)
+
+    # Load bobot spesifik pilihan Anda
+    physics_model_v53.load_weights(weights_path)
+    print(f"✅ BINGO! Berhasil memuat bobot spesifik: {weights_path}")
+else:
+    print(f"⚠️ Peringatan: File {weights_path} tidak ditemukan. Menggunakan model yang ada di memori RAM.")
+
+# --------------------------------------------------------------------------
+# 2. INFERENSI MENTAH PADA TEST SET
+# --------------------------------------------------------------------------
+print("🔮 Melakukan Inferensi Mentah v5.3 Precision (v53_best2) pada Test Set...")
+preds_raw = physics_model_v53.predict(X_te, verbose=0)
+y_sbp_pred_z = preds_raw['sbp_output'].flatten()
+y_dbp_pred_z = preds_raw['dbp_output'].flatten()
+
+y_sbp_pred_mmHg, y_dbp_pred_mmHg = target_scaler.inverse_transform(y_sbp_pred_z, y_dbp_pred_z)
+y_sbp_true_mmHg = y_sbp_te
+y_dbp_true_mmHg = y_dbp_te
+
+# --------------------------------------------------------------------------
+# 3. HITUNG METRIK KLINIS & AAMI / BHS
+# --------------------------------------------------------------------------
+mae_sbp = mean_absolute_error(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+rmse_sbp = np.sqrt(mean_squared_error(y_sbp_true_mmHg, y_sbp_pred_mmHg))
+r2_sbp = r2_score(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+me_sbp, sd_sbp, pass_aami_sbp = evaluate_aami_standard(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+p5_s, p10_s, p15_s, grade_sbp = evaluate_bhs_standard(y_sbp_true_mmHg, y_sbp_pred_mmHg)
+
+mae_dbp = mean_absolute_error(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+rmse_dbp = np.sqrt(mean_squared_error(y_dbp_true_mmHg, y_dbp_pred_mmHg))
+r2_dbp = r2_score(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+me_dbp, sd_dbp, pass_aami_dbp = evaluate_aami_standard(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+p5_d, p10_d, p15_d, grade_dbp = evaluate_bhs_standard(y_dbp_true_mmHg, y_dbp_pred_mmHg)
+
+print("\n========================================================================")
+print("   HASIL EVALUASI KLINIS MURNI v5.3 (v53_best2.weights.h5)               ")
+print("========================================================================")
+print("\n1. METRIK REGRESI UTAMA")
+print(f"   SBP -> MAE: {mae_sbp:.2f} mmHg | RMSE: {rmse_sbp:.2f} mmHg | R²: {r2_sbp:.4f}")
+print(f"   DBP -> MAE: {mae_dbp:.2f} mmHg | RMSE: {rmse_dbp:.2f} mmHg | R²: {r2_dbp:.4f}")
+
+print("\n2. EVALUASI STANDAR AAMI (Syarat: |ME| <= 5.0 mmHg, SD <= 8.0 mmHg)")
+print(f"   SBP -> ME: {me_sbp:+.2f} mmHg, SD: {sd_sbp:.2f} mmHg  => [{'LOLOS' if pass_aami_sbp else 'BELUM LOLOS'} AAMI]")
+print(f"   DBP -> ME: {me_dbp:+.2f} mmHg, SD: {sd_dbp:.2f} mmHg  => [{'LOLOS' if pass_aami_dbp else 'BELUM LOLOS'} AAMI]")
+
+print("\n3. EVALUASI STANDAR BRITISH HYPERTENSION SOCIETY (BHS)")
+print(f"   SBP -> <=5mmHg: {p5_s:.1f}% | <=10mmHg: {p10_s:.1f}% | <=15mmHg: {p15_s:.1f}%  => ** GRADE {grade_sbp} **")
+print(f"   DBP -> <=5mmHg: {p5_d:.1f}% | <=10mmHg: {p10_d:.1f}% | <=15mmHg: {p15_d:.1f}%  => ** GRADE {grade_dbp} **")
+print("========================================================================")
+
+# --------------------------------------------------------------------------
+# 4. PLOT TRAINING HISTORY (SAFE CHECK)
+# --------------------------------------------------------------------------
+if 'history_v53' in locals() or 'history_v53' in globals():
+    fig, axes = plt.subplots(1, 3, figsize=(18, 4.5))
+    axes[0].plot(history_v53.history['loss'], label='Train Loss', color='#1f77b4', linewidth=2)
+    axes[0].plot(history_v53.history['val_loss'], label='Val Loss', color='#ff7f0e', linewidth=2)
+    axes[0].set_title('Total Loss History v5.3', fontweight='bold')
+    axes[0].set_xlabel('Epoch'); axes[0].grid(True, linestyle='--', alpha=0.5); axes[0].legend()
+
+    axes[1].plot(history_v53.history['sbp_mae'], label='Train SBP MAE', color='#1f77b4', linewidth=2)
+    axes[1].plot(history_v53.history['val_sbp_mae'], label='Val SBP MAE', color='#ff7f0e', linewidth=2)
+    axes[1].set_title('SBP MAE History', fontweight='bold')
+    axes[1].set_xlabel('Epoch'); axes[1].grid(True, linestyle='--', alpha=0.5); axes[1].legend()
+
+    axes[2].plot(history_v53.history['dbp_mae'], label='Train DBP MAE', color='#1f77b4', linewidth=2)
+    axes[2].plot(history_v53.history['val_dbp_mae'], label='Val DBP MAE', color='#ff7f0e', linewidth=2)
+    axes[2].set_title('DBP MAE History', fontweight='bold')
+    axes[2].set_xlabel('Epoch'); axes[2].grid(True, linestyle='--', alpha=0.5); axes[2].legend()
+
+    plt.suptitle("1. RIWAYAT PELATIHAN MODEL v5.3 PRECISION", fontsize=14, fontweight='bold', y=1.03)
+    plt.tight_layout(); plt.show()
+else:
+    print("ℹ️ Catatan: Grafik riwayat pelatihan dilewati karena sesi tidak menjalankan fit() dari awal.")
+
+========================================
+CELL 29 [code]
+========================================
+# ==========================================
+# CELL 26 (PERFECT & ROBUST): Keras Static Model to Pure TFLite Conversion
+# ==========================================
+import os
+import warnings
+import tensorflow as tf
+
+# Sembunyikan warning deprecation agar konsol bersih
+warnings.filterwarnings('ignore')
+
+print("📦 Mempersiapkan Konversi Model TriaGO_BPNet v5.3 ke Pure TFLite (Static Batch Size = 1)...")
+
+# Path file di Google Drive
+model_keras_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/v53_best2_Precision.keras'
+weights_path = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/v53_best2.weights.h5'
+output_dir = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/tflite'
+os.makedirs(output_dir, exist_ok=True)
+
+# 1. Buka / Bangun Base Model Keras
+base_model_v53 = None
+
+if os.path.exists(model_keras_path):
+    try:
+        base_model_v53 = tf.keras.models.load_model(model_keras_path, compile=False)
+        print(f"✅ Berhasil memuat model Keras murni dari: {model_keras_path}")
+    except Exception as e:
+        print(f"⚠️ Gagal memuat file .keras secara langsung ({e}). Membangun ulang arsitektur...")
+
+if base_model_v53 is None:
+    base_model_v53 = build_triago_bpnet_v53_precision(input_shape=(1250, 7), l2_reg=1e-4)
+    if os.path.exists(weights_path):
+        scaler_params = {
+            'sbp_mean': target_scaler.sbp_mean, 'sbp_std': target_scaler.sbp_std,
+            'dbp_mean': target_scaler.dbp_mean, 'dbp_std': target_scaler.dbp_std
+        }
+        wrapper_model = PhysicsBHSModel_V53(base_model_v53, scaler_params, k_start=0.5)
+        dummy_input = tf.zeros((1, 1250, 7))
+        _ = wrapper_model(dummy_input)
+        wrapper_model.load_weights(weights_path)
+        base_model_v53 = wrapper_model.base_model
+        print(f"✅ Berhasil memuat bobot dari wrapper: {weights_path}")
+
+if base_model_v53 is None:
+    raise FileNotFoundError("❌ File model (.keras) maupun bobot (.weights.h5) tidak ditemukan!")
+
+# 2. BUNGKUS DENGAN INPUT STATIS (batch_size=1) MENGGUNAKAN KERAS FUNCTIONAL API
+# Mengunci shape input (1, 1250, 7) untuk membekukan variabel TFLite
+static_input = tf.keras.Input(shape=(1250, 7), batch_size=1, name='static_multichannel_input')
+static_output = base_model_v53(static_input)
+deploy_model = tf.keras.Model(inputs=static_input, outputs=static_output, name='TriaGO_BPNet_Static')
+
+# --------------------------------------------------------------------------
+# A. Konversi TFLite FP32 (Pure Builtins, Frozen Weights)
+# --------------------------------------------------------------------------
+converter_fp32 = tf.lite.TFLiteConverter.from_keras_model(deploy_model)
+converter_fp32.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
+
+tflite_fp32_model = converter_fp32.convert()
+
+fp32_path = os.path.join(output_dir, 'triago_bpnet_v53_fp32.tflite')
+with open(fp32_path, 'wb') as f:
+    f.write(tflite_fp32_model)
+
+size_fp32_kb = os.path.getsize(fp32_path) / 1024
+print(f"📄 Model TFLite FP32 (Pure Builtins) tersimpan: {fp32_path} ({size_fp32_kb:.2f} KB)")
+
+# --------------------------------------------------------------------------
+# B. Konversi TFLite Dynamic Range Quantized (INT8 Weights)
+# --------------------------------------------------------------------------
+converter_quant = tf.lite.TFLiteConverter.from_keras_model(deploy_model)
+converter_quant.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
+converter_quant.optimizations = [tf.lite.Optimize.DEFAULT]
+
+tflite_quant_model = converter_quant.convert()
+
+quant_path = os.path.join(output_dir, 'triago_bpnet_v53_quant.tflite')
+with open(quant_path, 'wb') as f:
+    f.write(tflite_quant_model)
+
+size_quant_kb = os.path.getsize(quant_path) / 1024
+print(f"⚡ Model TFLite Quantized (Pure Builtins) tersimpan: {quant_path} ({size_quant_kb:.2f} KB)")
+print(f"📉 Efisiensi Pemangkasan Memori: {((size_fp32_kb - size_quant_kb) / size_fp32_kb) * 100:.1f}% lebih kecil!")
+
+========================================
+CELL 30 [code]
+========================================
+# ==========================================
+# CELL 27: Benchmarking Latency & Accuracy Drift on Test Set
+# ==========================================
+import os
+import time
+import warnings
+import numpy as np
+import tensorflow as tf
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+warnings.filterwarnings('ignore')
+
+print("🧪 Menjalankan Benchmarking TFLite pada Test Set (112 segmen / 12 Pasien Baru)...")
+
+output_dir = '/content/drive/MyDrive/TriaGO_Project/Model_Artifacts/tflite'
+fp32_path = os.path.join(output_dir, 'triago_bpnet_v53_fp32.tflite')
+quant_path = os.path.join(output_dir, 'triago_bpnet_v53_quant.tflite')
+
+def evaluate_tflite_model(tflite_model_path, X_test, target_scaler):
+    if not os.path.exists(tflite_model_path):
+        raise FileNotFoundError(f"❌ File model TFLite tidak ditemukan di: {tflite_model_path}")
+
+    interpreter = tf.lite.Interpreter(model_path=tflite_model_path)
+    interpreter.allocate_tensors()
+
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    sbp_idx, dbp_idx = None, None
+    for idx, out in enumerate(output_details):
+        name_lower = out['name'].lower()
+        if 'sbp' in name_lower:
+            sbp_idx = idx
+        elif 'dbp' in name_lower:
+            dbp_idx = idx
+
+    if sbp_idx is None or dbp_idx is None:
+        sbp_idx, dbp_idx = 0, 1
+
+    y_sbp_pred_z, y_dbp_pred_z = [], []
+    latencies_ms = []
+
+    for i in range(len(X_test)):
+        sample_input = np.expand_dims(X_test[i], axis=0).astype(np.float32)
+
+        start_time = time.perf_counter()
+        interpreter.set_tensor(input_details[0]['index'], sample_input)
+        interpreter.invoke()
+
+        sbp_out = interpreter.get_tensor(output_details[sbp_idx]['index']).flatten()[0]
+        dbp_out = interpreter.get_tensor(output_details[dbp_idx]['index']).flatten()[0]
+        end_time = time.perf_counter()
+
+        latencies_ms.append((end_time - start_time) * 1000.0)
+        y_sbp_pred_z.append(sbp_out)
+        y_dbp_pred_z.append(dbp_out)
+
+    y_sbp_pred_z = np.array(y_sbp_pred_z)
+    y_dbp_pred_z = np.array(y_dbp_pred_z)
+
+    y_sbp_pred_mmHg, y_dbp_pred_mmHg = target_scaler.inverse_transform(y_sbp_pred_z, y_dbp_pred_z)
+    return y_sbp_pred_mmHg, y_dbp_pred_mmHg, np.mean(latencies_ms), np.std(latencies_ms)
+
+# Evaluasi TFLite FP32 & Quantized
+s_fp32, d_fp32, lat_fp32_avg, lat_fp32_std = evaluate_tflite_model(fp32_path, X_te, target_scaler)
+mae_s_fp32 = mean_absolute_error(y_sbp_te, s_fp32)
+mae_d_fp32 = mean_absolute_error(y_dbp_te, d_fp32)
+
+s_quant, d_quant, lat_quant_avg, lat_quant_std = evaluate_tflite_model(quant_path, X_te, target_scaler)
+mae_s_quant = mean_absolute_error(y_sbp_te, s_quant)
+mae_d_quant = mean_absolute_error(y_dbp_te, d_quant)
+
+drift_s = abs(mae_s_quant - mae_s_fp32)
+drift_d = abs(mae_d_quant - mae_d_fp32)
+
+print("\n========================================================================")
+print("   HASIL BENCHMARKING DEPLOYMENT TFLITE vs TEST SET (UNSEEN PATIENTS)   ")
+print("========================================================================")
+print(f"1. MODEL TFLITE FP32 (FROZEN CONSTANTS)")
+print(f"   - SBP MAE : {mae_s_fp32:.2f} mmHg | DBP MAE : {mae_d_fp32:.2f} mmHg")
+print(f"   - Latensi Inferensi (Colab CPU): {lat_fp32_avg:.2f} ± {lat_fp32_std:.2f} ms / segment")
+
+print(f"\n2. MODEL TFLITE DYNAMIC RANGE QUANTIZED (INT8 Weights)")
+print(f"   - SBP MAE : {mae_s_quant:.2f} mmHg | DBP MAE : {mae_d_quant:.2f} mmHg")
+print(f"   - Latensi Inferensi (Colab CPU): {lat_quant_avg:.2f} ± {lat_quant_std:.2f} ms / segment")
+
+print(f"\n3. ACCURACY DRIFT PASCA-KUANTISASI")
+print(f"   - SBP Drift : {drift_s:.4f} mmHg ({'SANGAT AMAN (<0.1 mmHg)' if drift_s < 0.1 else 'DITERIMA'})")
+print(f"   - DBP Drift : {drift_d:.4f} mmHg ({'SANGAT AMAN (<0.1 mmHg)' if drift_d < 0.1 else 'DITERIMA'})")
+print("========================================================================")

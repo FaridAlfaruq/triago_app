@@ -1,0 +1,200 @@
+=== PAGE 12 ===
+12 ---
+BAB III DESAIN PURWARUPA 
+3.1. Desain Perangkat Keras 
+Desain perangkat keras TriaGo dibuat agar tenaga medis bisa mendapatkan parameter 
+tanda vital dengan cara yang efisien hanya menggunakan satu perangkat saja seperti yang 
+ditunjukkan pada Gambar 3.1. TriaGo dibuat menyerupai penjepit yang biasa digunakan untuk 
+mengukur sinyal ECG dengan cara memodifikasi dan menambahkan sensor suhu dan sensor 
+PPG di bagian bawah. Selain itu, konfigurasi elektroda ground yang biasa dipasangkan di kaki 
+dipindahkan ke lengan sebelah kiri bersama elektroda positif, sedangkan elektroda negatif di 
+lengan sebelah kanan. Dengan konfigurasi penempatan sensor ini, tenaga medis dapat 
+mengukur tanda vital pasien secara bersamaan dan praktis.  
+ 
+(a) 
+(b) 
+Gambar 3.1 Desain 3D penjepit TriaGo: (a) Penjepit kanan dan (b) Penjepit kiri 
+3.1.1. Spesifikasi Komponen 
+Berikut ini adalah beberapa spesifikasi komponen yang digunakan pada sistem TriaGo 
+secara keseluruhan, spesifikasi lengkap komponen ditunjukkan pada Tabel 3.1. 
+Tabel 3.1 Daftar komponen TriaGo 
+Komponen 
+Spesifikasi Utama 
+Raspberry Pi 5 
+Quad-core Cortex-A76 64-bit, 16 GB RAM, USB 3.0, GPIO 40-pin 
+STM32 Black Pill 
+ARM Cortex-M4 32-bit, USB Type-C, High-speed 25 MHz, 3x I2C, 
+dan 52 pin GPIO 
+MAX30105 
+Pembacaan data digital up to 18-bit ADC, memiliki 3 LED (Red, IR, 
+dan Green), 1 fotodetektor 
+MLX90614 
+Pembacaan data digital, akurasi ±0.5°C pada rentang suhu tubuh 
+(35°C - 42°C), pengukuran non-contact dengan inframerah 
+ECG Click MikroE 
+Built-in IC MCP609 dengan rangkaian terintegrasi proteksi daya, 
+penguat, filter, dan rangkaian Driven Right Leg (DRL) 
+Baterai PowerBank 
+Kapasitas 20.000 mAh dengan output maksimum 100W 
+Layar LCD 10” 
+Resolusi layar 1280 x 800 piksel dan panel IPS dengan tipe kapasitif  
+ 
+3.1.2. Integrasi Sistem 
+Dalam sistem TriaGo, perangkat keras dan perangkat lunak dirancang agar saling 
+terhubung secara efisien. Model estimasi tekanan darah menggunakan model deep learning 
+dijalakan di Raspberry Pi 5 menggunakan Tensor Flow Lite, sedangkan model XGboost untuk 
+klasifikasi triase dijalankan menggunakan runtime ONNX. Cara eksekusi kedua algoritma ini 
+memastikan Raspberry Pi 5 bekerja secara cepat dengan hasil yang tetap optimal, walaupun 
+dijalankan di Raspberry Pi 5. Dari sisi perangkat keras, mikrokontroler STM32 Black Pill 
+bertindak sebagai unit akuisisi tingkat rendah yang membaca data dari sensor MAX30105, 
+MLX90614, dan modul ECG Click pada frekuensi sampling sebesar 400 Hz. Data yang 
+
+
+=== PAGE 13 ===
+13 ---
+didapatkan dikirimkan melalui mekanisme serial USB ke Raspberry Pi 5. Layar monitor dari 
+Waveshare terhubung langsung ke Raspberry Pi 5 melalui port HDMI untuk menampilkan 
+GUI untuk mengoperasikan alat. 
+Raspberry Pi 5 juga berfungsi sebagai publisher IoT yang mengirimkan data tanda vital 
+pasien dan hasil klasifikasi triase ke broker MQTT melalui koneksi Wi-Fi, kemudian diterima 
+oleh backend Flask dan disimpan ke dalam basis data MySQL sebagai riwayat hasil triase. 
+Seluruh pemrosesan dilakukan di dalam lingkungan pemrograman bahasa Python untuk 
+menangani pemrosesan yang berat, seperti pemrosesan sinyal digital, inferensi model AI, 
+pembuatan tampilan GUI, transmisi data IoT secara otomatis. Rincian pemetaan pin dari 
+masing-masing komponen dan metode komunikasi fisik antar-komponen dalam integrasi 
+sistem TriaGo dijelaskan secara lengkap pada Tabel 3.2 dan Gambar 3.2. 
+Tabel 3.2 Pemetaan pin komponen perangkat keras 
+Komponen 
+Pin 
+Terhubung ke Pin 
+Keterangan 
+MAX30105 (PPG) 
+VCC, GND, SDA,  
+SCL, INT 
+STM32 Black Pill 
+(3.3V, GND, PB7, 
+PB6, PA0) 
+Komunikasi I2C 
+MLX90614 (Suhu) 
+VCC, GND, SDA, 
+SCL 
+STM32 Black Pill 
+(3.3V, GND, PB7, 
+PB6) 
+Komunikasi I2C 
+Modul ECG Click 
+VCC, GND, OUT 
+STM32 Black Pill 
+(5V, GND, PA1) 
+Komunikasi 
+Analog 
+STM32 Black Pill 
+USB Type-C 
+USB Raspberry Pi 5 
+Pengiriman data 
+serial USB 
+Raspberry Pi 5 
+Micro-HDMI Port 
+Layar LCD 10" 
+(HDMI Port) 
+Jalur untuk 
+mengoperasikan 
+dan melihat hasil 
+alat 
+PowerBank (20.000 mAh) Output USB  
+Type-C 1 
+Raspberry Pi 5 
+(Type-C Power 
+Supply) 
+Sumber tegangan 
+5V DC 
+PowerBank (20.000 mAh) Output USB  
+Type-C 2 
+Layar LCD 10” 
+(Jack 3.5mm/Type-
+C) 
+Sumber tegangan 
+5V DC 
+ 
+ 
+(a) 
+(b) 
+Gambar 3.2 Desain kelistrikan perangkat keras TriaGo: (a) Schematics (b) PCB layout 
+ 
+3.2. Desain Perangkat Lunak 
+Perancangan perangkat lunak difokuskan pada  pengembangan arsitektur kecerdasan 
+buatan yang berjalan pada platform edge computing di Raspberry Pi 5. Desain perangkat lunak 
+
+
+=== PAGE 14 ===
+14 ---
+untuk mendapatkan parameter tanda vital tidak semuanya bisa dilakukan secara langsung 
+menggunakan persamaan matematis. Klasifikasi tingkat triase dirancang secara otomatis 
+menggunakan algoritma perangkat lunak yang pintar berdasarkan tanda vital pasien dan tingkat 
+kesadarannya. Tanda vital seperti tekanan darah perlu diekstraksi menggunakan algoritma deep 
+learning dan klasifikasi triase pintar perlu diklasifikasikan menggunakan algoritma machine 
+learning. 
+ 
+3.2.1 Model Estimasi Tekanan Darah 
+Rancangan model estimasi tekanan darah dibangun secara hybrid menggunakan dua 
+model utama, yaitu Convolutional Neural Network (CNN) dan Bidirectional Gated Recurrent 
+Unit (BiGRU). Model CNN digunakan untuk mengekstraksi informasi morfologi dari sinyal 
+ECG dan PPG yang digunakan sebagai input utama, sedangkan BiGRU digunakan untuk 
+mengekstraksi informasi temporal sekuensial dua arah antar siklus detak jantung. Selain itu, 
+model menggunakan Multi Head Self-Attention (MHSA) untuk mengevaluasi korelasi 
+temporal antar-segmen sinyal dan memberikan bobot yang relevan. Hasil akhir tekanan sistolik 
+dan diastolik dipisahkan menjadi cabang yang berbeda untuk memastikan prediksi nilai sistolik 
+dan diastolik yang lebih optimal seperti rancangan yang ditunjukkan pada Gambar 3.3. 
+ 
+Gambar 3.3 Arsitektur model estimasi tekanan darah 
+ 
+3.2.2 Model Klasifikasi Tingkat Triase 
+Model klasifikasi tingkat triase yang dibangun secara otomatis dibangun menggunakan 
+algoritma berbasis decision tree, yaitu Extreme Gradient Boosting (XGBoost). Arsitektur 
+lengkap model klasifikasi triase ini ditunjukkan pada Gambar 3.4. Model tidak hanya dirancang 
+secara pintar menggunakan algoritma XGBoost saja, tetapi juga dilengkapi dengan algoritma 
+yang dapat meningkatkan kewaspadaan model apabila terdapat pasien dengan saturasi oksigen 
+rendah dan tingkat kesadaran minim. Hasil klasifikasi dipetakan menjadi tiga tingkat 
+kegawatdaruratan, yaitu Resusitasi atau pasien kritis, darurat dan non-darurat. 
+ 
+Gambar 3.4 Model klasifikasi tingkat triase 
+ 
+3.3. Desain Antarmuka  
+Tenaga medis dapat mengoperasikan perangkat TriaGo melalui Graphical User Interface 
+(GUI) yang ditampilkan melalui monitor cukup dengan sentuhan layar saja. Tampilan dibuat 
+
+
+=== PAGE 15 ===
+15 ---
+secara menarik dan sederhana yang ditunjukkan pada Gambar 3.5. Desain tampilan terdiri dari 
+halaman utama, halaman registrasi, halaman pengambilan data, dan halaman akhir yang 
+memberikan informasi tanda vital, serta hasil akhir status klasifikasi triase. 
+ 
+(a) 
+(b) 
+ 
+(c) 
+(d) 
+(e) 
+Gambar 3.5 Tampilan GUI pada monitor tenaga medis: (a) Halaman utama, (b) Halaman 
+registrasi, (c) Halaman pemrosesan, (d) Halaman pengambilan data, dan (e) Halaman hasil 
+dan klasifikasi 
+ 
+Hasil pengukuran dari perangkat keras TriaGo ditransmisikan secara nirkabel dan 
+terhubung secara otomatis ke aplikasi web dashboard rumah sakit untuk pemantauan pasien 
+secara real-time. Seperti yang ditunjukkan pada Gambar 3.6, antarmuka web ini menyajikan 
+ringkasan statistik total pasien berdasarkan kategori triase (Resusitasi, Darurat, dan Non-
+
+
+=== PAGE 16 ===
+16 ---
+Darurat) serta memvisualisasikan denah tata letak kasur (bed layout) di IGD yang dilengkapi 
+indikator warna sesuai tingkat kegawatan pasien. Selain itu, tenaga medis dapat menekan salah 
+satu elemen kasur pada layar untuk menampilkan rincian informasi tanda vital pasien hasil 
+pengukuran secara spesifik. 
+ 
+(a) 
+(b) 
+Gambar 3.6 Tampilan website dashboard rumah sakit: (a) Tampilan bed monitoring utama, 
+(b) Tampilan opsi memasukkan identitas pasien
+

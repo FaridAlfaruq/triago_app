@@ -1,0 +1,1013 @@
+BAB V HASIL IMPLEMENTASI DAN RENCANA PENGEMBANGAN ......................... 25 
+5.1. 
+Hasil Implementasi Purwarupa ................................................................................ 25 
+5.2. 
+Rencana Implementasi ............................................................................................. 25 
+5.3. 
+Tautan Video ............................................................................................................ 26 
+DAFTAR PUSTAKA .............................................................................................................. 27 
+ 
+ 
+
+--- PAGE 5 ---
+BAB I PENDAHULUAN 
+1.1.  Latar Belakang 
+Triase merupakan sistem seleksi prioritas pasien yang harus didahulukan penanganannya 
+berdasarkan tingkat ancaman jiwa [1]. Oleh karena itu, ketepatan evaluasi klinis pada tahap ini 
+bersifat 
+krusial, 
+mengingat 
+kesalahan 
+dalam 
+pengambilan 
+keputusan 
+tindakan 
+kegawatdaruratan berisiko fatal dan dilaporkan telah menyebabkan hingga 98.000 kematian 
+pasien [2]. Di sisi lain, volume kunjungan pasien ke instalasi gawat darurat (IGD) terus 
+meningkat hingga 40% sejak tahun 2020 sehingga semakin meningkatkan beban kerja tenaga 
+medis [3]. Kondisi tersebut menyebabkan proses triase konvensional yang membutuhkan rata-
+rata 4 menit 11 detik per pasien menjadi semakin menantang untuk dilakukan secara cepat dan 
+konsisten [4]. Akibatnya, tingkat kesalahan triase masih tergolong tinggi, pada metode 
+konvensional Emergency Severity Index (ESI) kesalahan mencapai 49%, yang terdiri atas 
+31,3% over-triage dan 17,7% under-triage [5]. Selain itu, pasien yang mengalami under-triage 
+memiliki risiko kematian sekitar 3,1 kali lebih tinggi dibandingkan pasien yang mendapatkan 
+klasifikasi triase yang tepat [6]. 
+Pengukuran tanda vital di IGD masih dilakukan secara manual, sehingga tenaga medis 
+harus memeriksa setiap parameter fisiologis secara bergantian dengan waktu rata-rata 3–4 
+menit untuk setiap pasien [7]. Selain kurang efisien, pengukuran tanda vital secara manual di 
+luar ruang perawatan intensif juga rentan menghasilkan data yang subjektif dan kurang optimal 
+karena dipengaruhi oleh variasi teknik antar-petugas [8]. Padahal, parameter tanda vital 
+merupakan dasar utama dalam proses triase untuk merepresentasikan tingkat urgensi pasien 
+secara objektif, sehingga pengukuran yang tidak akurat berpotensi memengaruhi ketepatan 
+klasifikasi triase [8].  Oleh karena itu, diperlukan suatu sistem yang mampu mengakuisisi 
+parameter tanda vital secara otomatis, cepat, dan objektif sebagai dasar klasifikasi triase yang 
+lebih akurat dan konsisten. 
+Untuk menjawab kebutuhan tersebut, TriaGo hadir sebagai solusi klasifikasi triase 
+otomatis berbasis multisensor non-invasif. Sistem dirancang untuk mengukur parameter tanda 
+vital, tingkat rasa sakit dan kesadaran pasien secara real-time melalui satu perangkat. 
+Klasifikasi triase diolah menggunakan algoritma eXtreme Gradient Boosting (XGBoost). 
+Algoritma klasifikasi dibangun berdasarkan Permenkes RI No. 47 Tahun 2018 ke dalam tiga 
+tingkatan, yaitu Resusitasi, Darurat, dan Non-Darurat. Pengembangan TriaGo selaras dengan 
+tema GEMASTIK XIX 2026 ('Berdampak, Inklusif, Berkelanjutan menuju Masyarakat 
+Cerdas') dan selaras berkontribusi pada SDG 3 (reduksi mortalitas dan under-triage), SDG 8 
+(efisiensi beban kerja tenaga medis), SDG 9 (inovasi perangkat medis cerdas mandiri), dan 
+SDG 12 (perangkat hemat daya dan ramah sumber daya terintegrasi web dashboard rekam 
+medis). 
+ 
+1.2.  Tujuan  
+Tujuan penelitian ini yaitu untuk merancang dan membangun sistem akuisisi tanda vital 
+berbasis multisensor non-invasif yang mampu memperoleh parameter fisiologis secara 
+otomatis. Selain itu, penelitian ini bertujuan untuk mengembangkan model klasifikasi triase 
+berbasis algoritma eXtreme Gradient Boosting (XGBoost) serta mengevaluasi akurasi 
+parameter fisiologis yang dihasilkan sistem serta kinerja model klasifikasi triase berdasarkan 
+metrik evaluasi yang ditetapkan. 
+
+--- PAGE 6 ---
+ 
+ 
+1.3. Urgensi dan Manfaat 
+Beberapa manfaat yang dapat dihasilkan melalui penelitian ini yaitu: 
+1. Mempercepat proses klasifikasi pasien di Instalasi Gawat Darurat (IGD) sehingga 
+pasien dengan kondisi kritis dapat dideteksi lebih cepat, mengurangi tingkat kematian 
+dan keparahan. Hal ini dapat memberikan manfaat sesuai dengan SDG ke-3 yaitu 
+Good Health and Well-being 
+2. Mengurangi beban kerja operasional dan beban kognitif tenaga medis melalui 
+otomatisasi akuisisi tanda vital, meminimalkan risiko kelelahan kerja dan kesalahan 
+klasifikasi, yang memberikan kontribusi nyata pada SDG ke-8 yaitu Decent Work and 
+Economic Growth. 
+3. Mendorong kemandirian dan hilirisasi inovasi teknologi alat kesehatan berbasis 
+kecerdasan buatan yang terjangkau dan dapat diimplementasikan di berbagai 
+tingkatan fasilitas kesehatan, sejalan dengan pencapaian SDG ke-9 yaitu Industry, 
+Innovation, and Infrastructure. 
+4. Meningkatkan efisiensi manajemen dan sumber daya tenaga medis rumah sakit 
+melalui integrasi sistem web dashboard serta rancang bangun perangkat non-invasif 
+untuk meminimalkan limbah medis, yang mendukung SDG ke-12 yaitu Responsible 
+Consumption and Production. 
+ 
+1.4. Batasan Masalah 
+Inovasi sistem TriaGo ini memiliki beberapa batasan masalah sebagai berikut: 
+1. Parameter fisiologis yang diakuisisi secara otomatis oleh sistem multisensor dibatasi 
+pada 5 parameter tanda vital, yaitu suhu tubuh, denyut jantung, laju pernapasan, 
+saturasi oksigen dan tekanan darah.  
+2. Penilaian tingkat kesadaran pasien dinilai menggunakan standar Glasgow Coma Scale 
+(GCS) dan tingkat rasa sakit diperoleh melalui input manual oleh tenaga medis 
+melalui antarmuka layar sentuh. 
+3. Kategori Hitam (pasien meninggal) sesuai standar Permenkes RI No. 47 Tahun 2018 
+dieksklusikan dari sistem karena konfirmasi kematian dapat dipastikan secara visual, 
+serta sistem tidak diterapkan pada pasien dengan luka terbuka parah pada area 
+pergelangan tangan. 
+ 
+ 
+
+--- PAGE 7 ---
+BAB II METODE DASAR PENGEMBANGAN KARYA 
+2.1. Arsitektur Sistem TriaGo 
+Sistem TriaGo dirancang untuk dapat melakukan pengambilan data tanda vital secara 
+bersamaan melalui dua penjepit di masing-masing tangan kanan dan kiri. Penjepit di tangan 
+kanan berisi elektroda negatif, sensor suhu, dan sensor PPG, sedangkan di tangan kiri berisi 
+elektroda positif dan ground yang berfungsi untuk memperoleh sinyal ECG. Masing-masing 
+sensor terhubung ke mikrokontroler STM32 Black Pill, di mana sensor suhu dan sensor PPG 
+terhubung menggunakan protokol I2C dan modul ECG secara analog. Pengambilan data 
+dilakukan secara presisi secara bersamaan di dalam satu unit mikrokontroler selama satu menit 
+pengukuran. Setelah pengambilan data selesai, data yang terkumpul dikirimkan ke Raspberry 
+Pi 5 secara serial untuk memulai proses pengolahan sinyal menjadi parameter tanda vital. 
+Pengolahan sinyal di dalam Raspberry Pi 5 meliputi pembersihan sinyal dari gangguan 
+gerak atau interferensi komponen, ekstraksi parameter tanda vital, serta inferensi model 
+kecerdasan buatan untuk menentukan tingkat triase pasien secara real-time. Seluruh hasil 
+pengolahan tersebut langsung ditampilkan pada antarmuka GUI layar sentuh dan dikirimkan 
+secara nirkabel ke server cloud Azure. Hasil yang didapatkan dari pengukuran perangkat fisik 
+juga dapat langsung terlihat di dashboard web IGD secara real-time. Alur kerja sistem disusun 
+dengan lebih rinci pada Gambar 2.1. 
+ 
+Gambar 2.1 Arsitektur Sistem TriaGo 
+ 
+2.2. Pengolahan Sinyal Biomedis 
+Dalam sistem klasifikasi tingkat triase pasien, sensor sinyal biomedis yang digunakan 
+memerlukan cara pemrosesan yang berbeda sesuai dengan karakteristik masing-masing sinyal. 
+Pemrosesan ini sangat penting untuk menghasilkan hasil tanda vital yang optimal. Pengukuran 
+tanda vital sangat penting untuk menilai kondisi kesehatan, di mana setiap parameter memiliki 
+rentang normal sebagai acuan. Suhu tubuh mencerminkan keseimbangan produksi dan 
+pengeluaran panas, dengan kisaran normal 35,01°C - 37,76°C [9]. Denyut jantung 
+mencerminkan aktivitas kardiovaskular dengan rentang normal 60 – 100 detak per menit [10]. 
+Laju pernapasan berkisar antara 12–20 napas per menit pada orang dewasa [11]. Kadar oksigen 
+
+--- PAGE 8 ---
+dalam darah menunjukkan efektivitas pertukaran gas dengan nilai normal 95%–100% [12]. 
+Tekanan darah menunjukkan tekanan pada dinding arteri dengan nilai normal sekitar 120/80 
+mmHg [13]. 
+ 
+2.2.1. Denyut Jantung 
+Parameter denyut jantung didapatkan melalui algoritma Pan Tompkins melalui sinyal 
+ECG [14]. Algoritma memproses sinyal ECG dengan bandpass filter cut-off 5 – 18 Hz untuk 
+menghilangkan gangguan pada sinyal. Kemudian melakukan diferensiasi, pengkuadratan, 
+penghalusan dan integrasi moving window untuk memudahkan deteksi puncak gelombang R 
+pada sinyal ECG. Setelah didapatkan puncak-puncak gelombang R, perhitungan denyut 
+jantung dihitung dengan membagi 60 dengan nilai rata-rata interval antar puncak R yang telah 
+didapatkan. Rumus perhitungan denyut jantung didefinisikan pada Persamaan (2.1). 
+𝐻𝑅=
+60
+𝑅𝑅̅
+   𝑖𝑛𝑡𝑒𝑟𝑣𝑎𝑙
+ 
+(2.1) 
+ 
+2.2.2. Laju Pernapasan 
+Laju pernapasan menggambarkan siklus pernapasan seseorang dalam waktu satu menit. 
+Parameter laju pernapasan didapatkan melalui ekstraksi modulasi pernapasan pada sinyal ECG 
+dan PPG [15]. Pernapasan memodulasi amplitudo puncak (amplitude modulation, AM), 
+interval detak jantung (frequency modulation, FM), dan pergeseran garis dasar (baseline 
+wandering, BW). Modulasi dari kedua sinyal digabungkan sehingga estimasi tetap dapat 
+dilakukan meskipun salah satu sinyal terganggu. Sinyal modulasi diinterpolasi secara merata 
+menggunakan Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) dengan frekuensi 
+sampling 4,0 Hz, kemudian difilter pada rentang frekuensi fisiologis 0,167–0,70 Hz (10–42 
+napas/menit). Selanjutnya, spektrum daya dihitung menggunakan metode Welch Power 
+Spectral Density (PSD) dengan pembobotan berdasarkan Respiratory Quality Index (RQI) 
+untuk menentukan frekuensi pernapasan dominan (fₚₑₐₖ). Nilai laju pernapasan kemudian 
+dihitung menggunakan Persamaan (2.2). 
+𝑅𝑅= 60 × 𝑓𝑝𝑒𝑎𝑘 
+(2.2) 
+ 
+2.2.3. Saturasi Oksigen 
+Sinyal PPG yang didapatkan dari sensor MAX30105 memberikan dua gelombang optik, 
+yaitu gelombang inframerah dan merah yang dapat digunakan untuk mengukur nilai saturasi 
+oksigen (SpO2) dalam tubuh. Parameter saturasi oksigen diukur dengan memisahkan 
+komponen pulsatile (AC) dan komponen non-pulsatile (DC) dari kedua gelombang tersebut 
+[16]. Rasio absorpsi optik (𝑅) antara komponen AC dan DC kedua gelombang dihitung melalui 
+Persamaan (2.3). 
+𝑅=
+(𝐴𝐶𝑟𝑒𝑑
+𝐷𝐶𝑟𝑒𝑑)
+(𝐴𝐶𝑖𝑟
+𝐷𝐶𝑖𝑟)
+ 
+(2.3) 
+Nilai rasio R dihitung pada setiap denyut, kemudian nilai median digunakan sebagai R akhir 
+setelah denyut yang terganggu artefak gerak dihilangkan. Nilai rasio R tersebut kemudian akan 
+digunakan dalam persamaan regresi linear untuk mengalibrasi nilai SpO₂ yang diukur melalui 
+Persamaan (2.4). 
+ 𝑆𝑝𝑂2(%) = 107,83 −25 ⋅𝑅 
+(2.4) 
+Persamaan tersebut menggunakan pendekatan kalibrasi linear yang sesuai untuk rentang 
+saturasi oksigen yang sempit, dengan konstanta yang didapatkan melalui kalibrasi 
+menggunakan dataset PhysioNet Pulse Transit Time PPG. Dibandingkan persamaan kuadratik 
+
+--- PAGE 9 ---
+sebelumnya yang cenderung menghasilkan nilai konstan sekitar 98%, persamaan ini 
+memberikan penurunan SpO₂ yang sebanding dengan kenaikan nilai R sehingga kondisi 
+desaturasi dapat terdeteksi. 
+ 
+2.2.4. Estimasi Suhu Tubuh 
+Suhu tubuh di pergelangan tangan tidak menggambarkan nilai suhu tubuh yang sesuai. 
+Estimasi suhu tubuh (𝑇𝑐) diterapkan menggunakan model matematis untuk memastikan hasil 
+pengukuran tepat. Pengukuran suhu tubuh dapat diestimasi menggunakan informasi suhu kulit 
+(𝑇𝑠), suhu lingkungan (𝑇𝑎𝑚𝑏) dan modulasi perfusi (PI) optik sinyal PPG [17]. Perpindahan 
+panas dari tubuh ke permukaan kulit dipengaruhi oleh laju perfusi darah dan konduktivitas 
+termal jaringan. Pengukuran suhu tubuh diestimasi menggunakan Persamaan (2.5). 
+𝑇𝑐= 𝑇𝑠+ 𝑇𝑠−𝑇𝑎𝑚𝑏
+𝑎+ 𝑏× 𝑃𝐼+ 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 
+(2.5) 
+Di mana nilai a, b, k dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 didapatkan melalui kalibrasi dan pengukuran berulang untuk 
+memastikan pengukuran suhu tubuh yang akurat. Variabel a menunjukkan resistansi konduktif 
+dalam tubuh, b menunjukkan sensitivitas perfusi darah, dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 sebagai koefisien nilai 
+metabolik yang tidak dimodelkan. Nilai PI didapatkan melalui rasio antara komponen AC dan 
+DC dari sinyal PPG yang kemudian diubah dalam skala persentase seperti pada persamaan 2.6. 
+𝑃𝐼= 𝐴𝐶
+𝐷𝐶× 100% 
+(2.6) 
+ 
+2.3. Kecerdasan Buatan 
+Kecerdasan buatan diterapkan untuk mengekstraksi informasi tekanan darah yang tidak 
+bisa didapatkan melalui pemrosesan sederhana dan klasifikasi tingkat triase yang memiliki 
+hubungan non-linear dari masing-masing parameter. Tekanan darah dapat diestimasi 
+menggunakan kecerdasan buatan menggunakan sinyal ECG dan sinyal PPG. Sinyal PPG 
+beserta turunannya (VPG dan APG) memberikan informasi elastisitas pembuluh darah [18], 
+sedangkan kombinasi sinyal ECG dan PPG mengekstrak variabel Pulse Transit Time (PTT) 
+[19]. Seluruh fitur multimodal ini diolah menggunakan arsitektur 1D-CNN untuk mengekstrak 
+morfologi gelombang lokal [19], Bidirectional Gated Recurrent Unit (BiGRU) digunakan 
+untuk memodelkan ketergantungan sekuensial dua arah antar detak jantung [18]. Klasifikasi 
+triase pada sistem TriaGo mengadopsi standar resmi Permenkes RI No. 47 Tahun 2018. 
+Peraturan ini mendefinisikan triase menjadi empat prioritas, yaitu Hitam, Resusitasi, Darurat, 
+dan Non-Darurat [1]. Sistem TriaGo mengklasifikasi triase ke dalam tiga kelompok utama 
+mengecualikan kategori hitam, karena kategori hitam digunakan untuk mengklasifikasikan 
+pasien meninggal pada saat tiba.  
+ Algoritma kecerdasan untuk mengklasifikasikan tingkat triase diterapkan menggunakan 
+algoritma Extreme Gradient Boosting (XGBoost) karena memiliki kemampuan klasifikasi 
+yang lebih baik dibandingkan model algoritma dasar lainnya [20]. 
+ 
+2.4. Sistem Benam 
+Terdapat beberapa komponen perangkat keras yang mendukung kinerja sistem TriaGo 
+untuk mengklasifikasikan tingkat triase dengan cepat dan akurat. Beberapa komponen tersebut 
+ditampilkan pada Gambar 2.2. 
+
+--- PAGE 10 ---
+ 
+Gambar 2.2 Komponen sistem benam TriaGo 
+ 
+2.4.1. Sensor Biomedis 
+Terdapat tiga sensor utama yang digunakan untuk mendukung sistem TriaGo yang 
+dibangun, yaitu MAX30105, MLX90614, dan modul ECG Click dari MikroE. Sensor 
+MAX30105 merupakan modul optik yang memiliki sensitivitas tinggi yang berfungsi utama 
+untuk memantau denyut jantung dan saturasi oksigen melalui sinar optik [21]. Sensor 
+MLX90614 merupakan sensor suhu yang bekerja dengan prinsip kerja inframerah yang 
+memiliki kemampuan mengukur suhu objek dan suhu lingkungan secara bersamaan secara 
+non-invasif [22]. Modul ECG Click telah dirancang secara khusus menerapkan tujuh blok 
+rangkaian yang mencakup proteksi daya, penguat, filter high-pass dan low-pass, serta sirkuit 
+Driven Right Leg (DRL) untuk menghasilkan sinyal ECG analog yang bersih dan aman [23]. 
+Sensor yang dipilih telah dipastikan memiliki tingkat akurasi dan sensitivitas yang sesuai 
+dengan standar keselamatan dan kesehatan. 
+ 
+2.4.2. Pemrosesan 
+Pengambilan data dari sensor ditangani oleh mikrokontroler STM32 Black Pill dan 
+pemrosesan utama dilakukan di edge computing Raspberry Pi 5. STM32 Black Pill memiliki 
+kecepatan pemrosesan tinggi, ADC 12-bit untuk konversi sinyal analog dengan presisi tinggi, 
+serta dukungan antarmuka I2C dan Native USB untuk transmisi data yang cepat [24]. 
+Raspberry Pi 5 memiliki kemampuan pemrosesan Quad-core 2.4GHz dan RAM LPDDR4X 
+yang menjadikan komponen ini sangat ideal sebagai platform edge computing yang cepat [25]. 
+Pengiriman data dilakukan secara serial USB dari STM32 ke Raspberry Pi 5. Unit edge 
+computing digunakan untuk mengolah sinyal, mengekstraksi parameter tanda vital, dan 
+menjalankan algoritma kecerdasan buatan.   
+ 
+2.5. Internet of Things (IoT) 
+Internet of Things (IoT) merupakan teknologi yang dapat menghubungkan perangkat fisik ke 
+jaringan internet untuk melakukan pertukaran/pengiriman data secara otomatis dan real-time 
+untuk mendukung pengambilan keputusan berbasis data [26]. 
+ 
+2.5.1. Komunikasi Flask REST API 
+Pada sistem TriaGo, arsitektur komunikasi IoT diimplementasikan menggunakan 
+pendekatan Representational State Transfer (REST) berbasis framework Flask API. Raspberry 
+Pi 5 bertindak sebagai klien yang mengirimkan data hasil ekstraksi parameter tanda vital serta 
+status triase ke server backend melalui protokol aman HTTPS POST secara nirkabel 
+menggunakan koneksi Wi-Fi. 
+  
+
+--- PAGE 11 ---
+2.5.2. Website dan Database MySQL 
+Data fisiologis yang diterima oleh server Flask secara periodik akan diolah dan 
+disimpan secara terstruktur ke dalam basis data MySQL. Penyimpanan ini berfungsi sebagai 
+sistem Rekam Medis Elektronik yang menjamin integritas, riwayat medis pasien, dan 
+keamanan data. Deployment aplikasi web dan backend server diimplementasikan 
+menggunakan layanan cloud Microsoft Azure App Service yang berperan dalam pengelolaan 
+data, eksekusi API, dan menjamin ketersediaan komunikasi antara perangkat IoT dengan 
+aplikasi web. Implementasi ini memberikan keunggulan berupa arsitektur sistem yang utuh, 
+interoperabilitas antar perangkat, serta kemudahan integrasi dengan ekosistem pelayanan 
+kesehatan digital di rumah sakit. 
+ 
+
+--- PAGE 12 ---
+BAB III DESAIN PURWARUPA 
+3.1. Desain Perangkat Keras 
+Desain perangkat keras TriaGo dibuat agar tenaga medis bisa mendapatkan parameter 
+tanda vital dengan cara yang efisien hanya menggunakan satu perangkat saja seperti yang 
+ditunjukkan pada Gambar 3.1. TriaGo dibuat menyerupai penjepit yang biasa digunakan untuk 
+mengukur sinyal ECG dengan cara memodifikasi dan menambahkan sensor suhu dan sensor 
+PPG di bagian bawah. Selain itu, konfigurasi elektroda ground yang biasa dipasangkan di kaki 
+dipindahkan ke lengan sebelah kiri bersama elektroda positif, sedangkan elektroda negatif di 
+lengan sebelah kanan. Dengan konfigurasi penempatan sensor ini, tenaga medis dapat 
+mengukur tanda vital pasien secara bersamaan dan praktis.  
+ 
+(a) 
+(b) 
+Gambar 3.1 Desain 3D penjepit TriaGo: (a) Penjepit kanan dan (b) Penjepit kiri 
+3.1.1. Spesifikasi Komponen 
+Berikut ini adalah beberapa spesifikasi komponen yang digunakan pada sistem TriaGo 
+secara keseluruhan, spesifikasi lengkap komponen ditunjukkan pada Tabel 3.1. 
+Tabel 3.1 Daftar komponen TriaGo 
+Komponen 
+Spesifikasi Utama 
+Raspberry Pi 5 
+Quad-core Cortex-A76 64-bit, 16 GB RAM, USB 3.0, GPIO 40-pin 
+STM32 Black Pill 
+ARM Cortex-M4 32-bit, USB Type-C, High-speed 25 MHz, 3x I2C, 
+dan 52 pin GPIO 
+MAX30105 
+Pembacaan data digital up to 18-bit ADC, memiliki 3 LED (Red, IR, 
+dan Green), 1 fotodetektor 
+MLX90614 
+Pembacaan data digital, akurasi ±0.5°C pada rentang suhu tubuh 
+(35°C - 42°C), pengukuran non-contact dengan inframerah 
+ECG Click MikroE 
+Built-in IC MCP609 dengan rangkaian terintegrasi proteksi daya, 
+penguat, filter, dan rangkaian Driven Right Leg (DRL) 
+Baterai PowerBank 
+Kapasitas 20.000 mAh dengan output maksimum 100W 
+Layar LCD 10” 
+Resolusi layar 1280 x 800 piksel dan panel IPS dengan tipe kapasitif  
+ 
+3.1.2. Integrasi Sistem 
+Dalam sistem TriaGo, perangkat keras dan perangkat lunak dirancang agar saling 
+terhubung secara efisien. Model estimasi tekanan darah menggunakan model deep learning 
+dijalakan di Raspberry Pi 5 menggunakan Tensor Flow Lite, sedangkan model XGboost untuk 
+klasifikasi triase dijalankan menggunakan runtime ONNX. Cara eksekusi kedua algoritma ini 
+memastikan Raspberry Pi 5 bekerja secara cepat dengan hasil yang tetap optimal, walaupun 
+dijalankan di Raspberry Pi 5. Dari sisi perangkat keras, mikrokontroler STM32 Black Pill 
+bertindak sebagai unit akuisisi tingkat rendah yang membaca data dari sensor MAX30105, 
+MLX90614, dan modul ECG Click pada frekuensi sampling sebesar 400 Hz. Data yang 
+
+--- PAGE 13 ---
+didapatkan dikirimkan melalui mekanisme serial USB ke Raspberry Pi 5. Layar monitor dari 
+Waveshare terhubung langsung ke Raspberry Pi 5 melalui port HDMI untuk menampilkan 
+GUI untuk mengoperasikan alat. 
+Raspberry Pi 5 juga berfungsi sebagai klien IoT yang mengirimkan data tanda vital 
+pasien dan hasil klasifikasi triase yang diukur ke server backend Flask melalui koneksi WiFi. 
+Data yang berhasil dikirimkan akan disimpan ke dalam database MySQL sebagai rekam medis 
+elektronik. Seluruh pemrosesan dilakukan di dalam lingkungan pemrograman bahasa Python 
+untuk menangani pemrosesan yang berat, seperti pemrosesan sinyal digital, inferensi model 
+AI, pembuatan tampilan GUI, transmisi data IoT secara otomatis. Rincian pemetaan pin dari 
+masing-masing komponen dan metode komunikasi fisik antar-komponen dalam integrasi 
+sistem TriaGo dijelaskan secara lengkap pada Tabel 3.2 dan Gambar 3.2. 
+Tabel 3.2 Pemetaan pin komponen perangkat keras 
+Komponen 
+Pin 
+Terhubung ke Pin 
+Keterangan 
+MAX30105 (PPG) 
+VCC, GND, SDA,  
+SCL, INT 
+STM32 Black Pill 
+(3.3V, GND, PB7, 
+PB6, PA0) 
+Komunikasi I2C 
+MLX90614 (Suhu) 
+VCC, GND, SDA, 
+SCL 
+STM32 Black Pill 
+(3.3V, GND, PB7, 
+PB6) 
+Komunikasi I2C 
+Modul ECG Click 
+VCC, GND, OUT 
+STM32 Black Pill 
+(5V, GND, PA1) 
+Komunikasi 
+Analog 
+STM32 Black Pill 
+USB Type-C 
+USB Raspberry Pi 5 
+Pengiriman data 
+serial USB 
+Raspberry Pi 5 
+Micro-HDMI Port 
+Layar LCD 10" 
+(HDMI Port) 
+Jalur untuk 
+mengoperasikan 
+dan melihat hasil 
+alat 
+PowerBank (20.000 mAh) Output USB  
+Type-C 1 
+Raspberry Pi 5 
+(Type-C Power 
+Supply) 
+Sumber tegangan 
+5V DC 
+PowerBank (20.000 mAh) Output USB  
+Type-C 2 
+Layar LCD 10” 
+(Jack 3.5mm/Type-
+C) 
+Sumber tegangan 
+5V DC 
+ 
+ 
+(a) 
+(b) 
+Gambar 3.2 Desain kelistrikan perangkat keras TriaGo: (a) Schematics (b) PCB layout 
+ 
+3.2. Desain Perangkat Lunak 
+Perancangan perangkat lunak difokuskan pada  pengembangan arsitektur kecerdasan 
+buatan yang berjalan pada platform edge computing di Raspberry Pi 5. Desain perangkat lunak 
+
+--- PAGE 14 ---
+untuk mendapatkan parameter tanda vital tidak semuanya bisa dilakukan secara langsung 
+menggunakan persamaan matematis. Klasifikasi tingkat triase dirancang secara otomatis 
+menggunakan algoritma perangkat lunak yang pintar berdasarkan tanda vital pasien dan tingkat 
+kesadarannya. Tanda vital seperti tekanan darah perlu diekstraksi menggunakan algoritma deep 
+learning dan klasifikasi triase pintar perlu diklasifikasikan menggunakan algoritma machine 
+learning. 
+ 
+3.2.1 Model Estimasi Tekanan Darah 
+Rancangan model estimasi tekanan darah dibangun secara hybrid menggunakan dua 
+model utama, yaitu Convolutional Neural Network (CNN) dan Bidirectional Gated Recurrent 
+Unit (BiGRU). Model CNN digunakan untuk mengekstraksi informasi morfologi dari sinyal 
+ECG dan PPG yang digunakan sebagai input utama, sedangkan BiGRU digunakan untuk 
+mengekstraksi informasi temporal sekuensial dua arah antar siklus detak jantung. Selain itu, 
+model menggunakan Multi Head Self-Attention (MHSA) untuk mengevaluasi korelasi 
+temporal antar-segmen sinyal dan memberikan bobot yang relevan. Hasil akhir tekanan sistolik 
+dan diastolik dipisahkan menjadi cabang yang berbeda untuk memastikan prediksi nilai sistolik 
+dan diastolik yang lebih optimal seperti rancangan yang ditunjukkan pada Gambar 3.3. 
+ 
+Gambar 3.3 Arsitektur model estimasi tekanan darah 
+ 
+3.2.2 Model Klasifikasi Tingkat Triase 
+Model klasifikasi tingkat triase yang dibangun secara otomatis dibangun menggunakan 
+algoritma berbasis decision tree, yaitu Extreme Gradient Boosting (XGBoost). Arsitektur 
+lengkap model klasifikasi triase ini ditunjukkan pada Gambar 3.4. Model tidak hanya dirancang 
+secara pintar menggunakan algoritma XGBoost saja, tetapi juga dilengkapi dengan algoritma 
+yang dapat meningkatkan kewaspadaan model apabila terdapat pasien dengan saturasi oksigen 
+rendah dan tingkat kesadaran minim. Hasil klasifikasi dipetakan menjadi tiga tingkat 
+kegawatdaruratan, yaitu Resusitasi atau pasien kritis, darurat dan non-darurat. 
+ 
+Gambar 3.4 Model klasifikasi tingkat triase 
+ 
+3.3. Desain Antarmuka  
+Tenaga medis dapat mengoperasikan perangkat TriaGo melalui Graphical User Interface 
+(GUI) yang ditampilkan melalui monitor cukup dengan sentuhan layar saja. Tampilan dibuat 
+
+--- PAGE 15 ---
+secara menarik dan sederhana yang ditunjukkan pada Gambar 3.5. Desain tampilan terdiri dari 
+halaman utama, halaman registrasi, halaman pengambilan data, dan halaman akhir yang 
+memberikan informasi tanda vital, serta hasil akhir status klasifikasi triase. 
+ 
+(a) 
+(b) 
+ 
+(c) 
+(d) 
+(e) 
+Gambar 3.5 Tampilan GUI pada monitor tenaga medis: (a) Halaman utama, (b) Halaman 
+registrasi, (c) Halaman pemrosesan, (d) Halaman pengambilan data, dan (e) Halaman hasil 
+dan klasifikasi 
+ 
+Hasil pengukuran dari perangkat keras TriaGo ditransmisikan secara nirkabel dan 
+terhubung secara otomatis ke aplikasi web dashboard rumah sakit untuk pemantauan pasien 
+secara real-time. Seperti yang ditunjukkan pada Gambar 3.6, antarmuka web ini menyajikan 
+ringkasan statistik total pasien berdasarkan kategori triase (Resusitasi, Darurat, dan Non-
+
+--- PAGE 16 ---
+Darurat) serta memvisualisasikan denah tata letak kasur (bed layout) di IGD yang dilengkapi 
+indikator warna sesuai tingkat kegawatan pasien. Selain itu, tenaga medis dapat menekan salah 
+satu elemen kasur pada layar untuk menampilkan rincian informasi tanda vital pasien hasil 
+pengukuran secara spesifik. 
+ 
+Gambar 3.6 Tampilan website dashboard rumah sakit 
+
+--- PAGE 17 ---
+BAB IV ANALISIS FUNGSIONAL 
+4.1. Prinsip Kerja Alat 
+Sistem TriaGo dirancang sebagai perangkat yang cerdas untuk mengklasifikasi tingkat 
+triase pasien IGD dan terintegrasi secara langsung ke web dashboard IGD. Secara umum, alur 
+kerja sistem TriaGo terbagi menjadi tiga tahapan utama yang saling berkaitan, yaitu tahap 
+akuisisi data dan pemrosesan sinyal, tahap inferensi model AI tekanan darah dan klasifikasi 
+triase, serta tahap antarmuka GUI dan integrasi IoT. Akuisisi data sinyal biomedis dilakukan 
+secara bersamaan menggunakan sensor suhu MLX90614, sensor PPG MAX30105, dan modul 
+ECG Click yang terhubung ke mikrokontroler STM32. Pengambilan data sinyal PPG dan ECG 
+dilakukan pada frekuensi sampling 400 Hz dan pengukuran suhu tubuh dengan sampling 2 Hz. 
+Seluruh data yang didapatkan dikirimkan secara serial USB ke Raspberry Pi 5. Pemrosesan 
+yang dilakukan meliputi downsample, detrending, dan filtering sinyal yang kemudian 
+diekstraksi menjadi parameter tanda vital, serta output klasifikasi tingkat triase.  
+Pada tahap akhir, keseluruhan parameter akan dikirimkan ke server backend Flask dalam 
+format JSON melalui protokol HTTPS Post. Hasil pengukuran ini dapat dilihat melalui web 
+dashboard IGD yang di-deploy menggunakan layanan Microsoft Azure App Service. Data 
+pasien disimpan di dalam database MySQL sebagai rekaman medis elektronik untuk menjamin 
+kerahasiaan dan keamanan pasien. 
+ 
+4.2. Analisis Fungsional Perangkat Keras 
+4.2.1. Sensor PPG MAX30105 
+Pengujian sensor dilakukan untuk memastikan sensor dapat bekerja menghasilkan sinyal 
+PPG yang sesuai dengan kondisi fisiologis tubuh. Pengujian dilakukan dengan menggunakan 
+STM32 Black Pill untuk mengambil data dari sensor di ujung jari dan melakukan visualisasi 
+grafik menggunakan Python seperti yang digambarkan pada Gambar 4.1. Hasil menunjukkan 
+sinyal dari sinyal Red dan IR sesuai dengan kondisi fisiologis tubuh dan cukup jelas. Meskipun 
+masih terdapat noise, morfologi sinyal tetap optimal dalam menggambarkan kondisi fisiologis 
+pasien. 
+ 
+(a) 
+(b) 
+Gambar 4.1. Pengambilan data sinyal PPG Red dan IR: (a) Dokumentasi pengambilan 
+data dan (b) Hasil sinyal PPG Red dan PPG IR 
+ 
+4.2.2. Sensor Suhu MLX90614 
+Pengujian sensor suhu dilakukan di dahi dan membandingkan hasilnya dengan alat 
+komersial dengan cara kerja serupa menggunakan inframerah. Cara pengambilan data 
+dilakukan dengan mendekatkan sensor ke dahi dengan jarak yang cukup dekat agar pengukuran 
+lebih optimal seperti yang terlihat pada Gambar 4.2. Hasil yang didapatkan dari analisis 
+percobaan dan perbandingan dari sensor menunjukkan sensor suhu bekerja dengan cukup 
+dengan nilai akhir yang sama antara sensor dengan alat komersial.  
+
+--- PAGE 18 ---
+ 
+ 
+(a) 
+(b) 
+(c) 
+Gambar 4.2. Pengambilan data suhu: (a) Hasil MLX90614, (b) Dokumentasi pengukuran 
+dan (c) Termo Gun 
+ 
+4.2.3. ECG Click 
+Pengujian modul ECG Click dilakukan menggunakan konfigurasi 3 elektroda mengikuti 
+prinsip Lead I, modifikasi dilakukan dengan menempelkan elektroda di kedua pergelangan 
+tangan pasien. Elektroda negatif ditempelkan pada pergelangan tangan kanan dan elektroda 
+positif serta ground ditempelkan di pergelangan tangan kiri. Berdasarkan hasil pengambilan 
+data ECG mentah masih terdapat noise frekuensi tinggi akibat resistansi kulit yang membuat 
+morfologi sinyal P dan T tidak terlihat. Namun, puncak-puncak sinyal R tetap terlihat yang 
+menandakan morfologi sinyal ECG berhasil diekstraksi dari sensor. Masalah noise ini bukan 
+menjadi halangan bagi TriaGo, karena yang dibutuhkan adalah interval antar puncak R yang 
+tampak pada sinyal dan bisa ditangani melalui proses filter digital.  
+ 
+ 
+(a) 
+(b) 
+Gambar 4.3. Pengambilan data sinyal ECG: (a) Dokumentasi pengambilan data dan 
+(b) Hasil sinyal ECG 
+ 
+4.3. Analisis Fungsional Perangkat Lunak 
+4.3.1. Pengolahan Sinyal ECG 
+Sistem pengolahan sinyal ECG diproses dengan menerapkan filter digital berupa 
+detrending menggunakan metode double median untuk menghilangkan gangguan frekuensi 
+rendah yang ada pada sinyal dan mengembalikan sinyal ke baseline yang sebenarnya. 
+Kemudian hasilnya akan dilewatkan ke tahap lowpass filter dengan frekuensi cut off sebesar 
+35 Hz untuk memastikan gangguan frekuensi tinggi tidak diloloskan. Proses selanjutnya, sinyal 
+ECG akan dilewatkan ke metode Savitzky Golay untuk menghaluskan riple kecil pada sinyal 
+agar visualisasi lebih halus dan bersih ketika ditampilkan. Hasil dari algoritma pemrosesan 
+sinyal ECG ditampilkan pada Gambar 4.4 yang sudah bersih dari gangguan atau artefak. 
+ 
+Gambar 4.4 Hasil pengolahan sinyal ECG 
+ 
+ 
+
+--- PAGE 19 ---
+. 
+ 
+4.3.2. Pengolahan Sinyal PPG 
+Pengolahan sinyal PPG untuk dilakukan dengan memisahkan sinyal menjadi dua 
+komponen, yaitu komponen AC dan DC dari masing-masing kanal sinyal PPG. Komponen DC 
+merupakan penyerapan cahaya statis oleh jaringan dan darah non-pulsatile. Komponen AC 
+menunjukkan fluktuasi volume darah akibat denyut jantung. Hasil pemisahan ini digunakan 
+untuk menghitung nilai saturasi oksigen () dan perfusi darah untuk sebagai variabel eror dalam 
+estimasi suhu tubuh. Hasil pemisahan komponen AC dan DC digunakan untuk memperbaiki 
+baseline sinyal yang volatil agar kembali ke baseline aslinya menggunakan Cubic Spline. 
+Gangguan pada sinyal yang masih ada dihilangan melalui penerapan bandpass filter dengan 
+frekuensi cut off 0,5 – 15 Hz. Riak-riak kecil yang masih ada pada sinyal dihaluskan 
+menggunakan metode Savitzky Golay untuk memastikan hasil sinyal terhindari dari gangguan 
+atau artefak seperti yang ditunjukkan pada Gambar 4.5.  
+ 
+ 
+ 
+Gambar 4.5 Hasil pengolahan sinyal PPG 
+ 
+4.3.3. Pengujian Algoritma Denyut Jantung 
+Sinyal ECG bersih selanjutnya digunakan untuk ekstraksi denyut jantung dalam satu 
+menit. Deteksi puncak gelombang R menerapkan algoritma Pan-Tompkins yang meliputi 
+bandpass filter (5 – 18 Hz), diferensiasi, pengkuadratan, smoothing, serta moving window 
+integration (MWI) untuk memperjelas gelombang QRS. Logika thresholding dinamis 
+diterapkan untuk mencegah kesalahan deteksi akibat gelombang P atau T yang tinggi. Hasil 
+deteksi puncak R ditunjukkan pada Gambar 4.6, di mana masing-masing puncak sinyal ECG 
+menunjukkan detak jantung yang terjadi pada tubuh. Algoritma ini diuji menggunakan dataset 
+Beth Israel Deaconess Medical Center (BIDMC), dari hasil pengujian didapatkan performa 
+akurasi sebesar  99,15% dengan MAE hanya 0,695 BPM saja. 
+ 
+Gambar 4.5 Deteksi puncak gelombang R 
+ 
+4.3.4. Pengujian Algoritma Laju Pernapasan 
+Dari sinyal ECG dan PPG yang telah dibersihkan, modulasi pernapasan diekstraksi 
+berdasarkan variasi amplitudo puncak R dan gelombang denyut nadi. Sinyal modulasi tersebut 
+kemudian diinterpolasi menggunakan metode Piecewise Cubic Hermite Interpolating 
+Polynomial (PCHIP) dan dianalisis pada domain frekuensi menggunakan metode Welch, 
+sebagaimana ditunjukkan pada Gambar 4.6. Frekuensi dominan (𝑓𝑝𝑒𝑎𝑘) yang diperoleh 
+selanjutnya digunakan dalam Persamaan (2.2) untuk menghitung laju pernapasan akhir. 
+  
+
+--- PAGE 20 ---
+ 
+Gambar 4.6 Spektrum Daya (PSD) domain frekuensi sinyal respirasi 
+  
+Sebagai pengujian lanjutan, algoritma estimasi denyut jantung dan laju pernapasan diuji 
+menggunakan dataset BIDMC. Dataset ini berisi rekaman multimodal sinyal PPG dan ECG 
+dari 53 subjek. Performa algoritma menunjukkan akurasi estimasi laju pernapasan multimodal 
+mencapai akurasi 92,32% dengan nilai MAE sebesar 0,96 RPM. 
+ 
+4.3.5. Pengujian Algoritma Saturasi Oksigen 
+Pengujian pengolahan sinyal PPG dilakukan pada dataset The University of Sydney yang 
+berisikan 22 subjek. Dataset ini berisikan dua gelombang optik dengan parameter saturasi 
+oksigen yang dapat digunakan untuk menguji algoritma. Dari hasil pengujian terhadap 22 
+subjek dataset, parameter saturasi oksigen didapatkan melalui pemisahan komponen AC dan 
+DC yang sudah dilakukan pada pemrosesan sinyal PPG sebelumnya. Hasil dari pemisahan 
+komponen AC dan DC ditunjukkan pada Gambar 4.7 yang memisahkan komponen AC dan 
+DC dari sinyal PPG inframerah.  Hasil pengujian algoritma menggunakan dataset sekunder 
+berhasil mencapai performa akurasi sebesar 98,88% dan MAE hanya 1,08% saja. Performa 
+pengolahan sinyal ini telah memenuhi standar ISO 80601-2-61 dengan toleransi eror yang 
+sangat kecil.  
+ 
+ 
+Gambar 4.7 Perbedaan komponen DC dan AC sinyal PPG 
+ 
+4.3.6. Pengujian Estimasi Suhu Tubuh 
+Pengujian estimasi suhu tubuh dilakukan menggunakan dataset sekunder VitalDB 
+dengan memanfaatkan label suhu tubuh yang ada. Pengolahan sinyal dikondisikan sama 
+dengan sistem TriaGo yang dibangun, meliputi downsample,  filtering, segmentasi dan signal 
+quality index untuk memastikan hanya memproses sinyal yang sudah bersih dan optimal. 
+Parameter a, b, dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 diselesaikan melalui persamaan regresi kuadrat non-linier pada 80 
+subjek. Hasil yang didapatkan adalah parameter a sebesar 0,82991, b sebesar 0,97126, dan 
+𝐶𝑜𝑓𝑓𝑠𝑒𝑡 sebesar 1,0649. Hasil parameter ini diuji pada 20 kasus baru menghasilkan tingkat 
+kelolosan sebesar 80% (16/20) dengan rata-rata MAE sebesar 0,237 ℃. Jika dilihat secara 
+menyuruh pada 100 kasus yang digunakan, tingkat kelolosan mencapai 83% (83/100) dengan 
+nilai MAE sebesar 0,250 ℃.  
+ 
+
+--- PAGE 21 ---
+4.3.7. Pengujian Estimasi Tekanan Darah 
+Model estimasi tekanan darah dirancang menggunakan mekanisme transfer learning dari 
+dataset sekunder PulseDB ke dataset primer yang diambil pada penelitian sebelumnya. 
+Mekanisme transfer learning digunakan untuk menyesuaikan model yang sudah melewati 
+tahap pre-training ke dataset primer yang memiliki konfigurasi hardware yang serupa dengan 
+sistem TriaGo. Dataset ini berisikan sinyal ECG yang didapatkan menggunakan modul ECG 
+Click dan PPG melalui sensor MAX30105 dengan total 94 subjek. Label tekanan darah diukur 
+menggunakan alat komersial menggunakan manset. Subjek bervariasi, namun didominasi oleh 
+usia remaja 18 – 22 tahun. Hasil evaluasi model ditunjukkan pada Gambar 4.9. 
+ 
+Gambar 4.9 Evaluasi model estimasi tekanan darah 
+ 
+ 
+Hasil pelatihan dan testing untuk SBP dan DBP mendapatkan nilai MAE sebesar 4.90 
+mmHg dan 2.3 mmHg. Standar deviasi hasil pelatihan yang didapatkan dari SBP dan DBP 
+adalah 6.22 mmHg dan 3.22 mmHg yang sudah cukup sempit. Persentase akurasi model yang 
+dibangun ditunjukkan pada Tabel 4.1. Berdasarkan standar British Hypertension Society 
+(BHS), tingkat akurasi model untuk SBP termasuk dalam kategori grade B dan DBP berada di 
+kategori grade A. Hal ini menunjukkan model telah mencapai tingkat akurasi yang sangat baik 
+dan dapat diterima secara klinis. 
+ 
+Tabel 4.1 Akurasi model SBP dan DBP 
+Parameter 
+Batas Toleransi 
+Keterangan 
+(≤±5.0 mmHg) 
+(≤±10 mmHg) 
+(≤±15 mmHg) 
+SBP 
+59.76% 
+87.23% 
+97.35% 
+Grade B 
+DBP 
+89.40% 
+98.07% 
+100% 
+Grade A 
+ 
+4.3.8. Pengujian Klasifikasi Triase 
+Model klasifikasi tingkat triase dirancang menggunakan dataset sekunder yang diambil 
+dari ‘Triagegeist’ yang berisikan data-data pasien IGD dengan lima tingkat klasifikasi 
+Emergency Severity Indeks (ESI). Tingkat klasifikasi berpedoman pada Permenkes RI No. 47 
+Tahun 2018 yang mengklasifikasi tingkat triase pasien menjadi tiga prioritas, yaitu Resusitasi, 
+Darurat, dan Non-Darurat. Hasil performa model dalam memisahkan kelas berdasarkan 
+evaluasi kurva ROC-AUC dan Confusion Matrix ditunjukkan pada Gambar 4.10. 
+
+--- PAGE 22 ---
+ 
+Gambar 4.10 Hasil kurva ROC-AUC dan Confusion Matrix 
+ 
+Model yang dibangun memperoleh akurasi yang jauh lebih tinggi daripada metode 
+konvensional, seperti linear regression (LR), support vector machine (SVM), random forest 
+(RF), dan Decision Tree (DT) seperti yang ditunjukkan pada tabel 4.3. dengan akurasi sebesar 
+88.20% dan F1 Score sebesar 89.83%. Secara lebih detail, performa model per tingkat triase 
+ditampilkan pada Tabel 4.4. Evaluasi metrik menunjukkan bahwa kategori Resusitasi mencapai 
+sensitivitas 0.925 dan spesifisitas 0.998, yang mengindikasikan kemampuan deteksi pasien 
+kritis yang sangat tinggi serta minimalnya risiko false positive. Selain itu, nilai Positive 
+Predictive Value (PPV) yaitu ketepatan prediksi positif pasien benar sakit mencapai 0.948 pada 
+kelas Resusitasi, sedangkan Negative Predictive Value (NPV) yaitu kepastian bahwa pasien 
+terprediksi negatif memang benar tidak kritis mencapai 0.997. Performa konsisten juga 
+ditunjukkan pada kategori Darurat dengan sensitivitas 0.878 dan PPV 0.897 serta kategori Non 
+Darurat dengan sensitivitas 0.883 dan NPV 0.910. Hasil ini membuktikan bahwa model tidak 
+hanya unggul secara komputasi tetapi juga memenuhi standar keselamatan medis dalam 
+memprioritaskan penanganan pasien di IGD. 
+Tabel 4.2 Perbandingan performma model machine learning. 
+Model 
+Akurasi 
+F1-Skor 
+Latensi Inferensi 
+(ms/sample) 
+Linear Regression 
+0.8848 
+0.8940 
+0.0005 
+Support Vector Machine 
+0.8911 
+0.8992 
+0.3280 
+Random Forest 
+0.8845 
+0.8929 
+0.0042 
+Decision Tree 
+0.7613 
+0.7774 
+0.0037 
+Xtreme Gradien Boost 
+0.9067 
+0.9142 
+0.0037 
+ 
+Tabel 4.3 Performa setiap tingkat triase 
+Indikator 
+Resusitasi 
+Darurat 
+Non-Darurat 
+Sensitivitas 
+0.925 
+0.878 
+0.883 
+Spesifitas 
+0.998 
+0.887 
+0.890 
+Positive Predictive Value 
+0.948 
+0.897 
+0.858 
+Negative Predictive Value 
+0.997 
+0.866 
+0.910 
+ 
+4.4. Kinerja Prototipe 
+Setelah melakukan pengujian perangkat keras dari masing-masing sensor dan algoritma 
+pemrosesan perangkat lunak, sistem kemudian dirancang sebagaimana pada Gambar 4.11. 
+Kinerja prototipe diuji dengan bantuan subjek dalam kondisi sehat dan berada pada lingkungan 
+
+--- PAGE 23 ---
+Institut Teknologi Sepuluh Nopember. Subjek diinstruksikan untuk menggunakan prototipe 
+sistem TriaGo yang dibangun, terutama dalam pengambilan data tanda vital. 
+ 
+Gambar 4.11 Hasil rancangan TriaGo 
+ 
+Pengujian juga dilakukan pada kondisi yang mungkin terjadi di kondisi nyata ruang IGD, 
+di mana subjek akan diminta menggunakan prototipe pada posisi normal (duduk), 
+menggunakan kursi roda, dan berbaring di tempat tidur. Pengujian ini dilakukan untuk melihat 
+fleksibilitas prototipe yang dibangun agar dapat digunakan oleh berbagai macam pasien. Posisi 
+pengambilan ditunjukkan pada Gambar 4.12. Hasil penggunaan di berbagai kondisi ini 
+menunjukkan kemudahan penggunaan dari prototipe yang telah dibuat. 
+ 
+(a) 
+(b) 
+(c) 
+Gambar 4.12 Dokumentasi penggunaan prototipe: (a) Normal, (b) Di kursi roda, dan (c) 
+Berbaring 
+ 
+Hasil keseluruhan parameter yang telah diuji telah memenuhi standar klinis sesuai 
+dengan masing-masing parameter fisiologis utama. Keseluruhan hasil pengujian disajikan 
+secara lengkap pada Tabel 4.5 berikut. 
+Tabel 4.4. Hasil performa masing-masing parameter  
+Parameter 
+Hasil Evaluasi 
+Keterangan 
+Denyut Jantung 
+MAE: 0.695 BPM / Akurasi: 
+99.15% 
+Memenuhi standar AAMI 
+EC13 
+Laju Pernapasan 
+MAE: 0.96 RPM / Akurasi: 
+92.32% 
+Memenuhi ISO 80601-2-87 
+Saturasi Oksigen 
+MAE: 1.08% / Akurasi: 
+98.89% 
+Memenuhi ISO 80601-2-61 
+
+--- PAGE 24 ---
+Suhu Tubuh 
+MAE: 0,250 ℃ / Akurasi: 
+83% 
+Memenuhi ISO 80601-2-56 
+Tekanan Darah Sistolik 
+(mmHg) 
+Akurasi (MAE ≤ 5 / 10 / 15): 
+68,8% / 83,9% / 96,4% 
+Memenuhi grade B 
+berdasarkan 
+British Hypertension Society 
+(BHS) 
+Tekanan Darah Diastolik 
+(mmHg) 
+Akurasi (MAE ≤ 5 / 10 / 15): 
+73,2% / 90,2% / 95,5% 
+Memenuhi grade A 
+berdasarkan 
+British Hypertension Society 
+(BHS) 
+ 
+4.5. Pengujian Sistem IoT 
+Pengujian sistem IoT bertujuan memastikan hasil triase terkirim secara end-to-end dan 
+real-time dari perangkat hingga ke web dashboard IGD. Setelah pengolahan sinyal dan 
+klasifikasi selesai di Raspberry Pi 5, hasilnya dikemas dalam format JSON. Paket ini berisi 
+nilai tanda vital, skor GCS, skor nyeri, dan kategori triase. Data dikirim melalui protokol 
+MQTT ke broker HiveMQ Cloud dengan koneksi terenkripsi TLS dan QoS 1, sehingga setiap 
+pesan dijamin sampai. Data juga disimpan sementara di perangkat, sehingga tidak hilang saat 
+jaringan terputus dan dikirim ulang otomatis setelah koneksi pulih. 
+Backend Flask menerima dan memvalidasi data, lalu menyimpannya ke basis data 
+MySQL. Setelah itu, backend mengalokasikan bed sesuai zona triase secara otomatis. Hasilnya 
+langsung ditampilkan pada web dashboard IGD melalui WebSocket, dan nomor bed dikirim 
+kembali ke layar perangkat. Gambar 4.13 menunjukkan proses pengiriman data dari perangkat 
+hingga tampil di dashboard 
+(a) 
+- 
+(b) 
+Gambar 4.13 Hasil uji pengiriman data: (a) Log pengiriman data hasil pengukuran ke 
+server dan (b) Web Dashboard monitoring IGD 
+
+--- PAGE 25 ---
+BAB V HASIL IMPLEMENTASI DAN RENCANA PENGEMBANGAN 
+5.1. Hasil Implementasi Purwarupa 
+Implementasi untuk realisasi fungsi utama dari sistem TriaGo telah mencakup integrasi 
+komponen perangkat keras, pemrograman perangkat lunak, komunikasi dan pemrosesan data, 
+hingga pengujian pada subjek sehat secara langsung. Hasil implementasi perangkat 
+ditunjukkan sebagaimana pada Gambar 5.1 ketika digunakan oleh subjek dan melakukan 
+pengukuran. Saat ini, progress pengerjaan sistem TriaGo telah mencapai progress pengerjaan 
+sebesar 70%, di mana komponen utama seperti sensor MAX30105, MLX90614, modul ECG 
+Click, STM32 Black Pill, Raspberry Pi 5, PowerBank, dan layar LCD telah terintegrasi menjadi 
+satu kesatuan alat yang dapat digunakan. Desain perangkat TriaGo dibuat secara ringkas 
+dengan penempatan sensor yang strategis hingga memungkinkan tenaga medis dapat mengukur 
+berbagai tanda vital dalam satu alat saja. 
+(a) 
+(b) 
+Gambar 5.1 Prototipe TriaGo saat digunakan: (a) Proses pengambilan data dan (b) 
+Penempatan sensor MAX30105, MLX90614 dan elektroda di sisi kanan 
+ 
+ 
+Adapun hasil implementasi lebih detail yang telah dilakukan adalah sebagai berikut: 
+1. Pembuatan purwarupa awal dua penjepit berbasis multisensor untuk pengukuran tanda 
+vital. 
+2. Integrasi sensor MAX30105, MLX90614, dan modul ECG Click dengan mikrokontroler 
+STM32 Black Pill dengan pengiriman data secara serial USB ke Raspberry Pi 5. 
+3. Integrasi Raspberry Pi 5 dalam menerima data dari mikrokontroler dan menampilkan 
+output ke layar monitor. 
+4. Pengujian awal pada masing-masing kerja komponen perangkat keras maupun 
+pengembangan perangkat lunak. 
+5. Membuat model pintar untuk mengukur tekanan darah secara non-invasif dan 
+mengklasifikasikan hasil triase berdasarkan input tanda vital dan kesadaran pasien. 
+6. Pengembangan database MySQL dan proses pengujian pengiriman data dari perangkat 
+keras hingga dapat ditampilkan di website menggunakan Azure App Service. 
+ 
+5.2. Rencana Implementasi 
+Dari tahapan purwarupa yang telah dikembangkan menuju implementasi nyata di 
+lingkungan nyata Instalasi Gawat Darurat (IGD) memerlukan penyempurnaan perangkat keras, 
+pemrosesan perangkat lunak, hingga sistem integrasi IoT. Oleh karena itu, rencana 
+pengembangan difokuskan pada aspek peningkatan ketahanan sistem terhadap gangguan 
+
+--- PAGE 26 ---
+akibat gerakan atau interferensi lingkungan IGD, validasi data tanda vital pada subjek 
+langsung, dan memastikan pengembangan berdasarkan standar keselamatan alat medis. 
+Rincian rencana pengembangan meliputi: 
+1. Peningkatan pengolahan sinyal biomedis untuk mengekstraksi data tanda vital pasien 
+yang sesuai dengan standar keselamatan medis. 
+2. Pengambilan dataset primer sebagai validasi data tanda vital, serta model tekanan darah 
+non-invasif dan klasifikasi tingkat triase di lingkungan nyata. 
+3. Re-evaluasi model kecerdasan buatan berbasis dataset primer untuk meningkatkan 
+akurasi tanda vital dan generalisasi klasifikasi pasien. 
+4. Pengembangan desain sistem dan antarmuka (GUI) dengan menerapkan System Usability 
+Scale (SUS) untuk memastikan kemudahan pengguna dalam mengoperasikan atau 
+menggunakan alat. 
+5. Melakukan pengujian implementasi perangkat di lingkungan Instalasi Gawat Darurat 
+(IGD) secara langsung. 
+ 
+5.3. Tautan Video 
+Tautan video dapat diakses di https://youtu.be/9eFyVXH_688, yang menampilkan 
+purwarupa sistem TriaGo saat digunakan pada pasien dengan posisi berbaring. Sistem TriaGo 
+dirancang untuk mengekstraksi tanda vital pasien dan melakukan klasifikasi tingkat triase 
+secara otomatis. Sistem TriaGo dapat bekerja dengan cepat, responsif, dan mudah digunakan 
+untuk meningkatkan efektivitas dan optimalisasi alur kerja tenaga medis di IGD. 
+ 
+ 
+
+--- PAGE 27 ---
+DAFTAR PUSTAKA 
+[1] 
+“JDIH Kementerian Kesehatan RI.” Diakses: 7 Agustus 2026. [Daring]. 
+Tersedia pada: https://jdih.kemkes.go.id/documents/peraturan-menteri-
+kesehatan-nomor-47-tahun-2018 
+[2] 
+A. Budiyanto Adi Putra, A. Adhiwijaya, E. Yustilawati, P. S. Studi, F. 
+Kedokteran dan Ilmu Kesehatan, dan U. Alauddin Makassar, “The Relationship 
+Of Work Experience With Triage Decision Making Of Nurses At The 
+Emergency Room Of Syekh Yusuf Hospital,” 2024. 
+[3] 
+“Emergency department volumes surge 40% since 2020 | HFMA.” Diakses: 11 
+Juli 2026. [Daring]. Tersedia pada: https://www.hfma.org/fast-finance/hospital-
+ed-volumes-increase/ 
+[4] 
+R. Karina dan M. Basabih, “The Role of The Triage Nurse Deployment in 
+Reducing Triage Time in Emergency Department,” Jurnal ARSI : Administrasi 
+Rumah Sakit Indonesia, vol. 11, no. 3, Okt 2025, doi: 10.7454/arsi.v11i3.1219. 
+[5] 
+M. Khajehgoodari, B. Najafi, A. S. Matanagh, M. Lotfi, dan R. Shabanloei, 
+“Nurse triage errors and their relationship with patient outcomes in emergency 
+departments,” Int. J. Afr. Nurs. Sci., vol. 23, hlm. 100902, Jan 2025, doi: 
+10.1016/J.IJANS.2025.100902. 
+[6] 
+H. Habib, S. Sulistio, I. A. Albar, R. M. Mulyana, dan N. Yundiarto, 
+“Validation of the cipto triage method: A single-centre study from indonesia.,” 
+2020, Dove Medical Press Ltd. doi: 10.21203/RS.2.20170/V1. 
+[7] 
+E. Ullah dkk., “Workload involved in vital signs-based monitoring & 
+responding to deteriorating patients: A single site experience from a regional 
+New Zealand hospital,” Heliyon, vol. 8, no. 10, hlm. e10955, Okt 2022, doi: 
+10.1016/J.HELIYON.2022.E10955. 
+[8] 
+A. Sapra, A. Malik, dan P. Bhandari, “Vital Sign Assessment,” StatPearls, Mei 
+2023, Diakses: 11 Juli 2026. [Daring]. Tersedia pada: 
+https://www.ncbi.nlm.nih.gov/books/NBK553213/ 
+[9] 
+I. I. Geneva, B. Cuzzo, T. Fazili, dan W. Javaid, “Normal body temperature: A 
+systematic review,” Open Forum Infect. Dis., vol. 6, no. 4, 2019, doi: 
+10.1093/ofid/ofz032. 
+[10] “Target Heart Rates Chart | American Heart Association.” Diakses: 3 Juli 2026. 
+[Daring]. Tersedia pada: https://www.heart.org/en/healthy-living/exercise-and-
+physical-activity/fitness-basics/target-heart-rates 
+[11] C. Chourpiliadis dan A. Bhardwaj, “Physiology, Respiratory Rate,” StatPearls, 
+Sep 2022, Diakses: 3 Juli 2026. [Daring]. Tersedia pada: 
+https://www.ncbi.nlm.nih.gov/books/NBK537306/ 
+[12] B. B. Hafen dan S. Sharma, “Oxygen Saturation,” Oxygen Saturation - 
+StatPearls - NCBI Bookshelf (nih.gov), hlm. 4–9, Nov 2022, Diakses: 3 Juli 
+2026. [Daring]. Tersedia pada: 
+https://www.ncbi.nlm.nih.gov/books/NBK525974/ 
+[13] C. Johansson, L. Johansson, M. Eriksson, J. Andersson, dan M. M. Lind, 
+“Normal Blood Pressure, High Normal Blood Pressure, and Risk of Incident 
+Atrial Fibrillation: A Population‐Based Cohort Study,” Health Sci. Rep., vol. 8, 
+no. 7, hlm. e71002, Jul 2025, doi: 10.1002/HSR2.71002. 
+[14] M. N. Imtiaz dan N. Khan, “Pan-Tompkins++: A Robust Approach to Detect R-
+peaks in ECG Signals,” Proceedings - 2022 IEEE International Conference on 
+Bioinformatics and Biomedicine, BIBM 2022, hlm. 2905–2912, 2022, doi: 
+10.1109/BIBM55620.2022.9995552. 
+
+--- PAGE 28 ---
+[15] P. P. Banik, S. Hossain, T. H. Kwon, H. Kim, dan K. D. Kim, “Development of 
+a wearable reflection-type pulse oximeter system to acquire clean ppg signals 
+and measure pulse rate and spo2 with and without finger motion,” Electronics 
+(Switzerland), vol. 9, no. 11, hlm. 1–26, Nov 2020, doi: 
+10.3390/electronics9111905. 
+[16] X. Ren, Y. Zhang, H. Yang, K. Li, X. Ye, dan C. Zhou, “Core body temperature 
+estimation model with thermal contact resistance compensation,” Measurement, 
+vol. 241, hlm. 115687, Feb 2025, doi: 
+10.1016/J.MEASUREMENT.2024.115687. 
+[17] C. El-Hajj dan P. A. Kyriacou, “Cuffless blood pressure estimation from PPG 
+signals and its derivatives using deep learning models,” Biomed. Signal Process. 
+Control, vol. 70, hlm. 102984, Sep 2021, doi: 10.1016/J.BSPC.2021.102984. 
+[18] W. Long dan X. Wang, “BPNet: A multi-modal fusion neural network for blood 
+pressure estimation using ECG and PPG,” Biomed. Signal Process. Control, 
+vol. 86, Sep 2023, doi: 10.1016/j.bspc.2023.105287. 
+[19] H. Jiang dkk., “Machine learning-based models to support decision-making in 
+emergency department triage for patients with suspected cardiovascular 
+disease,” Int. J. Med. Inform., vol. 145, hlm. 104326, Jan 2021, doi: 
+10.1016/J.IJMEDINF.2020.104326. 
+[20] “MAX30105 Datasheet and Product Info | Analog Devices.” Diakses: 11 Juli 
+2026. [Daring]. Tersedia pada: 
+https://www.analog.com/en/products/max30105.html 
+[21] “Datasheet for MLX90614 I Melexis.” Diakses: 11 Juli 2026. [Daring]. 
+Tersedia pada: 
+https://www.melexis.com/en/documents/documentation/datasheets/datasheet-
+mlx90614 
+[22] “ECG Click Board (Electrocardiography Measurement) - MikroElektronika.” 
+Diakses: 11 Juli 2026. [Daring]. Tersedia pada: https://www.mikroe.com/ecg-
+click?srsltid=AfmBOoq7R4UEv0zrsxHvh2XRU4GVzYXpUKj0rN4EC-
+MJBt0KPLWhUM7K 
+[23] “Meet the STM32 ‘Black Pill’ Development Board - Electronics-Lab.” Diakses: 
+26 Juli 2026. [Daring]. Tersedia pada: https://www.electronics-lab.com/meet-
+stm32-black-pill-development-board/ 
+[24] “Raspberry Pi 5 – Raspberry Pi.” Diakses: 11 Juli 2026. [Daring]. Tersedia 
+pada: https://www.raspberrypi.com/products/raspberry-pi-5/ 
+[25] P. Rajan, “Integrating IoT Analytics into Marketing Decision Making: A Smart 
+Data-Driven Approach,” International Journal of Data Informatics and 
+Intelligent Computing, vol. 3, no. 1, hlm. 12–22, Feb 2024, doi: 
+10.59461/IJDIIC.V3I1.92. 
+  
+

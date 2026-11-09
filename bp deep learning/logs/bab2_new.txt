@@ -1,0 +1,201 @@
+=== PAGE 7 ===
+7 ---
+BAB II METODE DASAR PENGEMBANGAN KARYA 
+2.1. Arsitektur Sistem TriaGo 
+Sistem TriaGo dirancang untuk dapat melakukan pengambilan data tanda vital secara 
+bersamaan melalui dua penjepit di masing-masing tangan kanan dan kiri. Penjepit di tangan 
+kanan berisi elektroda negatif, sensor suhu, dan sensor PPG, sedangkan di tangan kiri berisi 
+elektroda positif dan ground yang berfungsi untuk memperoleh sinyal ECG. Masing-masing 
+sensor terhubung ke mikrokontroler STM32 Black Pill, di mana sensor suhu dan sensor PPG 
+terhubung menggunakan protokol I2C dan modul ECG secara analog. Pengambilan data 
+dilakukan secara presisi secara bersamaan di dalam satu unit mikrokontroler selama satu menit 
+pengukuran. Setelah pengambilan data selesai, data yang terkumpul dikirimkan ke Raspberry 
+Pi 5 secara serial untuk memulai proses pengolahan sinyal menjadi parameter tanda vital. 
+Pengolahan sinyal di dalam Raspberry Pi 5 meliputi pembersihan sinyal dari gangguan 
+gerak atau interferensi komponen, ekstraksi parameter tanda vital, serta inferensi model 
+kecerdasan buatan untuk menentukan tingkat triase pasien secara real-time. Seluruh hasil 
+pengolahan tersebut langsung ditampilkan pada antarmuka GUI layar sentuh dan dikirimkan 
+secara nirkabel melalui protokol MQTT ke server rumah sakit. Hasil yang didapatkan dari 
+pengukuran perangkat fisik juga dapat langsung terlihat di dashboard web IGD secara real-
+time. Alur kerja sistem disusun dengan lebih rinci pada Gambar 2.1. 
+ 
+Gambar 2.1 Arsitektur Sistem TriaGo 
+ 
+2.2. Pengolahan Sinyal Biomedis 
+Dalam sistem klasifikasi tingkat triase pasien, sensor sinyal biomedis yang digunakan 
+memerlukan cara pemrosesan yang berbeda sesuai dengan karakteristik masing-masing sinyal. 
+Pemrosesan ini sangat penting untuk menghasilkan hasil tanda vital yang optimal. Pengukuran 
+tanda vital sangat penting untuk menilai kondisi kesehatan, di mana setiap parameter memiliki 
+rentang normal sebagai acuan. Suhu tubuh mencerminkan keseimbangan produksi dan 
+pengeluaran panas, dengan kisaran normal 35,01°C - 37,76°C [9]. Denyut jantung 
+mencerminkan aktivitas kardiovaskular dengan rentang normal 60 – 100 detak per menit [10]. 
+Laju pernapasan berkisar antara 12–20 napas per menit pada orang dewasa [11]. Kadar oksigen 
+
+
+=== PAGE 8 ===
+8 ---
+dalam darah menunjukkan efektivitas pertukaran gas dengan nilai normal 95%–100% [12]. 
+Tekanan darah menunjukkan tekanan pada dinding arteri dengan nilai normal sekitar 120/80 
+mmHg [13]. 
+ 
+2.2.1. Denyut Jantung 
+Parameter denyut jantung didapatkan melalui algoritma Pan Tompkins melalui sinyal 
+ECG [14]. Algoritma memproses sinyal ECG dengan bandpass filter cut-off 5 – 18 Hz untuk 
+menghilangkan gangguan pada sinyal. Kemudian melakukan diferensiasi, pengkuadratan, 
+penghalusan dan integrasi moving window untuk memudahkan deteksi puncak gelombang R 
+pada sinyal ECG. Setelah didapatkan puncak-puncak gelombang R, perhitungan denyut 
+jantung dihitung dengan membagi 60 dengan nilai rata-rata interval antar puncak R yang telah 
+didapatkan. Rumus perhitungan denyut jantung didefinisikan pada Persamaan (2.1). 
+𝐻𝑅=
+60
+𝑅𝑅̅
+   𝑖𝑛𝑡𝑒𝑟𝑣𝑎𝑙
+ 
+(2.1) 
+ 
+2.2.2. Laju Pernapasan 
+Laju pernapasan menggambarkan siklus pernapasan seseorang dalam waktu satu menit. 
+Parameter laju pernapasan didapatkan melalui ekstraksi modulasi pernapasan pada sinyal ECG 
+dan PPG [15]. Pernapasan memodulasi amplitudo puncak (amplitude modulation, AM), 
+interval detak jantung (frequency modulation, FM), dan pergeseran garis dasar (baseline 
+wandering, BW). Modulasi dari kedua sinyal digabungkan sehingga estimasi tetap dapat 
+dilakukan meskipun salah satu sinyal terganggu. Sinyal modulasi diinterpolasi secara merata 
+menggunakan Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) dengan frekuensi 
+sampling 4,0 Hz, kemudian difilter pada rentang frekuensi fisiologis 0,167–0,70 Hz (10–42 
+napas/menit). Selanjutnya, spektrum daya dihitung menggunakan metode Welch Power 
+Spectral Density (PSD) dengan pembobotan berdasarkan Respiratory Quality Index (RQI) 
+untuk menentukan frekuensi pernapasan dominan (fₚₑₐₖ). Nilai laju pernapasan kemudian 
+dihitung menggunakan Persamaan (2.2). 
+𝑅𝑅= 60 × 𝑓𝑝𝑒𝑎𝑘 
+(2.2) 
+ 
+2.2.3. Saturasi Oksigen 
+Sinyal PPG yang didapatkan dari sensor MAX30105 memberikan dua gelombang optik, 
+yaitu gelombang inframerah dan merah yang dapat digunakan untuk mengukur nilai saturasi 
+oksigen (SpO2) dalam tubuh. Parameter saturasi oksigen diukur dengan memisahkan 
+komponen pulsatile (AC) dan komponen non-pulsatile (DC) dari kedua gelombang tersebut 
+[15]. Rasio absorpsi optik (𝑅) antara komponen AC dan DC kedua gelombang dihitung melalui 
+Persamaan (2.3). 
+𝑅=
+(𝐴𝐶𝑟𝑒𝑑
+𝐷𝐶𝑟𝑒𝑑)
+(𝐴𝐶𝑖𝑟
+𝐷𝐶𝑖𝑟)
+ 
+(2.3) 
+Nilai rasio R dihitung pada setiap denyut, kemudian nilai median digunakan sebagai R akhir 
+setelah denyut yang terganggu artefak gerak dihilangkan. Nilai rasio R tersebut kemudian akan 
+digunakan dalam persamaan regresi linear untuk mengalibrasi nilai SpO₂ yang diukur melalui 
+Persamaan (2.4). 
+ 𝑆𝑝𝑂2(%) = 107,83 −25 ⋅𝑅 
+(2.4) 
+Persamaan tersebut menggunakan pendekatan kalibrasi linear yang sesuai untuk rentang 
+saturasi oksigen yang sempit, dengan konstanta yang didapatkan melalui kalibrasi 
+menggunakan dataset PhysioNet Pulse Transit Time PPG. Dibandingkan persamaan kuadratik 
+
+
+=== PAGE 9 ===
+9 ---
+sebelumnya yang cenderung menghasilkan nilai konstan sekitar 98%, persamaan ini 
+memberikan penurunan SpO₂ yang sebanding dengan kenaikan nilai R sehingga kondisi 
+desaturasi dapat terdeteksi. 
+ 
+2.2.4. Estimasi Suhu Tubuh 
+Suhu tubuh di pergelangan tangan tidak menggambarkan nilai suhu tubuh yang sesuai. 
+Estimasi suhu tubuh (𝑇𝑐) diterapkan menggunakan model matematis untuk memastikan hasil 
+pengukuran tepat. Pengukuran suhu tubuh dapat diestimasi menggunakan informasi suhu kulit 
+(𝑇𝑠), suhu lingkungan (𝑇𝑎𝑚𝑏) dan modulasi perfusi (PI) optik sinyal PPG [16]. Perpindahan 
+panas dari tubuh ke permukaan kulit dipengaruhi oleh laju perfusi darah dan konduktivitas 
+termal jaringan. Pengukuran suhu tubuh diestimasi menggunakan Persamaan (2.5). 
+𝑇𝑐= 𝑇𝑠+ 𝑇𝑠−𝑇𝑎𝑚𝑏
+𝑎+ 𝑏× 𝑃𝐼+ 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 
+(2.5) 
+Di mana nilai a, b, dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 didapatkan melalui kalibrasi dan pengukuran berulang untuk 
+memastikan pengukuran suhu tubuh yang akurat. Variabel a menunjukkan resistansi konduktif 
+dalam tubuh, b menunjukkan sensitivitas perfusi darah, dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 sebagai koefisien nilai 
+metabolik yang tidak dimodelkan. Nilai PI didapatkan melalui rasio antara komponen AC dan 
+DC dari sinyal PPG yang kemudian diubah dalam skala persentase seperti pada persamaan 2.6. 
+𝑃𝐼= 𝐴𝐶
+𝐷𝐶× 100% 
+(2.6) 
+ 
+2.3. Kecerdasan Buatan 
+Kecerdasan buatan diterapkan untuk mengekstraksi informasi tekanan darah yang tidak 
+bisa didapatkan melalui pemrosesan sederhana dan klasifikasi tingkat triase yang memiliki 
+hubungan non-linear dari masing-masing parameter. Tekanan darah dapat diestimasi 
+menggunakan kecerdasan buatan menggunakan sinyal ECG dan sinyal PPG. Sinyal PPG 
+beserta turunannya (VPG dan APG) memberikan informasi elastisitas pembuluh darah [17], 
+sedangkan kombinasi sinyal ECG dan PPG mengekstrak variabel Pulse Transit Time (PTT) 
+[18]. Seluruh fitur multimodal ini diolah menggunakan arsitektur 1D-CNN untuk mengekstrak 
+morfologi gelombang lokal [18], Bidirectional Gated Recurrent Unit (BiGRU) digunakan 
+untuk memodelkan ketergantungan sekuensial dua arah antar detak jantung [17]. Klasifikasi 
+triase pada sistem TriaGo mengadopsi standar resmi Permenkes RI No. 47 Tahun 2018. 
+Peraturan ini mendefinisikan triase menjadi empat prioritas, yaitu Hitam, Resusitasi, Darurat, 
+dan Non-Darurat [1]. Sistem TriaGo mengklasifikasi triase ke dalam tiga kelompok utama 
+mengecualikan kategori hitam, karena kategori hitam digunakan untuk mengklasifikasikan 
+pasien meninggal pada saat tiba.  
+ Algoritma kecerdasan untuk mengklasifikasikan tingkat triase diterapkan menggunakan 
+algoritma Extreme Gradient Boosting (XGBoost) karena memiliki kemampuan klasifikasi 
+yang lebih baik dibandingkan model algoritma dasar lainnya [19]. 
+ 
+2.4. Sistem Benam 
+Terdapat beberapa komponen perangkat keras yang mendukung kinerja sistem TriaGo 
+untuk mengklasifikasikan tingkat triase dengan cepat dan akurat. Beberapa komponen tersebut 
+ditampilkan pada Gambar 2.2. 
+
+
+=== PAGE 10 ===
+10 ---
+ 
+Gambar 2.2 Komponen sistem benam TriaGo 
+ 
+2.4.1. Sensor Biomedis 
+Terdapat tiga sensor utama yang digunakan untuk mendukung sistem TriaGo yang 
+dibangun, yaitu MAX30105, MLX90614, dan modul ECG Click dari MikroE. Sensor 
+MAX30105 merupakan modul optik yang memiliki sensitivitas tinggi yang berfungsi utama 
+untuk memantau denyut jantung dan saturasi oksigen melalui sinar optik [20]. Sensor 
+MLX90614 merupakan sensor suhu yang bekerja dengan prinsip kerja inframerah yang 
+memiliki kemampuan mengukur suhu objek dan suhu lingkungan secara bersamaan secara 
+non-invasif [21]. Modul ECG Click telah dirancang secara khusus menerapkan tujuh blok 
+rangkaian yang mencakup proteksi daya, penguat, filter high-pass dan low-pass, serta sirkuit 
+Driven Right Leg (DRL) untuk menghasilkan sinyal ECG analog yang bersih dan aman [22]. 
+Sensor yang dipilih telah dipastikan memiliki tingkat akurasi dan sensitivitas yang sesuai 
+dengan standar keselamatan dan kesehatan. 
+ 
+2.4.2. Pemrosesan 
+Pengambilan data dari sensor ditangani oleh mikrokontroler STM32 Black Pill dan 
+pemrosesan utama dilakukan di edge computing Raspberry Pi 5. STM32 Black Pill memiliki 
+kecepatan pemrosesan tinggi, ADC 12-bit untuk konversi sinyal analog dengan presisi tinggi, 
+serta dukungan antarmuka I2C dan Native USB untuk transmisi data yang cepat [23]. 
+Raspberry Pi 5 memiliki kemampuan pemrosesan Quad-core 2.4GHz dan RAM LPDDR4X 
+yang menjadikan komponen ini sangat ideal sebagai platform edge computing yang cepat [24]. 
+Pengiriman data dilakukan secara serial USB dari STM32 ke Raspberry Pi 5. Unit edge 
+computing digunakan untuk mengolah sinyal, mengekstraksi parameter tanda vital, dan 
+menjalankan algoritma kecerdasan buatan.   
+ 
+2.5. Internet of Things (IoT) 
+Internet of Things (IoT) merupakan teknologi yang dapat menghubungkan perangkat fisik ke 
+jaringan internet untuk melakukan pertukaran/pengiriman data secara otomatis dan real-time 
+untuk mendukung pengambilan keputusan berbasis data [25]. 
+ 
+2.5.1. Komunikasi Data MQTT 
+Pada sistem TriaGo, arsitektur komunikasi IoT diimplementasikan menggunakan 
+protokol MQTT yang ringan dan sesuai untuk perangkat IoT. Raspberry Pi 5 bertindak sebagai 
+publisher yang mengirimkan data hasil ekstraksi parameter tanda vital serta status triase dalam 
+format JSON ke broker HiveMQ Cloud melalui koneksi Wi-Fi terenkripsi TLS dengan QoS 1, 
+sehingga pesan tetap terkirim meskipul jaringan sempat terputus. 
+  
+
+
+=== PAGE 11 ===
+11 ---
+2.5.2. Website dan Database MySQL 
+Backend berbasis Flask menerima data hasil triase dengan melakuakan subscribe topik 
+MQTT yang dikirimkan Raspberry Pi 5, memvalidasi setiap pesan, mencegah data ganda, lalu 
+menyimpannya secara terstruktur ke basis data MySQL sebagai riwayat hasil triase pasien. 
+Data kemudian diteruskan ke web dashboard melalui Socket.IO sehingga meja perawat dan 
+monitor IGD menerima pembaruan secara real-time. Arsitektur ini memberikan keunggulan 
+berupa pengiriman data yang andal serta kemudahan integrasi dengan sistem pelayanan di 
+rumah sakit. 
+ 
+

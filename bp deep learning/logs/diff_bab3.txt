@@ -1,0 +1,32 @@
+--- bab3_old
++++ bab3_new
+@@ -55,12 +55,12 @@
+ didapatkan dikirimkan melalui mekanisme serial USB ke Raspberry Pi 5. Layar monitor dari 
+ Waveshare terhubung langsung ke Raspberry Pi 5 melalui port HDMI untuk menampilkan 
+ GUI untuk mengoperasikan alat. 
+-Raspberry Pi 5 juga berfungsi sebagai klien IoT yang mengirimkan data tanda vital 
+-pasien dan hasil klasifikasi triase yang diukur ke server backend Flask melalui koneksi WiFi. 
+-Data yang berhasil dikirimkan akan disimpan ke dalam database MySQL sebagai rekam medis 
+-elektronik. Seluruh pemrosesan dilakukan di dalam lingkungan pemrograman bahasa Python 
+-untuk menangani pemrosesan yang berat, seperti pemrosesan sinyal digital, inferensi model 
+-AI, pembuatan tampilan GUI, transmisi data IoT secara otomatis. Rincian pemetaan pin dari 
++Raspberry Pi 5 juga berfungsi sebagai publisher IoT yang mengirimkan data tanda vital 
++pasien dan hasil klasifikasi triase ke broker MQTT melalui koneksi Wi-Fi, kemudian diterima 
++oleh backend Flask dan disimpan ke dalam basis data MySQL sebagai riwayat hasil triase. 
++Seluruh pemrosesan dilakukan di dalam lingkungan pemrograman bahasa Python untuk 
++menangani pemrosesan yang berat, seperti pemrosesan sinyal digital, inferensi model AI, 
++pembuatan tampilan GUI, transmisi data IoT secara otomatis. Rincian pemetaan pin dari 
+ masing-masing komponen dan metode komunikasi fisik antar-komponen dalam integrasi 
+ sistem TriaGo dijelaskan secara lengkap pada Tabel 3.2 dan Gambar 3.2. 
+ Tabel 3.2 Pemetaan pin komponen perangkat keras 
+@@ -193,5 +193,8 @@
+ satu elemen kasur pada layar untuk menampilkan rincian informasi tanda vital pasien hasil 
+ pengukuran secara spesifik. 
+  
+-Gambar 3.6 Tampilan website dashboard rumah sakit 
+-
++(a) 
++(b) 
++Gambar 3.6 Tampilan website dashboard rumah sakit: (a) Tampilan bed monitoring utama, 
++(b) Tampilan opsi memasukkan identitas pasien
++

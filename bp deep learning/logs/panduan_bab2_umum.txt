@@ -1,0 +1,392 @@
+=== PAGE 9 ===
+9 ---
+ 
+5 
+ 
+BAB II 
+PENJELASAN UMUM 
+ 
+A. Kompetisi 
+Kegiatan kompetisi dalam GEMASTIK XIX dilaksanakan dalam 2 (dua) 
+babak kompetisi untuk semua cabang kompetisi, yaitu Babak Penyisihan dan 
+Babak Final. Babak Penyisihan wajib diikuti oleh seluruh tim peserta pada setiap 
+cabang kompetisi. Babak Final diikuti oleh para peserta yang dinyatakan lolos 
+pada pengumuman Babak Penyisihan sebagai tim finalis masing-masing 
+cabang kompetisi. Babak Penyisihan dilaksanakan secara daring penuh, dan 
+Babak Final dilaksanakan secara kombinasi luring dan daring dengan 
+penyelenggaraan sesuai yang dijelaskan pada penjelasan umum dan aturan 
+pelaksanaan masing-masing cabang kompetisi. 
+GEMASTIK XIX menggelar 11 cabang kompetisi dalam bidang TIK 
+(Teknologi Informasi dan Komunikasi), baik dengan format pertandingan 
+maupun kompetisi karya, yaitu meliputi: 
+1. Kompetisi I Pemrograman (Programming) 
+2. Kompetisi II Keamanan Siber (Cyber Security) 
+3. Kompetisi III Penambangan Data (Data Mining) 
+4. Kompetisi IV Desain Pengalaman Pengguna (UX Design) 
+5. Kompetisi V Animasi (Animation) 
+6. Kompetisi VI Kota Cerdas (Smart City) 
+7. Kompetisi VII Karya Tulis Ilmiah (Scientific Paper) 
+8. Kompetisi VIII Pengembangan Perangkat Lunak (Software Development) 
+9. Kompetisi IX Piranti Cerdas, Sistem Benam & IoT (Smart Device, Embedded 
+System & IoT) 
+10. Kompetisi X Pengembangan Aplikasi Permainan (Game Development) 
+11. Kompetisi XI Pengembangan Bisnis TIK (ICT Business Development) 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 10 ===
+10 ---
+ 
+6 
+ 
+B. Persyaratan Umum 
+1. Perguruan Tinggi peserta adalah perguruan tinggi di lingkungan 
+Kementerian Pendidikan Tinggi, Sains, dan Teknologi yang terdaftar pada 
+laman PDDIKTI (https://pddikti.kemdiktisaintek.go.id/ ) 
+2. Peserta adalah mahasiswa aktif jenjang program sarjana dan diploma yang 
+terdaftar 
+pada 
+perguruan 
+tinggi 
+dan 
+pada 
+laman 
+PDDIKTI 
+(https://pddikti.kemdiktisaintek.go.id/) pada saat dilakukan pendaftaran 
+tim peserta hingga pelaksanaan babak final dan pengumuman pemenang. 
+3. Setiap 1 (satu) tim peserta terdiri dari maksimum 3 (tiga) orang mahasiswa 
+(satu orang ketua dan dua orang anggota). 
+4. Setiap Perguruan Tinggi dibatasi mengirimkan paling banyak 10 (sepuluh) 
+tim untuk setiap cabang kompetisi pada babak penyisihan berdasarkan 
+seleksi internal perguruan tinggi dan paling banyak 3 (tiga) tim sebagai 
+finalis berdasarkan penilaian dewan juri pada babak penyisihan. 
+5. Peserta bukan merupakan salah satu personel tim yang telah memperoleh 
+medali emas pada cabang kompetisi yang sama di GEMASTIK tahun-tahun 
+sebelumnya. 
+6. Penulisan nama mahasiswa peserta wajib menggunakan nama lengkap 
+tanpa disingkat sesuai dengan yang terdaftar pada laman PDDIKTI. 
+7. Peserta wajib mengikuti seluruh jadwal dan aturan ketentuan kompetisi 
+sesuai buku pedoman dan/atau pengumuman resmi yang diterbitkan oleh 
+panitia penyelenggara. 
+8. Untuk kompetisi berbasis karya kreasi atau inovasi, konten karya yang 
+diikutsertakan tidak diperkenankan mengandung unsur SARA (suku, 
+agama, ras, dan antar golongan), radikalisme, asusila, dan plagiarisme. 
+9. Konten karya yang pernah memenangkan kejuaraan pada kompetisi tingkat 
+nasional atau internasional dapat diikutsertakan dalam GEMASTIK apabila 
+terdapat bobot pengembangan minimal 50% (wajib melampirkan Surat 
+Pernyataan yang memuat penjelasan perbedaan antara keduanya, yang bila 
+dikuantifikasikan lebih dari 50%). 
+10. Jika konten karya yang diajukan ke kompetisi GEMASTIK atau kompetisi 
+nasional atau internasional lainnya pada saat yang sama sampai pada 
+
+
+=== PAGE 11 ===
+11 ---
+ 
+7 
+ 
+babak final, maka peserta wajib memilih salah satu kompetisi saja dan 
+wajib menginformasikan ke panitia penyelenggara GEMASTIK. Pelanggaran 
+terhadap ketentuan ini akan menyebabkan sanksi berupa diskualifikasi.   
+11. Tim finalis kompetisi IV s.d. X wajib mengunggah laporan akhir dan 
+makalah menggunakan template IEEE yang dapat diunduh dari menu 
+Download 
+pada 
+tautan 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ dan dilengkapi 
+hasil uji periksa similaritas (Turnitin, iThenticate, lainnya), maksimal 
+dengan indeks similaritas 25%. 
+12. Karya para finalis kompetisi IV s.d. XI telah didaftarkan Hak Cipta (HKI) 
+minimal dalam bentuk surat pencatatan ciptaan dari DJKI Kemkum RI. Para 
+finalis kompetisi IV s.d. XI bertanggung jawab penuh atas konsekuensi 
+originalitas dan hak cipta hasil karyanya. Pelanggaran terhadap ketentuan 
+ini akan menyebabkan sanksi berupa diskualifikasi. 
+13. Tim peserta yang dinyatakan lolos babak penyisihan sebagai tim finalis 
+diwajibkan mengumpulkan video profil 60 detik (profil tim untuk 
+kompetisi I-III, profil karya untuk kompetisi IV-XI) dengan mendaftarkan 
+link YouTube pada aplikasi pendaftaran ulang untuk konfirmasi 
+keikutsertaan pada babak final. Pada saat dibacakan pengumuman 
+pemenang dalam upacara penutupan akan ditayangkan video profil dari 
+tim finalis yang dinyatakan sebagai juara 1, juara 2, juara 3, dan juara 
+harapan. 
+ 
+C. Ketentuan Umum Pelaksanaan Kompetisi 
+1. Seluruh Kompetisi I s. d. XI dilaksanakan dalam dua babak, yaitu Babak 
+Penyisihan dan Babak Final. 
+2. Babak Penyisihan dilaksanakan secara daring penuh untuk keseluruhan 
+Kompetisi I s. d. XI, baik untuk tim juri maupun tim finalis. 
+3. Babak Final dilaksanakan secara kombinasi luring dan daring:  
+a. Untuk Kompetisi I, II, dan III, babak final dilaksanakan secara luring 
+penuh di Universitas Bina Nusantara di kampus Jakarta, baik untuk 
+tim juri maupun tim finalis.  
+
+
+=== PAGE 12 ===
+12 ---
+ 
+8 
+ 
+b. Untuk Kompetisi IV s. d. XI, babak final dilaksanakan secara daring 
+penuh untuk tim juri maupun tim finalis. 
+4. Presentasi dan demo karya inovasi atau kreasi pada Babak Final untuk 
+Kompetisi IV s. d. XI pada butir 3.b dilaksanakan secara daring, yaitu 
+dengan ketentuan sebagai berikut: 
+a. Presentasi dan demo karya inovasi final menggambarkan hasil 
+pengembangan karya inovasi dengan pencapaian 100%. 
+b. Presentasi dan demo karya inovasi final dilaksanakan tidak secara 
+live, namun dalam bentuk rekaman video. 
+c. Video dapat mencantumkan intro dan subtitle. 
+d. Video dalam format MP4 720p berdurasi maksimum 10 menit, terdiri 
+dari rekaman presentasi dan demo karya inovasi, termasuk intro dan 
+subtitle. 
+e. Video diunggah ke YouTube dengan format judul GEMASTIK XIX 2026 
+– <Nama Divisi Lomba> - <ID-Tim> - <Nama Tim> - <Judul Karya> – 
+Karya Final. 
+f. Link rekaman video presentasi dan demo karya inovasi final tersebut 
+diinformasikan kepada penyelenggara melalui aplikasi pendaftaran 
+ulang untuk konfirmasi keikutsertaan tim finalis dalam Babak Final. 
+g. Setiap tim peserta sudah siap di ruang tunggu ruang pertemuan paling 
+lambat 30 menit sebelum jadwal presentasi. 
+h. Akan diberikan tanda peringatan 2 menit sebelum waktu presentasi 
+habis. 
+i. Jika waktu presentasi sudah habis, maka akan dihentikan oleh panitia. 
+5. Upacara Pembukaan dan Upacara Penutupan secara bauran luring dan 
+daring. 
+ 
+D. Pendaftaran 
+1. Pendaftaran Kepesertaan Perguruan Tinggi 
+a. Perguruan Tinggi yang mengikutsertakan mahasiswa ke kegiatan 
+GEMASTIK XIX terlebih dahulu mendaftarkan kepesertaan Perguruan 
+Tinggi secara daring melalui aplikasi pendaftaran pada laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+untuk 
+
+
+=== PAGE 13 ===
+13 ---
+ 
+9 
+ 
+mendapatkan akun Perguruan Tinggi oleh operator perguruan tinggi; 
+b. Surat pengajuan akun operator Perguruan Tinggi ditandatangani oleh 
+Pimpinan Perguruan Tinggi Bidang Kemahasiswaan dan diunggah ke 
+aplikasi pendaftaran tersebut diatas (bagi yang belum memiliki akun 
+operator); dan 
+c. Setelah Perguruan Tinggi memiliki akun pada aplikasi pendaftaran, 
+Perguruan Tinggi juga wajib melakukan aktivasi akun pada laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+(dengan 
+minimal 1 Tim Peserta telah difinalisasi). 
+2. Pendaftaran Kepesertaan Tim 
+a. Pendaftaran Tim Peserta dilaksanakan secara daring melalui aplikasi 
+pendaftaran 
+pada 
+laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+setelah 
+pendaftaran kepesertaan Perguruan Tinggi diselesaikan; 
+b. Pendaftaran Tim Peserta diwajibkan untuk setiap tim peserta seluruh 
+cabang kompetisi; 
+c. Setelah pendaftaran Tim Peserta diselesaikan oleh Perguruan Tinggi 
+pada aplikasi pendaftaran dan status Tim Peserta telah difinalisasi, 
+selanjutnya Perguruan Tinggi wajib melakukan sinkronisasi penarikan 
+data 
+Tim 
+Peserta 
+pada 
+laman 
+kompetisi 
+Gemastik 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ melalui akun 
+Perguruan Tinggi;  
+d. Akun tim peserta bisa didapatkan melalui akun Perguruan Tinggi 
+setelah melakukan sinkronisasi data seperti yang disebutkan di atas 
+pada laman kompetisi Gemastik; 
+e. Perguruan Tinggi wajib mengunggah surat pengantar tim perguruan 
+tinggi atau surat delegasi tim yang ditandatangani Pimpinan 
+Perguruan Tinggi Bidang Kemahasiswaan pada laman kompetisi 
+Gemastik dengan format PDF; 
+f. 
+Perguruan Tinggi wajib mengunggah berita acara melalui akun Tim 
+Peserta yang menyatakan bahwa telah dilaksanakannya seleksi 
+dan/atau pembinaan terhadap Tim Peserta yang akan berkompetisi 
+
+
+=== PAGE 14 ===
+14 ---
+ 
+10 
+ 
+pada Gemastik dengan format PDF; 
+g. Peserta wajib mengunggah Kartu Tanda Mahasiswa dan Pas Foto; 
+h. Peserta yang belum memiliki Kartu Tanda Mahasiswa bisa digantikan 
+dengan unggah surat keterangan mahasiswa aktif dari Perguruan Tinggi 
+asal; dan 
+i. 
+Setiap karya yang diikutsertakan, mengacu pada Persyaratan Umum 
+pada nomor 8, 9, dan 10. 
+3. Pendaftaran Ulang Peserta Babak Final 
+a. Pendaftaran ulang peserta Babak Final dilakukan secara daring melalui 
+laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+setelah pengumuman hasil Babak Penyisihan; 
+b. Pendaftaran ulang dilakukan oleh masing-masing Tim Finalis pada 
+semua kompetisi GEMASTIK XIX dengan melakukan konfirmasi 
+checklist  kesediaan  mengikuti  babak  final secara luring untuk 
+kompetisi I s. d. III dan secara daring untuk kompetisi IV s. d. XI, serta 
+mengunggah berkas babak final sesuai dengan ketentuan masing-
+masing kompetisi; dan 
+c. Persyaratan karya pada babak final untuk kompetisi IV s.d. XI mengacu 
+pada Persyaratan Umum nomor 11 dan 12. 
+ 
+ 
+E. Kejuaraan dan Penghargaan 
+Untuk setiap tim finalis pada masing-masing cabang kompetisi Gemastik 
+akan ditetapkan para juara yang diberikan penghargaan berupa medali (medali 
+“emas” untuk Juara I, medali “perak” untuk Juara II, medali “perunggu” untuk 
+Juara III), sertifikat, dan uang pembinaan, sehingga total disediakan 3 x 11 = 
+33 medali kejuaraan. Untuk tim finalis peringkat IV diberikan penghargaan 
+Harapan yang bersifat non-medali dan tanpa uang pembinaan, sehingga hanya 
+diberikan sertifikat. 
+Berdasar perhitungan pengumpulan medali akan ditetapkan Juara Umum 
+Kompetisi Utama Gemastik kepada perguruan tinggi dengan perolehan medali 
+terbanyak menurut sistem olimpiade yang akan dianugerahkan Piala Utama 
+Gemastik ”SAMYAKBYA PADESA WIDYA”, yang berarti Informasi yang 
+
+
+=== PAGE 15 ===
+15 ---
+ 
+11 
+ 
+Benar untuk Pengetahuan, berupa piala bergilir dan piala tetap. 
+Penghargaan lain dalam bentuk sertifikat dan tidak menjadi penentu 
+dalam perhitungan juara umum, antara lain: 
+▪ Tim dengan Penghargaan Khusus “The Most Inspiring Team”; 
+▪ Penghargaan tim terbaik untuk Regional 1, 2, dan 3 pada Kompetisi I 
+Pemrograman; 
+▪ Penghargaan sebagai The Best Defender dan The Best Attacker pada 
+Kompetisi II Keamanan Siber; dan 
+▪ Penghargaan makalah terbaik (best paper) pada masing-masing Kompetisi 
+IV sampai X. 
+ 
+ 
+F. Pendanaan 
+1. Peserta tidak dipungut biaya pendaftaran. 
+2. Seleksi pada tingkat perguruan tinggi dan pembinaan untuk mengikuti 
+kegiatan Gemastik menjadi tanggung jawab perguruan tinggi masing- 
+masing. 
+3. Biaya keikutsertaan pada pelaksanaan tingkat Nasional (Akomodasi, 
+Transportasi, Konsumsi) menjadi tanggung jawab Perguruan Tinggi 
+masing-masing. 
+ 
+ 
+G. 
+Informasi Kompetisi Gemastik 
+Laman Portal Website 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+Laman Aplikasi Pendaftaran 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+Laman Kompetisi Gemastik 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+
+
+=== PAGE 16 ===
+16 ---
+ 
+12 
+ 
+H. 
+Timeline Gemastik XIX/2026 
+ 
+No. 
+Divisi Kompetisi 
+Pendaftaran 
+Perguruan 
+Tinggi dan Tim 
+Peserta 
+Pemanasan  
+Pra-Penyisihan /  
+Tenggat Unggah 
+Proposal 
+Penyisihan / 
+Masa Penjurian 
+Pengumum
+an Finalis 
+Daftar Ulang 
+Finalis 
+Babak Final 
+& Puncak 
+Acara 1).2).8). 
+I 
+Pemrograman (Programming) 
+27 Juli - 
+14 Agustus 2026 
+23 Agustus 2026 
+pkl. 13:00-15:00 WIB 
+30 Agustus 2026 
+pkl. 09:00 - 12:00 WIB 
+M1 
+September 
+26-30 
+Oktober 2026 
+10-13  
+November 2026 
+II 
+Keamanan Siber (Cyber Security) 
+15 Agustus 2026 
+pkl. 09:00-22:00 WIB 
+Penyisihan: 23 Agustus 2026 
+Penilaian Write-up:  
+24-30 Agustus 2026 
+III 
+Penambangan Data (Data Mining) 
+ 
+ 
+ 
+ 
+ 
+ 
+27 Juli -  
+14 Agustus 2026 
+ 
+ 
+ 
+ 
+ 
+ 
+15 Agustus  
+- 2 September 2026 
+IV 
+Desain Pengalaman Pengguna (UX Design) 
+V 
+Animasi (Animation) 
+VI 
+Kota Cerdas (Smart City) 
+VII Karya Tulis Ilmiah (Scientific Paper) 
+VIII Pengembangan Perangkat Lunak (Software Development) 
+IX 
+Piranti Cerdas, Sistem Benam & IoT (Smart Device, 
+Embedded System & IoT) 
+X 
+Pengembangan Aplikasi Permainan (Game Development) 
+XI 
+Pengembangan Bisnis TIK (ICT Business Development) 
+Catatan untuk Kegiatan Babak Final dan Acara Puncak: 
+1. Pendaftaran ulang kepesertaan babak final dan unggah dokumen babak final semua tim finalis 26 - 30 Oktober 2026 
+2. Technical Meeting Peserta Finalis Kompetisi II s. d. XI dilaksanakan pada tanggal 10 November 2026 
+3. Upacara Pembukaan dilaksanakan pada tanggal 11 November 2026 
+4. Untuk Kompetisi I Pemrograman: a). warming-up dan technical meeting (pemanasan pra-final) 11 November 2026, b). pelaksanaan kompetisi 12 November 2026 Pkl. 08:00 - 13:00 WIB 
+5. Untuk Kompetisi II Keamanan Siber: a). technical meeting, set-up sistem dan warming-up (pemanasan pra-final) 10 November 2026, b). pelaksanaan kompetisi 11 November 2026 Pkl. 
+13:00 - 19:00 WIB, c). penyusunan write-up disubmit paling lambat 12 November 2026 Pkl. 02:00 WIB, d). presentasi write-up 12 November 2026 Pkl. 08:00 - 14:00 WIB (20 tim) 
+6. Untuk Kompetisi III Penambangan Data: a). set-up workstation tanggal 10 November 2026 Pkl. 12:00 - 18:00 WIB, b). penyelesaian kasus tanggal 11 November 2026 Pkl. 13:00 - 
+18:00 WIB. c). presentasi solusi kasus tanggal 12 November 2026 Pkl. 08:00 - 17:00 WIB (20 tim) 
+7. Presentasi dan/atau demo karya Kompetisi IV s. d. XI tanggal 11 November 2026 Pkl. 13:00 - 17:30 WIB (8 tim) dan 12 November 2026 Pkl. 08:30 - 16:30 WIB (12 tim) 
+8. Upacara Penutupan, pengumuman juara, dan penyerahan hadiah tanggal 13 November 2026 malam.
+

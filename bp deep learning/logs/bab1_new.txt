@@ -1,0 +1,93 @@
+=== PAGE 5 ===
+5 ---
+BAB I PENDAHULUAN 
+1.1.  Latar Belakang 
+Triase merupakan sistem seleksi prioritas pasien yang harus didahulukan penanganannya 
+berdasarkan tingkat ancaman jiwa [1]. Oleh karena itu, ketepatan evaluasi klinis pada tahap ini 
+bersifat 
+krusial, 
+mengingat 
+kesalahan 
+dalam 
+pengambilan 
+keputusan 
+tindakan 
+kegawatdaruratan berisiko fatal dan dilaporkan telah menyebabkan hingga 98.000 kematian 
+pasien [2]. Di sisi lain, volume kunjungan pasien ke instalasi gawat darurat (IGD) terus 
+meningkat hingga 40% sejak tahun 2020 sehingga semakin meningkatkan beban kerja tenaga 
+medis [3]. Kondisi tersebut menyebabkan proses triase konvensional yang membutuhkan rata-
+rata 4 menit 11 detik per pasien menjadi semakin menantang untuk dilakukan secara cepat dan 
+konsisten [4]. Akibatnya, tingkat kesalahan triase masih tergolong tinggi, pada metode 
+konvensional Emergency Severity Index (ESI) kesalahan mencapai 49%, yang terdiri atas 
+31,3% over-triage dan 17,7% under-triage [5]. Selain itu, pasien yang mengalami under-triage 
+memiliki risiko kematian sekitar 3,1 kali lebih tinggi dibandingkan pasien yang mendapatkan 
+klasifikasi triase yang tepat [6]. 
+Pengukuran tanda vital di IGD masih dilakukan secara manual, sehingga tenaga medis 
+harus memeriksa setiap parameter fisiologis secara bergantian dengan waktu rata-rata 3–4 
+menit untuk setiap pasien [7]. Selain kurang efisien, pengukuran tanda vital secara manual di 
+luar ruang perawatan intensif juga rentan menghasilkan data yang subjektif dan kurang optimal 
+karena dipengaruhi oleh variasi teknik antar-petugas [8]. Padahal, parameter tanda vital 
+merupakan dasar utama dalam proses triase untuk merepresentasikan tingkat urgensi pasien 
+secara objektif, sehingga pengukuran yang tidak akurat berpotensi memengaruhi ketepatan 
+klasifikasi triase [8].  Oleh karena itu, diperlukan suatu sistem yang mampu mengakuisisi 
+parameter tanda vital secara otomatis, cepat, dan objektif sebagai dasar klasifikasi triase yang 
+lebih akurat dan konsisten. 
+Untuk menjawab kebutuhan tersebut, TriaGo hadir sebagai solusi klasifikasi triase 
+otomatis berbasis multisensor non-invasif. Sistem dirancang untuk mengukur parameter tanda 
+vital, tingkat rasa sakit dan kesadaran pasien secara real-time melalui satu perangkat. 
+Klasifikasi triase diolah menggunakan algoritma eXtreme Gradient Boosting (XGBoost). 
+Algoritma klasifikasi dibangun berdasarkan Permenkes RI No. 47 Tahun 2018 ke dalam tiga 
+tingkatan, yaitu Resusitasi, Darurat, dan Non-Darurat. Pengembangan TriaGo selaras dengan 
+tema GEMASTIK XIX 2026 ('Berdampak, Inklusif, Berkelanjutan menuju Masyarakat 
+Cerdas') dan selaras berkontribusi pada SDG 3 (reduksi mortalitas dan under-triage), SDG 8 
+(efisiensi beban kerja tenaga medis), SDG 9 (inovasi perangkat medis cerdas mandiri), dan 
+SDG 12 (perangkat hemat daya dan ramah sumber daya terintegrasi web dashboard rekam 
+medis). 
+ 
+1.2.  Tujuan  
+Tujuan penelitian ini yaitu untuk merancang dan membangun sistem akuisisi tanda vital 
+berbasis multisensor non-invasif yang mampu memperoleh parameter fisiologis secara 
+otomatis. Selain itu, penelitian ini bertujuan untuk mengembangkan model klasifikasi triase 
+berbasis algoritma eXtreme Gradient Boosting (XGBoost) serta mengevaluasi akurasi 
+parameter fisiologis yang dihasilkan sistem serta kinerja model klasifikasi triase berdasarkan 
+metrik evaluasi yang ditetapkan. 
+
+
+=== PAGE 6 ===
+6 ---
+ 
+ 
+1.3. Urgensi dan Manfaat 
+Beberapa manfaat yang dapat dihasilkan melalui penelitian ini yaitu: 
+1. Mempercepat proses klasifikasi pasien di Instalasi Gawat Darurat (IGD) sehingga 
+pasien dengan kondisi kritis dapat dideteksi lebih cepat, mengurangi tingkat kematian 
+dan keparahan. Hal ini dapat memberikan manfaat sesuai dengan SDG ke-3 yaitu 
+Good Health and Well-being 
+2. Mengurangi beban kerja operasional dan beban kognitif tenaga medis melalui 
+otomatisasi akuisisi tanda vital, meminimalkan risiko kelelahan kerja dan kesalahan 
+klasifikasi, yang memberikan kontribusi nyata pada SDG ke-8 yaitu Decent Work and 
+Economic Growth. 
+3. Mendorong kemandirian dan hilirisasi inovasi teknologi alat kesehatan berbasis 
+kecerdasan buatan yang terjangkau dan dapat diimplementasikan di berbagai 
+tingkatan fasilitas kesehatan, sejalan dengan pencapaian SDG ke-9 yaitu Industry, 
+Innovation, and Infrastructure. 
+4. Meningkatkan efisiensi manajemen dan sumber daya tenaga medis rumah sakit 
+melalui integrasi sistem web dashboard serta rancang bangun perangkat non-invasif 
+untuk meminimalkan limbah medis, yang mendukung SDG ke-12 yaitu Responsible 
+Consumption and Production. 
+ 
+1.4. Batasan Masalah 
+Inovasi sistem TriaGo ini memiliki beberapa batasan masalah sebagai berikut: 
+1. Parameter fisiologis yang diakuisisi secara otomatis oleh sistem multisensor dibatasi 
+pada 5 parameter tanda vital, yaitu suhu tubuh, denyut jantung, laju pernapasan, 
+saturasi oksigen dan tekanan darah.  
+2. Penilaian tingkat kesadaran pasien dinilai menggunakan standar Glasgow Coma Scale 
+(GCS) dan tingkat rasa sakit diperoleh melalui input manual oleh tenaga medis 
+melalui antarmuka layar sentuh. 
+3. Kategori Hitam (pasien meninggal) sesuai standar Permenkes RI No. 47 Tahun 2018 
+dieksklusikan dari sistem karena konfirmasi kematian dapat dipastikan secara visual, 
+serta sistem tidak diterapkan pada pasien dengan luka terbuka parah pada area 
+pergelangan tangan. 
+ 
+ 
+

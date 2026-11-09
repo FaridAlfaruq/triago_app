@@ -1,0 +1,379 @@
+=== PAGE 17 ===
+17 ---
+BAB IV ANALISIS FUNGSIONAL 
+4.1. Prinsip Kerja Alat 
+Sistem TriaGo dirancang sebagai perangkat yang cerdas untuk mengklasifikasi tingkat 
+triase pasien IGD dan terintegrasi secara langsung ke web dashboard IGD. Secara umum, alur 
+kerja sistem TriaGo terbagi menjadi tiga tahapan utama yang saling berkaitan, yaitu tahap 
+akuisisi data dan pemrosesan sinyal, tahap inferensi model AI tekanan darah dan klasifikasi 
+triase, serta tahap antarmuka GUI dan integrasi IoT. Akuisisi data sinyal biomedis dilakukan 
+secara bersamaan menggunakan sensor suhu MLX90614, sensor PPG MAX30105, dan modul 
+ECG Click yang terhubung ke mikrokontroler STM32. Pengambilan data sinyal PPG dan ECG 
+dilakukan pada frekuensi sampling 400 Hz dan pengukuran suhu tubuh dengan sampling 2 Hz. 
+Seluruh data yang didapatkan dikirimkan secara serial USB ke Raspberry Pi 5. Pemrosesan 
+yang dilakukan meliputi downsample, detrending, dan filtering sinyal yang kemudian 
+diekstraksi menjadi parameter tanda vital, serta output klasifikasi tingkat triase.  
+Pada tahap akhir, keseluruhan parameter akan dikirimkan ke server backend Flask dalam 
+format JSON melalui protokol HTTPS Post. Hasil pengukuran ini dapat dilihat melalui web 
+dashboard IGD yang di-deploy menggunakan layanan Microsoft Azure App Service. Data 
+pasien disimpan di dalam database MySQL sebagai rekaman medis elektronik untuk menjamin 
+kerahasiaan dan keamanan pasien. 
+ 
+4.2. Analisis Fungsional Perangkat Keras 
+4.2.1. Sensor PPG MAX30105 
+Pengujian sensor dilakukan untuk memastikan sensor dapat bekerja menghasilkan sinyal 
+PPG yang sesuai dengan kondisi fisiologis tubuh. Pengujian dilakukan dengan menggunakan 
+STM32 Black Pill untuk mengambil data dari sensor di ujung jari dan melakukan visualisasi 
+grafik menggunakan Python seperti yang digambarkan pada Gambar 4.1. Hasil menunjukkan 
+sinyal dari sinyal Red dan IR sesuai dengan kondisi fisiologis tubuh dan cukup jelas. Meskipun 
+masih terdapat noise, morfologi sinyal tetap optimal dalam menggambarkan kondisi fisiologis 
+pasien. 
+ 
+(a) 
+(b) 
+Gambar 4.1. Pengambilan data sinyal PPG Red dan IR: (a) Dokumentasi pengambilan 
+data dan (b) Hasil sinyal PPG Red dan PPG IR 
+ 
+4.2.2. Sensor Suhu MLX90614 
+Pengujian sensor suhu dilakukan di dahi dan membandingkan hasilnya dengan alat 
+komersial dengan cara kerja serupa menggunakan inframerah. Cara pengambilan data 
+dilakukan dengan mendekatkan sensor ke dahi dengan jarak yang cukup dekat agar pengukuran 
+lebih optimal seperti yang terlihat pada Gambar 4.2. Hasil yang didapatkan dari analisis 
+percobaan dan perbandingan dari sensor menunjukkan sensor suhu bekerja dengan cukup 
+dengan nilai akhir yang sama antara sensor dengan alat komersial.  
+
+
+=== PAGE 18 ===
+18 ---
+ 
+ 
+(a) 
+(b) 
+(c) 
+Gambar 4.2. Pengambilan data suhu: (a) Hasil MLX90614, (b) Dokumentasi pengukuran 
+dan (c) Termo Gun 
+ 
+4.2.3. ECG Click 
+Pengujian modul ECG Click dilakukan menggunakan konfigurasi 3 elektroda mengikuti 
+prinsip Lead I, modifikasi dilakukan dengan menempelkan elektroda di kedua pergelangan 
+tangan pasien. Elektroda negatif ditempelkan pada pergelangan tangan kanan dan elektroda 
+positif serta ground ditempelkan di pergelangan tangan kiri. Berdasarkan hasil pengambilan 
+data ECG mentah masih terdapat noise frekuensi tinggi akibat resistansi kulit yang membuat 
+morfologi sinyal P dan T tidak terlihat. Namun, puncak-puncak sinyal R tetap terlihat yang 
+menandakan morfologi sinyal ECG berhasil diekstraksi dari sensor. Masalah noise ini bukan 
+menjadi halangan bagi TriaGo, karena yang dibutuhkan adalah interval antar puncak R yang 
+tampak pada sinyal dan bisa ditangani melalui proses filter digital.  
+ 
+ 
+(a) 
+(b) 
+Gambar 4.3. Pengambilan data sinyal ECG: (a) Dokumentasi pengambilan data dan 
+(b) Hasil sinyal ECG 
+ 
+4.3. Analisis Fungsional Perangkat Lunak 
+4.3.1. Pengolahan Sinyal ECG 
+Sistem pengolahan sinyal ECG diproses dengan menerapkan filter digital berupa 
+detrending menggunakan metode double median untuk menghilangkan gangguan frekuensi 
+rendah yang ada pada sinyal dan mengembalikan sinyal ke baseline yang sebenarnya. 
+Kemudian hasilnya akan dilewatkan ke tahap lowpass filter dengan frekuensi cut off sebesar 
+35 Hz untuk memastikan gangguan frekuensi tinggi tidak diloloskan. Proses selanjutnya, sinyal 
+ECG akan dilewatkan ke metode Savitzky Golay untuk menghaluskan riple kecil pada sinyal 
+agar visualisasi lebih halus dan bersih ketika ditampilkan. Hasil dari algoritma pemrosesan 
+sinyal ECG ditampilkan pada Gambar 4.4 yang sudah bersih dari gangguan atau artefak. 
+ 
+Gambar 4.4 Hasil pengolahan sinyal ECG 
+ 
+ 
+
+
+=== PAGE 19 ===
+19 ---
+. 
+ 
+4.3.2. Pengolahan Sinyal PPG 
+Pengolahan sinyal PPG untuk dilakukan dengan memisahkan sinyal menjadi dua 
+komponen, yaitu komponen AC dan DC dari masing-masing kanal sinyal PPG. Komponen DC 
+merupakan penyerapan cahaya statis oleh jaringan dan darah non-pulsatile. Komponen AC 
+menunjukkan fluktuasi volume darah akibat denyut jantung. Hasil pemisahan ini digunakan 
+untuk menghitung nilai saturasi oksigen () dan perfusi darah untuk sebagai variabel eror dalam 
+estimasi suhu tubuh. Hasil pemisahan komponen AC dan DC digunakan untuk memperbaiki 
+baseline sinyal yang volatil agar kembali ke baseline aslinya menggunakan Cubic Spline. 
+Gangguan pada sinyal yang masih ada dihilangan melalui penerapan bandpass filter dengan 
+frekuensi cut off 0,5 – 15 Hz. Riak-riak kecil yang masih ada pada sinyal dihaluskan 
+menggunakan metode Savitzky Golay untuk memastikan hasil sinyal terhindari dari gangguan 
+atau artefak seperti yang ditunjukkan pada Gambar 4.5.  
+ 
+ 
+ 
+Gambar 4.5 Hasil pengolahan sinyal PPG 
+ 
+4.3.3. Pengujian Algoritma Denyut Jantung 
+Sinyal ECG bersih selanjutnya digunakan untuk ekstraksi denyut jantung dalam satu 
+menit. Deteksi puncak gelombang R menerapkan algoritma Pan-Tompkins yang meliputi 
+bandpass filter (5 – 18 Hz), diferensiasi, pengkuadratan, smoothing, serta moving window 
+integration (MWI) untuk memperjelas gelombang QRS. Logika thresholding dinamis 
+diterapkan untuk mencegah kesalahan deteksi akibat gelombang P atau T yang tinggi. Hasil 
+deteksi puncak R ditunjukkan pada Gambar 4.6, di mana masing-masing puncak sinyal ECG 
+menunjukkan detak jantung yang terjadi pada tubuh. Algoritma ini diuji menggunakan dataset 
+Beth Israel Deaconess Medical Center (BIDMC), dari hasil pengujian didapatkan performa 
+akurasi sebesar  99,15% dengan MAE hanya 0,695 BPM saja. 
+ 
+Gambar 4.5 Deteksi puncak gelombang R 
+ 
+4.3.4. Pengujian Algoritma Laju Pernapasan 
+Dari sinyal ECG dan PPG yang telah dibersihkan, modulasi pernapasan diekstraksi 
+berdasarkan variasi amplitudo puncak R dan gelombang denyut nadi. Sinyal modulasi tersebut 
+kemudian diinterpolasi menggunakan metode Piecewise Cubic Hermite Interpolating 
+Polynomial (PCHIP) dan dianalisis pada domain frekuensi menggunakan metode Welch, 
+sebagaimana ditunjukkan pada Gambar 4.6. Frekuensi dominan (𝑓𝑝𝑒𝑎𝑘) yang diperoleh 
+selanjutnya digunakan dalam Persamaan (2.2) untuk menghitung laju pernapasan akhir. 
+  
+
+
+=== PAGE 20 ===
+20 ---
+ 
+Gambar 4.6 Spektrum Daya (PSD) domain frekuensi sinyal respirasi 
+  
+Sebagai pengujian lanjutan, algoritma estimasi denyut jantung dan laju pernapasan diuji 
+menggunakan dataset BIDMC. Dataset ini berisi rekaman multimodal sinyal PPG dan ECG 
+dari 53 subjek. Performa algoritma menunjukkan akurasi estimasi laju pernapasan multimodal 
+mencapai akurasi 92,32% dengan nilai MAE sebesar 0,96 RPM. 
+ 
+4.3.5. Pengujian Algoritma Saturasi Oksigen 
+Pengujian pengolahan sinyal PPG dilakukan pada dataset The University of Sydney yang 
+berisikan 22 subjek. Dataset ini berisikan dua gelombang optik dengan parameter saturasi 
+oksigen yang dapat digunakan untuk menguji algoritma. Dari hasil pengujian terhadap 22 
+subjek dataset, parameter saturasi oksigen didapatkan melalui pemisahan komponen AC dan 
+DC yang sudah dilakukan pada pemrosesan sinyal PPG sebelumnya. Hasil dari pemisahan 
+komponen AC dan DC ditunjukkan pada Gambar 4.7 yang memisahkan komponen AC dan 
+DC dari sinyal PPG inframerah.  Hasil pengujian algoritma menggunakan dataset sekunder 
+berhasil mencapai performa akurasi sebesar 98,88% dan MAE hanya 1,08% saja. Performa 
+pengolahan sinyal ini telah memenuhi standar ISO 80601-2-61 dengan toleransi eror yang 
+sangat kecil.  
+ 
+ 
+Gambar 4.7 Perbedaan komponen DC dan AC sinyal PPG 
+ 
+4.3.6. Pengujian Estimasi Suhu Tubuh 
+Pengujian estimasi suhu tubuh dilakukan menggunakan dataset sekunder VitalDB 
+dengan memanfaatkan label suhu tubuh yang ada. Pengolahan sinyal dikondisikan sama 
+dengan sistem TriaGo yang dibangun, meliputi downsample,  filtering, segmentasi dan signal 
+quality index untuk memastikan hanya memproses sinyal yang sudah bersih dan optimal. 
+Parameter a, b, dan 𝐶𝑜𝑓𝑓𝑠𝑒𝑡 diselesaikan melalui persamaan regresi kuadrat non-linier pada 80 
+subjek. Hasil yang didapatkan adalah parameter a sebesar 0,82991, b sebesar 0,97126, dan 
+𝐶𝑜𝑓𝑓𝑠𝑒𝑡 sebesar 1,0649. Hasil parameter ini diuji pada 20 kasus baru menghasilkan tingkat 
+kelolosan sebesar 80% (16/20) dengan rata-rata MAE sebesar 0,237 ℃. Jika dilihat secara 
+menyuruh pada 100 kasus yang digunakan, tingkat kelolosan mencapai 83% (83/100) dengan 
+nilai MAE sebesar 0,250 ℃.  
+ 
+
+
+=== PAGE 21 ===
+21 ---
+4.3.7. Pengujian Estimasi Tekanan Darah 
+Model estimasi tekanan darah dirancang menggunakan mekanisme transfer learning dari 
+dataset sekunder PulseDB ke dataset primer yang diambil pada penelitian sebelumnya. 
+Mekanisme transfer learning digunakan untuk menyesuaikan model yang sudah melewati 
+tahap pre-training ke dataset primer yang memiliki konfigurasi hardware yang serupa dengan 
+sistem TriaGo. Dataset ini berisikan sinyal ECG yang didapatkan menggunakan modul ECG 
+Click dan PPG melalui sensor MAX30105 dengan total 94 subjek. Label tekanan darah diukur 
+menggunakan alat komersial menggunakan manset. Subjek bervariasi, namun didominasi oleh 
+usia remaja 18 – 22 tahun. Hasil evaluasi model ditunjukkan pada Gambar 4.9. 
+ 
+Gambar 4.9 Evaluasi model estimasi tekanan darah 
+ 
+ 
+Hasil pelatihan dan testing untuk SBP dan DBP mendapatkan nilai MAE sebesar 4.90 
+mmHg dan 2.3 mmHg. Standar deviasi hasil pelatihan yang didapatkan dari SBP dan DBP 
+adalah 6.22 mmHg dan 3.22 mmHg yang sudah cukup sempit. Persentase akurasi model yang 
+dibangun ditunjukkan pada Tabel 4.1. Berdasarkan standar British Hypertension Society 
+(BHS), tingkat akurasi model untuk SBP termasuk dalam kategori grade B dan DBP berada di 
+kategori grade A. Hal ini menunjukkan model telah mencapai tingkat akurasi yang sangat baik 
+dan dapat diterima secara klinis. 
+ 
+Tabel 4.1 Akurasi model SBP dan DBP 
+Parameter 
+Batas Toleransi 
+Keterangan 
+(≤±5.0 mmHg) 
+(≤±10 mmHg) 
+(≤±15 mmHg) 
+SBP 
+59.76% 
+87.23% 
+97.35% 
+Grade B 
+DBP 
+89.40% 
+98.07% 
+100% 
+Grade A 
+ 
+4.3.8. Pengujian Klasifikasi Triase 
+Model klasifikasi tingkat triase dirancang menggunakan dataset sekunder yang diambil 
+dari ‘Triagegeist’ yang berisikan data-data pasien IGD dengan lima tingkat klasifikasi 
+Emergency Severity Indeks (ESI). Tingkat klasifikasi berpedoman pada Permenkes RI No. 47 
+Tahun 2018 yang mengklasifikasi tingkat triase pasien menjadi tiga prioritas, yaitu Resusitasi, 
+Darurat, dan Non-Darurat. Hasil performa model dalam memisahkan kelas berdasarkan 
+evaluasi kurva ROC-AUC dan Confusion Matrix ditunjukkan pada Gambar 4.10. 
+
+
+=== PAGE 22 ===
+22 ---
+ 
+Gambar 4.10 Hasil kurva ROC-AUC dan Confusion Matrix 
+ 
+Model yang dibangun memperoleh akurasi yang jauh lebih tinggi daripada metode 
+konvensional, seperti linear regression (LR), support vector machine (SVM), random forest 
+(RF), dan Decision Tree (DT) seperti yang ditunjukkan pada tabel 4.3. dengan akurasi sebesar 
+88.20% dan F1 Score sebesar 89.83%. Secara lebih detail, performa model per tingkat triase 
+ditampilkan pada Tabel 4.4. Evaluasi metrik menunjukkan bahwa kategori Resusitasi mencapai 
+sensitivitas 0.925 dan spesifisitas 0.998, yang mengindikasikan kemampuan deteksi pasien 
+kritis yang sangat tinggi serta minimalnya risiko false positive. Selain itu, nilai Positive 
+Predictive Value (PPV) yaitu ketepatan prediksi positif pasien benar sakit mencapai 0.948 pada 
+kelas Resusitasi, sedangkan Negative Predictive Value (NPV) yaitu kepastian bahwa pasien 
+terprediksi negatif memang benar tidak kritis mencapai 0.997. Performa konsisten juga 
+ditunjukkan pada kategori Darurat dengan sensitivitas 0.878 dan PPV 0.897 serta kategori Non 
+Darurat dengan sensitivitas 0.883 dan NPV 0.910. Hasil ini membuktikan bahwa model tidak 
+hanya unggul secara komputasi tetapi juga memenuhi standar keselamatan medis dalam 
+memprioritaskan penanganan pasien di IGD. 
+Tabel 4.2 Perbandingan performma model machine learning. 
+Model 
+Akurasi 
+F1-Skor 
+Latensi Inferensi 
+(ms/sample) 
+Linear Regression 
+0.8848 
+0.8940 
+0.0005 
+Support Vector Machine 
+0.8911 
+0.8992 
+0.3280 
+Random Forest 
+0.8845 
+0.8929 
+0.0042 
+Decision Tree 
+0.7613 
+0.7774 
+0.0037 
+Xtreme Gradien Boost 
+0.9067 
+0.9142 
+0.0037 
+ 
+Tabel 4.3 Performa setiap tingkat triase 
+Indikator 
+Resusitasi 
+Darurat 
+Non-Darurat 
+Sensitivitas 
+0.925 
+0.878 
+0.883 
+Spesifitas 
+0.998 
+0.887 
+0.890 
+Positive Predictive Value 
+0.948 
+0.897 
+0.858 
+Negative Predictive Value 
+0.997 
+0.866 
+0.910 
+ 
+4.4. Kinerja Prototipe 
+Setelah melakukan pengujian perangkat keras dari masing-masing sensor dan algoritma 
+pemrosesan perangkat lunak, sistem kemudian dirancang sebagaimana pada Gambar 4.11. 
+Kinerja prototipe diuji dengan bantuan subjek dalam kondisi sehat dan berada pada lingkungan 
+
+
+=== PAGE 23 ===
+23 ---
+Institut Teknologi Sepuluh Nopember. Subjek diinstruksikan untuk menggunakan prototipe 
+sistem TriaGo yang dibangun, terutama dalam pengambilan data tanda vital. 
+ 
+Gambar 4.11 Hasil rancangan TriaGo 
+ 
+Pengujian juga dilakukan pada kondisi yang mungkin terjadi di kondisi nyata ruang IGD, 
+di mana subjek akan diminta menggunakan prototipe pada posisi normal (duduk), 
+menggunakan kursi roda, dan berbaring di tempat tidur. Pengujian ini dilakukan untuk melihat 
+fleksibilitas prototipe yang dibangun agar dapat digunakan oleh berbagai macam pasien. Posisi 
+pengambilan ditunjukkan pada Gambar 4.12. Hasil penggunaan di berbagai kondisi ini 
+menunjukkan kemudahan penggunaan dari prototipe yang telah dibuat. 
+ 
+(a) 
+(b) 
+(c) 
+Gambar 4.12 Dokumentasi penggunaan prototipe: (a) Normal, (b) Di kursi roda, dan (c) 
+Berbaring 
+ 
+Hasil keseluruhan parameter yang telah diuji telah memenuhi standar klinis sesuai 
+dengan masing-masing parameter fisiologis utama. Keseluruhan hasil pengujian disajikan 
+secara lengkap pada Tabel 4.5 berikut. 
+Tabel 4.4. Hasil performa masing-masing parameter  
+Parameter 
+Hasil Evaluasi 
+Keterangan 
+Denyut Jantung 
+MAE: 0.695 BPM / Akurasi: 
+99.15% 
+Memenuhi standar AAMI 
+EC13 
+Laju Pernapasan 
+MAE: 0.96 RPM / Akurasi: 
+92.32% 
+Memenuhi ISO 80601-2-87 
+Saturasi Oksigen 
+MAE: 1.08% / Akurasi: 
+98.89% 
+Memenuhi ISO 80601-2-61 
+
+
+=== PAGE 24 ===
+24 ---
+Suhu Tubuh 
+MAE: 0,250 ℃ / Akurasi: 
+83% 
+Memenuhi ISO 80601-2-56 
+Tekanan Darah Sistolik 
+(mmHg) 
+Akurasi (MAE ≤ 5 / 10 / 15): 
+68,8% / 83,9% / 96,4% 
+Memenuhi grade B 
+berdasarkan 
+British Hypertension Society 
+(BHS) 
+Tekanan Darah Diastolik 
+(mmHg) 
+Akurasi (MAE ≤ 5 / 10 / 15): 
+73,2% / 90,2% / 95,5% 
+Memenuhi grade A 
+berdasarkan 
+British Hypertension Society 
+(BHS) 
+ 
+4.5. Pengujian Sistem IoT 
+Pengujian sistem IoT bertujuan memastikan hasil triase terkirim secara end-to-end dan 
+real-time dari perangkat hingga ke web dashboard IGD. Setelah pengolahan sinyal dan 
+klasifikasi selesai di Raspberry Pi 5, hasilnya dikemas dalam format JSON. Paket ini berisi 
+nilai tanda vital, skor GCS, skor nyeri, dan kategori triase. Data dikirim melalui protokol 
+MQTT ke broker HiveMQ Cloud dengan koneksi terenkripsi TLS dan QoS 1, sehingga setiap 
+pesan dijamin sampai. Data juga disimpan sementara di perangkat, sehingga tidak hilang saat 
+jaringan terputus dan dikirim ulang otomatis setelah koneksi pulih. 
+Backend Flask menerima dan memvalidasi data, lalu menyimpannya ke basis data 
+MySQL. Setelah itu, backend mengalokasikan bed sesuai zona triase secara otomatis. Hasilnya 
+langsung ditampilkan pada web dashboard IGD melalui WebSocket, dan nomor bed dikirim 
+kembali ke layar perangkat. Gambar 4.13 menunjukkan proses pengiriman data dari perangkat 
+hingga tampil di dashboard 
+(a) 
+- 
+(b) 
+Gambar 4.13 Hasil uji pengiriman data: (a) Log pengiriman data hasil pengukuran ke 
+server dan (b) Web Dashboard monitoring IGD 
+

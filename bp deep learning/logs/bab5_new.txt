@@ -1,0 +1,146 @@
+=== PAGE 27 ===
+27 ---
+BAB V HASIL IMPLEMENTASI DAN RENCANA PENGEMBANGAN 
+5.1. Hasil Implementasi Purwarupa 
+TriaGo dikembangkan dalam bentuk dua penjepit prakti menyerupai penjepit ECG yang 
+sering digunakan di fasilitas kesehatan. Bentuk yang mudah dan sering ditemui sehari-hari 
+memastikan tenaga medis bisa langsung menggunakan tanpa pelatihan lanjutan yang rumit. 
+Gambar 5.1 memperlihatkan implementasi langsung perangkat dan posisi penempatan sensor 
+pada penjepit. Perangkat yang dikembangkan mampu mengekstraksi parameter fisiologis dan 
+mengklasifikasikan berdasarkan tingkat kegawatdaruratan. Melalui protokol MQTT, data 
+diteruskan ke dasbor web IGD untuk menampilkan hasil klasifikasi pasien dan ketersediaan 
+tempat tidur. Dari hasil konsultasi bersama dengan dr. Saskia, TriaGo berpotensi mengurangi 
+beban kerja tenaga medis dan meningkatkan ketepatan proses triase. Inovasi TriaGo 
+diharapkan dapat mendukung keselamatan pasien dan peningkatan kualitas pelayanan 
+kesehatan, sekaligus berkontribusi terhadap Sustainable Development Goals (SDGs) 3, 8, 9, 
+dan 12 dalam bidang kesehatan, pertumbuhan ekonomi, infrastruktur, serta efisiensi sumber 
+daya. 
+ 
+ 
+(a) 
+(b) 
+Gambar 5.1 Prototipe TriaGo saat digunakan: (a) Posisi akhir sensor MAX30105, 
+MLX90614 dan elektroda di sisi kanan, (b) Pengukuran tanda vital dengan TriaGo 
+ 
+5.2. Rencana Pengembangan 
+Untuk meningkatkan kinerja dan ketangguhan sistem dalam lingkungan gawat darurat 
+yang penuh ketidakpastian, terdapat beberapa rencana pengembangan selanjutnya, meliputi: 
+1. Melakukan pengujian dan validasi perangkat secara langsung di lingkungan Instalasi 
+Gawat Darurat (IGD) untuk mengevaluasi kinerja sistem dalam kondisi operasional nyata. 
+2. Pengembangan sistem enkripsi dan autentikasi lanjutan untuk melindungi data pasien 
+serta membatasi akses ke sistem sesuai dengan kewenangan pengguna. 
+3. Pengembangan desain sistem dan antarmuka (GUI) dengan menerapkan System Usability 
+Scale (SUS) untuk memastikan kemudahan pengguna dalam mengoperasikan atau 
+menggunakan alat. 
+4. Mengembangkan integrasi dengan sistem informasi rumah sakit untuk menyinkronkan 
+data pasien, tata ruang IGD, hasil klasifikasi triase, dan ketersediaan tempat tidur yang 
+lebih efisien. 
+ 
+5.3. Tautan Video 
+Tautan video presentasi dapat diakses di https://youtu.be/9eFyVXH_688, menampilkan 
+implementasi purwarupa TriaGo, penjepit praktis untuk klasifikasi otomatis triase. 
+ 
+
+
+=== PAGE 28 ===
+28 ---
+DAFTAR PUSTAKA 
+[1] 
+“JDIH Kementerian Kesehatan RI.” Accessed: Aug. 07, 2026. [Online]. 
+Available: https://jdih.kemkes.go.id/documents/peraturan-menteri-kesehatan-
+nomor-47-tahun-2018 
+[2] 
+A. Budiyanto Adi Putra, A. Adhiwijaya, E. Yustilawati, P. S. Studi, F. 
+Kedokteran dan Ilmu Kesehatan, and U. Alauddin Makassar, “The Relationship 
+Of Work Experience With Triage Decision Making Of Nurses At The 
+Emergency Room Of Syekh Yusuf Hospital,” 2024. 
+[3] 
+“Emergency department volumes surge 40% since 2020 | HFMA.” Accessed: 
+Jul. 11, 2026. [Online]. Available: https://www.hfma.org/fast-finance/hospital-
+ed-volumes-increase/ 
+[4] 
+R. Karina and M. Basabih, “The Role of The Triage Nurse Deployment in 
+Reducing Triage Time in Emergency Department,” Jurnal ARSI : Administrasi 
+Rumah Sakit Indonesia, vol. 11, no. 3, Oct. 2025, doi: 10.7454/arsi.v11i3.1219. 
+[5] 
+M. Khajehgoodari, B. Najafi, A. S. Matanagh, M. Lotfi, and R. Shabanloei, 
+“Nurse triage errors and their relationship with patient outcomes in emergency 
+departments,” Int. J. Afr. Nurs. Sci., vol. 23, p. 100902, Jan. 2025, doi: 
+10.1016/J.IJANS.2025.100902. 
+[6] 
+H. Habib, S. Sulistio, I. A. Albar, R. M. Mulyana, and N. Yundiarto, 
+“Validation of the cipto triage method: A single-centre study from indonesia.,” 
+2020, Dove Medical Press Ltd. doi: 10.21203/RS.2.20170/V1. 
+[7] 
+E. Ullah et al., “Workload involved in vital signs-based monitoring & 
+responding to deteriorating patients: A single site experience from a regional 
+New Zealand hospital,” Heliyon, vol. 8, no. 10, p. e10955, Oct. 2022, doi: 
+10.1016/J.HELIYON.2022.E10955. 
+[8] 
+A. Sapra, A. Malik, and P. Bhandari, “Vital Sign Assessment,” StatPearls, May 
+2023, Accessed: Jul. 11, 2026. [Online]. Available: 
+https://www.ncbi.nlm.nih.gov/books/NBK553213/ 
+[9] 
+I. I. Geneva, B. Cuzzo, T. Fazili, and W. Javaid, “Normal body temperature: A 
+systematic review,” Open Forum Infect. Dis., vol. 6, no. 4, 2019, doi: 
+10.1093/ofid/ofz032. 
+[10] “Target Heart Rates Chart | American Heart Association.” Accessed: Jul. 03, 
+2026. [Online]. Available: https://www.heart.org/en/healthy-living/exercise-
+and-physical-activity/fitness-basics/target-heart-rates 
+[11] C. Chourpiliadis and A. Bhardwaj, “Physiology, Respiratory Rate,” StatPearls, 
+Sep. 2022, Accessed: Jul. 03, 2026. [Online]. Available: 
+https://www.ncbi.nlm.nih.gov/books/NBK537306/ 
+[12] B. B. Hafen and S. Sharma, “Oxygen Saturation,” Oxygen Saturation - 
+StatPearls - NCBI Bookshelf (nih.gov), pp. 4–9, Nov. 2022, Accessed: Jul. 03, 
+2026. [Online]. Available: https://www.ncbi.nlm.nih.gov/books/NBK525974/ 
+[13] C. Johansson, L. Johansson, M. Eriksson, J. Andersson, and M. M. Lind, 
+“Normal Blood Pressure, High Normal Blood Pressure, and Risk of Incident 
+Atrial Fibrillation: A Population‐Based Cohort Study,” Health Sci. Rep., vol. 8, 
+no. 7, p. e71002, Jul. 2025, doi: 10.1002/HSR2.71002. 
+[14] M. N. Imtiaz and N. Khan, “Pan-Tompkins++: A Robust Approach to Detect R-
+peaks in ECG Signals,” Proceedings - 2022 IEEE International Conference on 
+Bioinformatics and Biomedicine, BIBM 2022, pp. 2905–2912, 2022, doi: 
+10.1109/BIBM55620.2022.9995552. 
+[15] P. P. Banik, S. Hossain, T. H. Kwon, H. Kim, and K. D. Kim, “Development of 
+a wearable reflection-type pulse oximeter system to acquire clean ppg signals 
+
+
+=== PAGE 29 ===
+29 ---
+and measure pulse rate and spo2 with and without finger motion,” Electronics 
+(Switzerland), vol. 9, no. 11, pp. 1–26, Nov. 2020, doi: 
+10.3390/electronics9111905. 
+[16] X. Ren, Y. Zhang, H. Yang, K. Li, X. Ye, and C. Zhou, “Core body temperature 
+estimation model with thermal contact resistance compensation,” Measurement, 
+vol. 241, p. 115687, Feb. 2025, doi: 10.1016/J.MEASUREMENT.2024.115687. 
+[17] C. El-Hajj and P. A. Kyriacou, “Cuffless blood pressure estimation from PPG 
+signals and its derivatives using deep learning models,” Biomed. Signal Process. 
+Control, vol. 70, p. 102984, Sep. 2021, doi: 10.1016/J.BSPC.2021.102984. 
+[18] W. Long and X. Wang, “BPNet: A multi-modal fusion neural network for blood 
+pressure estimation using ECG and PPG,” Biomed. Signal Process. Control, 
+vol. 86, Sep. 2023, doi: 10.1016/j.bspc.2023.105287. 
+[19] H. Jiang et al., “Machine learning-based models to support decision-making in 
+emergency department triage for patients with suspected cardiovascular 
+disease,” Int. J. Med. Inform., vol. 145, p. 104326, Jan. 2021, doi: 
+10.1016/J.IJMEDINF.2020.104326. 
+[20] “MAX30105 Datasheet and Product Info | Analog Devices.” Accessed: Jul. 11, 
+2026. [Online]. Available: https://www.analog.com/en/products/max30105.html 
+[21] “Datasheet for MLX90614 I Melexis.” Accessed: Jul. 11, 2026. [Online]. 
+Available: 
+https://www.melexis.com/en/documents/documentation/datasheets/datasheet-
+mlx90614 
+[22] “ECG Click Board (Electrocardiography Measurement) - MikroElektronika.” 
+Accessed: Jul. 11, 2026. [Online]. Available: https://www.mikroe.com/ecg-
+click?srsltid=AfmBOoq7R4UEv0zrsxHvh2XRU4GVzYXpUKj0rN4EC-
+MJBt0KPLWhUM7K 
+[23] “Meet the STM32 ‘Black Pill’ Development Board - Electronics-Lab.” 
+Accessed: Jul. 26, 2026. [Online]. Available: https://www.electronics-
+lab.com/meet-stm32-black-pill-development-board/ 
+[24] “Raspberry Pi 5 – Raspberry Pi.” Accessed: Jul. 11, 2026. [Online]. Available: 
+https://www.raspberrypi.com/products/raspberry-pi-5/ 
+[25] P. Rajan, “Integrating IoT Analytics into Marketing Decision Making: A Smart 
+Data-Driven Approach,” International Journal of Data Informatics and 
+Intelligent Computing, vol. 3, no. 1, pp. 12–22, Feb. 2024, doi: 
+10.59461/IJDIIC.V3I1.92. 
+  
+

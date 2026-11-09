@@ -1,0 +1,4682 @@
+--- PAGE 1 ---
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 2 ---
+ 
+ 
+ 
+PEDOMAN PAGELARAN MAHASISWA NASIONAL BIDANG TIK  
+TAHUN 2026 
+ 
+ 
+ 
+Diterbitkan oleh: 
+Direktorat Pembelajaran dan Kemahasiswaan 
+Direktorat Jenderal Pendidikan Tinggi 
+Kementerian Pendidikan Tinggi, Sains, dan Teknologi 
+ 
+Pengarah: 
+Khairul Munadi 
+Beny Bandanadjaja 
+ 
+Tim Penyusun: 
+Heroe Wijanto  
+Wahyono  
+Muchammad Husni 
+Masayu Leylia Khodra 
+Dana Sulistiyo Kusumo  
+Basnendar Herry Prilosadoso  
+Asep Sholahuddin 
+Romi Satria Wahono 
+Dyah Anggraini 
+Lukito Edi Nugroho 
+Andry Chowanda 
+Bob Hardian 
+Sukino 
+Yulita Priyoningsih 
+ 
+Penyunting: 
+PJ Pengembangan Karakter dan Kesejahteraan Mahasiswa 
+ 
+ 
+ 
+ 
+©2026 Kementerian Pendidikan Tinggi, Sains, dan Teknologi  
+Hak Cipta Dilindungi Undang-Undang 
+All rights reserved 
+
+--- PAGE 3 ---
+ 
+1 
+ 
+KATA PENGANTAR 
+Pesatnya perkembangan Teknologi Informasi dan Komunikasi (TIK) 
+saat 
+ini 
+mendorong 
+hampir 
+seluruh 
+sektor 
+kehidupan 
+untuk 
+bertransformasi secara digital. Kebutuhan akan talenta muda yang 
+berkompetensi unggul di bidang TIK terus meningkat, sejalan dengan 
+pertumbuhan ekonomi berbasis pengetahuan dan inovasi. Pagelaran 
+Mahasiswa 
+Nasional 
+Bidang 
+Teknologi 
+Informasi 
+dan 
+Komunikasi 
+(GEMASTIK) 
+merupakan 
+salah 
+satu 
+program 
+strategis 
+Direktorat 
+Pembelajaran dan Kemahasiswaan, Ditjen Dikti, Kementerian Pendidikan 
+Tinggi, Sains, dan Teknologi, yang dirancang untuk memberikan wadah 
+bagi mahasiswa untuk mengembangkan kompetensi, kreativitas, serta 
+berkontribusi nyata bagi bangsa melalui pemanfaatan TIK. 
+Melalui pendekatan yang seirama dengan arah Asta Cita Pembangunan 
+Nasional dan semangat Kampus Berdampak, GEMASTIK diharapkan menjadi 
+bagian dari upaya mencetak talenta digital nasional yang relevan dengan 
+kebutuhan zaman, mampu menghasilkan karya dan solusi berbasis TIK 
+yang berdampak positif bagi masyarakat dan dunia usaha. 
+Panduan ini diharapkan menjadi acuan dan mendorong standarisasi 
+pelaksanaan GEMASTIK 2026, baik di tingkat perguruan tinggi maupun 
+tingkat nasional. Kami menyampaikan apresiasi kepada seluruh pihak yang 
+telah berkontribusi dalam penyusunan dokumen ini, dan berharap 
+GEMASTIK 2026 dapat berlangsung dengan lancar, kompetitif, dan 
+memberikan manfaat sebesar-besarnya bagi mahasiswa Indonesia. 
+ 
+Jakarta,    Juli 2026 
+Direktur Pembelajaran dan Kemahasiswaan 
+ 
+ 
+Beny Bandanadjaja 
+NIP 197009302000031001
+
+--- PAGE 4 ---
+ 
+2 
+ 
+DAFTAR ISI
+ 
+KATA PENGANTAR ................................................................................ 1 
+DAFTAR ISI ............................................................................................ 2 
+BAB I  
+PENDAHULUAN ...................................................................................... 1 
+A. Latar Belakang .................................................................................... 1 
+B. Dasar Hukum ...................................................................................... 2 
+C. Tujuan ................................................................................................ 3 
+D. Sasaran .............................................................................................. 4 
+E. Penyelenggara dan Pelaksana ..................................................................................... 4 
+F. Akomodasi dan Konsumsi Peserta ....................................................... 4 
+BAB II PENJELASAN UMUM .................................................................. 5 
+A. Kompetisi ........................................................................................... 5 
+B. Persyaratan Umum .............................................................................. 6 
+C. Ketentuan Umum Pelaksanaan Kompetisi ............................................ 7 
+D. Pendaftaran ........................................................................................ 8 
+E. Kejuaraan dan Penghargaan .............................................................. 10 
+F. Pendanaan ........................................................................................ 11 
+G. Informasi Kompetisi Gemastik ........................................................... 11 
+H. Timeline Gemastik XIX/2026 ............................................................. 12 
+I. Frequently Asked Questions (FAQ) ...................................................... 13 
+J. Penerbitan Makalah Tim Finalis .......................................................... 16 
+BAB III  
+KETENTUAN KOMPETISI .................................................................... 17 
+A. Pemrograman ................................................................................... 17 
+B. Keamanan Siber ................................................................................ 20 
+C. Penambangan Data ........................................................................... 24 
+D. Desain Pengalaman Pengguna ........................................................... 28 
+E. Animasi ............................................................................................. 36 
+F. Kota Cerdas ...................................................................................... 45 
+G. Karya Tulis Ilmiah ............................................................................. 51 
+H. Pengembangan Perangkat Lunak ....................................................... 61 
+I. Piranti Cerdas, Sistem Benam & IoT .................................................... 69 
+J. Pengembangan Aplikasi Permainan .................................................... 78 
+K. Pengembangan Bisnis TIK ................................................................. 89 
+
+--- PAGE 5 ---
+ 
+1 
+ 
+BAB I  
+PENDAHULUAN 
+ 
+A. Latar Belakang 
+GEMASTIK atau Pagelaran Mahasiswa Nasional Bidang Teknologi 
+Informasi dan Komunikasi Tahun 2026 dilaksanakan oleh Direktorat 
+Pembelajaran dan Kemahasiswaan (Dit. Belmawa), Direktorat Jenderal 
+Pendidikan Tinggi (Ditjen Dikti), Kementerian Pendidikan Tinggi, Sains, dan 
+Teknologi (Kemendiktisaintek). Program ini ditujukan untuk meningkatkan 
+kompetensi mahasiswa Indonesia, sehingga mampu mengambil peran sebagai 
+agen perubahan dalam memajukan TIK dan pemanfaatannya, baik ketika 
+masih dalam masa studi maupun kelak sesudah lulus studi. Pada tahun ini 
+GEMASTIK digelar untuk ke-19 kalinya dengan tema “Gemastik 2026: 
+Berdampak, Inklusif, dan Berkelanjutan menuju Masyarakat Cerdas”. 
+Lingkup penerapan TIK pada karya-karya inovasi dan kreativitas Gemastik 
+diharapkan merupakan solusi dalam berbagai kasus permasalahan yang 
+meliputi, namun tidak terbatas pada, bidang swasembada pangan, energi dan 
+sumberdaya mineral, air, ekonomi kreatif, kesehatan, disabilitas, pertanian 
+cerdas, kehutanan cerdas, ekonomi hijau dan ekonomi biru, pemberdayaan 
+UMKM, dan lain-lain. 
+Pelaksanaan GEMASTIK XIX akan dilaksanakan dengan metode daring 
+untuk semua kompetisi pada babak penyisihan sedangkan luring untuk babak 
+final. Pagelaran ini diselenggarakan bersama salah satu perguruan tinggi yang 
+ditunjuk 
+oleh 
+Direktorat 
+Pembelajaran 
+dan 
+Kemahasiswaan 
+sebagai 
+penyelenggara. 
+Melalui GEMASTIK, kompetensi TIK mahasiswa Indonesia akan diuji 
+dengan berbagai studi kasus pada masing-masing kompetisi untuk 
+menghasilkan solusi paling efisien dan efektif. Para mahasiswa diharapkan 
+selalu antusias untuk tetap menghasilkan karya dan menyalurkan semangat 
+inovasi dalam pengembangan TIK untuk kemajuan Indonesia. 
+Dari tahun ke tahun, tingkat persaingan Gemastik semakin meningkat, 
+
+--- PAGE 6 ---
+ 
+2 
+ 
+pada Gemastik X tahun 2017 tercatat 2.307 tim yang berasal dari 113 
+Perguruan Tinggi se-Indonesia terdaftar pada 10 cabang kompetisi. Sejak 
+penyelenggaraan Gemastik XI tahun 2018 hingga Gemastik XIX tahun 2026 ini 
+kompetisi telah dikembangkan menjadi 11 cabang kompetisi. Pada Gemastik 
+XI tahun 2018 terlaksana dengan diikuti oleh 2.470 tim yang berasal dari 132 
+Perguruan Tinggi. Pada penyelenggaraan tahun 2019, Gemastik XII diikuti oleh 
+3.285 tim yang berasal dari 133 Perguruan Tinggi. Pada Gemastik XIII tahun 
+2020 terlaksana dengan diikuti oleh 2.869 tim yang berasal dari 171 
+Perguruan Tinggi. Pada Gemastik XIV tahun 2021 terlaksana dengan diikuti 
+oleh 3.164 tim yang berasal dari 210 Perguruan Tinggi. Pada Gemastik XV 
+tahun 2022 terlaksana dengan diikuti oleh 2.577 tim yang berasal dari 153 
+Perguruan Tinggi. Pada Gemastik XVI tahun 2023 terlaksana dengan diikuti 
+oleh 2.781 tim yang berasal dari 203 Perguruan Tinggi. Pada Gemastik XVII 
+tahun 2024 terlaksana dengan diikuti oleh 3.390  tim yang berasal dari 402  
+Perguruan Tinggi. Pada Gemastik XVIII tahun 2025 terlaksana dengan diikuti 
+oleh 2.997 tim yang berasal dari 218 Perguruan Tinggi. Pada tahun 2026 ini, 
+Gemastik XIX diselenggarakan dalam 11 cabang kompetisi juga. 
+ 
+B. Dasar Hukum 
+1. 
+Undang-Undang Nomor 20 Tahun 2003 tentang Sistem Pendidikan 
+Nasional (Lembaran Negara Tahun 2003 Nomor 78, Tambahan Lembaran 
+Negara Nomor 4496); 
+2. 
+Undang-Undang Nomor 12 Tahun 2012 tentang Pendidikan Tinggi 
+(Lembaran Negara Tahun 2012 Nomor 158, Tambahan Lembaran Negara 
+Nomor 5336); 
+3. 
+Peraturan Pemerintah Nomor 4 Tahun 2014 Tentang Penyelenggaraan 
+Pendidikan Tinggi dan Pengelolaan Perguruan Tinggi (Tambahan 
+Lembaran Negara Republik Indonesia Nomor 5500); 
+4. 
+Peraturan Pemerintah Republik Indonesia Nomor 4 Tahun 2022 tentang 
+Perubahan atas Peraturan Pemerintah Nomor 57 Tahun 2021 tentang 
+Standar Nasional Pendidikan; 
+5. 
+Peraturan Presiden Nomor 189 Tahun 2024 tentang Kementerian 
+
+--- PAGE 7 ---
+ 
+3 
+ 
+Pendidikan Tinggi, Riset, dan Teknologi (Lembaran Negara Republik 
+Indonesia Tahun 2024 Nomor 189); 
+6. 
+Peraturan Menteri Pendidikan Tinggi, Sains, dan Teknologi Nomor 1 
+Tahun 2024 tentang Organisasi dan Tata Kerja Kementerian Pendidikan 
+Tinggi, Sains, dan Teknologi; 
+7. 
+Peraturan Menteri Pendidikan Tinggi, Sains, dan Teknologi Nomor 39 
+Tahun 2025 tentang Penjaminan Mutu Pendidikan Tinggi; dan 
+8. 
+Keputusan Menteri Pendidikan Tinggi, Sains, dan Teknologi Nomor 
+358/M/KEP/2025 tentang Indikator Kinerja Utama Perguruan Tinggi dan 
+Lembaga Layanan Pendidikan Tinggi di Lingkungan Kementerian 
+Pendidikan Tinggi, Sains, dan Teknologi. 
+ 
+C. Tujuan 
+Tujuan dari GEMASTIK adalah sebagai berikut: 
+1. 
+Menjadi salah satu wahana penguasaan Teknologi Informasi dan 
+Komunikasi (TIK) untuk menjaga keberlangsungan kehidupan berbangsa 
+dan bernegara serta dalam tatanan kehidupan bermasyarakat, khususnya 
+era Revolusi Industri 4.0 dan menyongsong era Society 5.0. 
+2. 
+Sebagai media bagi mahasiswa untuk terus berkarya dan menyalurkan 
+semangat berinovasi dalam pengembangan TIK untuk keunggulan daya 
+saing bangsa. 
+3. 
+Meningkatkan 
+kepedulian 
+serta 
+kesadaran 
+mahasiswa 
+dalam 
+memanfaatkan IPTEK sehingga menghasilkan produk inovasi yang 
+memiliki daya saing tinggi melalui penguasaan teknologi terkini, 
+termasuk artificial intelligent (AI) atau kecerdasan artifisial (KA). 
+4. 
+Sebagai sarana pendukung demi terciptanya inovasi dalam teknologi, 
+khususnya teknologi informasi dan komunikasi yang berdampak terhadap 
+lingkungan sekitar maupun masyarakat luas. 
+5. 
+Memberikan wahana untuk mahasiswa berinovasi dan berkreativitas di 
+bidang TIK serta menjadikan hasil karya mahasiswa sebagai hasil nyata 
+mahasiswa dalam membantu permasalahan di lingkungan keseharian. 
+ 
+
+--- PAGE 8 ---
+ 
+4 
+ 
+ 
+D. Sasaran 
+Sasaran penyelenggaraan GEMASTIK 2026 adalah seluruh mahasiswa 
+program sarjana dan diploma dari seluruh Perguruan Tinggi di lingkungan 
+Kementerian Pendidikan Tinggi, Sains, dan Teknologi (Kemdiktisaintek) dan 
+terdaftar pada Pangkalan Data Pendidikan Tinggi (PDDIKTI). 
+ 
+ 
+E. Penyelenggara dan Pelaksana 
+Penyelenggara Pagelaran Mahasiswa Nasional Bidang TIK (GEMASTIK) XIX 
+Tahun 2026 adalah Direktorat Pembelajaran dan Kemahasiswaan, Direktorat 
+Jenderal Pendidikan Tinggi, Kementerian Pendidikan Tinggi, Sains, dan 
+Teknologi. 
+ 
+Alamat Penyelenggara: 
+Direktorat Pembelajaran dan Kemahasiswaan 
+Jalan Jenderal Sudirman, Senayan, Jakarta 10270 
+Telepon: 021-57946104 
+Website: http://kemdiktisaintek.go.id  
+ 
+F. Akomodasi dan Konsumsi Peserta 
+Panitia tidak menyediakan akomodasi, transportasi, dan konsumsi bagi para 
+finalis dan pembimbing selama pelaksanaan kompetisi. 
+ 
+ 
+ 
+ 
+
+--- PAGE 9 ---
+ 
+5 
+ 
+BAB II 
+PENJELASAN UMUM 
+ 
+A. Kompetisi 
+Kegiatan kompetisi dalam GEMASTIK XIX dilaksanakan dalam 2 (dua) 
+babak kompetisi untuk semua cabang kompetisi, yaitu Babak Penyisihan dan 
+Babak Final. Babak Penyisihan wajib diikuti oleh seluruh tim peserta pada setiap 
+cabang kompetisi. Babak Final diikuti oleh para peserta yang dinyatakan lolos 
+pada pengumuman Babak Penyisihan sebagai tim finalis masing-masing 
+cabang kompetisi. Babak Penyisihan dilaksanakan secara daring penuh, dan 
+Babak Final dilaksanakan secara kombinasi luring dan daring dengan 
+penyelenggaraan sesuai yang dijelaskan pada penjelasan umum dan aturan 
+pelaksanaan masing-masing cabang kompetisi. 
+GEMASTIK XIX menggelar 11 cabang kompetisi dalam bidang TIK 
+(Teknologi Informasi dan Komunikasi), baik dengan format pertandingan 
+maupun kompetisi karya, yaitu meliputi: 
+1. Kompetisi I Pemrograman (Programming) 
+2. Kompetisi II Keamanan Siber (Cyber Security) 
+3. Kompetisi III Penambangan Data (Data Mining) 
+4. Kompetisi IV Desain Pengalaman Pengguna (UX Design) 
+5. Kompetisi V Animasi (Animation) 
+6. Kompetisi VI Kota Cerdas (Smart City) 
+7. Kompetisi VII Karya Tulis Ilmiah (Scientific Paper) 
+8. Kompetisi VIII Pengembangan Perangkat Lunak (Software Development) 
+9. Kompetisi IX Piranti Cerdas, Sistem Benam & IoT (Smart Device, Embedded 
+System & IoT) 
+10. Kompetisi X Pengembangan Aplikasi Permainan (Game Development) 
+11. Kompetisi XI Pengembangan Bisnis TIK (ICT Business Development) 
+ 
+ 
+ 
+ 
+
+--- PAGE 10 ---
+ 
+6 
+ 
+B. Persyaratan Umum 
+1. Perguruan Tinggi peserta adalah perguruan tinggi di lingkungan 
+Kementerian Pendidikan Tinggi, Sains, dan Teknologi yang terdaftar pada 
+laman PDDIKTI (https://pddikti.kemdiktisaintek.go.id/ ) 
+2. Peserta adalah mahasiswa aktif jenjang program sarjana dan diploma yang 
+terdaftar 
+pada 
+perguruan 
+tinggi 
+dan 
+pada 
+laman 
+PDDIKTI 
+(https://pddikti.kemdiktisaintek.go.id/) pada saat dilakukan pendaftaran 
+tim peserta hingga pelaksanaan babak final dan pengumuman pemenang. 
+3. Setiap 1 (satu) tim peserta terdiri dari maksimum 3 (tiga) orang mahasiswa 
+(satu orang ketua dan dua orang anggota). 
+4. Setiap Perguruan Tinggi dibatasi mengirimkan paling banyak 10 (sepuluh) 
+tim untuk setiap cabang kompetisi pada babak penyisihan berdasarkan 
+seleksi internal perguruan tinggi dan paling banyak 3 (tiga) tim sebagai 
+finalis berdasarkan penilaian dewan juri pada babak penyisihan. 
+5. Peserta bukan merupakan salah satu personel tim yang telah memperoleh 
+medali emas pada cabang kompetisi yang sama di GEMASTIK tahun-tahun 
+sebelumnya. 
+6. Penulisan nama mahasiswa peserta wajib menggunakan nama lengkap 
+tanpa disingkat sesuai dengan yang terdaftar pada laman PDDIKTI. 
+7. Peserta wajib mengikuti seluruh jadwal dan aturan ketentuan kompetisi 
+sesuai buku pedoman dan/atau pengumuman resmi yang diterbitkan oleh 
+panitia penyelenggara. 
+8. Untuk kompetisi berbasis karya kreasi atau inovasi, konten karya yang 
+diikutsertakan tidak diperkenankan mengandung unsur SARA (suku, 
+agama, ras, dan antar golongan), radikalisme, asusila, dan plagiarisme. 
+9. Konten karya yang pernah memenangkan kejuaraan pada kompetisi tingkat 
+nasional atau internasional dapat diikutsertakan dalam GEMASTIK apabila 
+terdapat bobot pengembangan minimal 50% (wajib melampirkan Surat 
+Pernyataan yang memuat penjelasan perbedaan antara keduanya, yang bila 
+dikuantifikasikan lebih dari 50%). 
+10. Jika konten karya yang diajukan ke kompetisi GEMASTIK atau kompetisi 
+nasional atau internasional lainnya pada saat yang sama sampai pada 
+
+--- PAGE 11 ---
+ 
+7 
+ 
+babak final, maka peserta wajib memilih salah satu kompetisi saja dan 
+wajib menginformasikan ke panitia penyelenggara GEMASTIK. Pelanggaran 
+terhadap ketentuan ini akan menyebabkan sanksi berupa diskualifikasi.   
+11. Tim finalis kompetisi IV s.d. X wajib mengunggah laporan akhir dan 
+makalah menggunakan template IEEE yang dapat diunduh dari menu 
+Download 
+pada 
+tautan 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ dan dilengkapi 
+hasil uji periksa similaritas (Turnitin, iThenticate, lainnya), maksimal 
+dengan indeks similaritas 25%. 
+12. Karya para finalis kompetisi IV s.d. XI telah didaftarkan Hak Cipta (HKI) 
+minimal dalam bentuk surat pencatatan ciptaan dari DJKI Kemkum RI. Para 
+finalis kompetisi IV s.d. XI bertanggung jawab penuh atas konsekuensi 
+originalitas dan hak cipta hasil karyanya. Pelanggaran terhadap ketentuan 
+ini akan menyebabkan sanksi berupa diskualifikasi. 
+13. Tim peserta yang dinyatakan lolos babak penyisihan sebagai tim finalis 
+diwajibkan mengumpulkan video profil 60 detik (profil tim untuk 
+kompetisi I-III, profil karya untuk kompetisi IV-XI) dengan mendaftarkan 
+link YouTube pada aplikasi pendaftaran ulang untuk konfirmasi 
+keikutsertaan pada babak final. Pada saat dibacakan pengumuman 
+pemenang dalam upacara penutupan akan ditayangkan video profil dari 
+tim finalis yang dinyatakan sebagai juara 1, juara 2, juara 3, dan juara 
+harapan. 
+ 
+C. Ketentuan Umum Pelaksanaan Kompetisi 
+1. Seluruh Kompetisi I s. d. XI dilaksanakan dalam dua babak, yaitu Babak 
+Penyisihan dan Babak Final. 
+2. Babak Penyisihan dilaksanakan secara daring penuh untuk keseluruhan 
+Kompetisi I s. d. XI, baik untuk tim juri maupun tim finalis. 
+3. Babak Final dilaksanakan secara kombinasi luring dan daring:  
+a. Untuk Kompetisi I, II, dan III, babak final dilaksanakan secara luring 
+penuh di Universitas Bina Nusantara di kampus Jakarta, baik untuk 
+tim juri maupun tim finalis.  
+
+--- PAGE 12 ---
+ 
+8 
+ 
+b. Untuk Kompetisi IV s. d. XI, babak final dilaksanakan secara daring 
+penuh untuk tim juri maupun tim finalis. 
+4. Presentasi dan demo karya inovasi atau kreasi pada Babak Final untuk 
+Kompetisi IV s. d. XI pada butir 3.b dilaksanakan secara daring, yaitu 
+dengan ketentuan sebagai berikut: 
+a. Presentasi dan demo karya inovasi final menggambarkan hasil 
+pengembangan karya inovasi dengan pencapaian 100%. 
+b. Presentasi dan demo karya inovasi final dilaksanakan tidak secara 
+live, namun dalam bentuk rekaman video. 
+c. Video dapat mencantumkan intro dan subtitle. 
+d. Video dalam format MP4 720p berdurasi maksimum 10 menit, terdiri 
+dari rekaman presentasi dan demo karya inovasi, termasuk intro dan 
+subtitle. 
+e. Video diunggah ke YouTube dengan format judul GEMASTIK XIX 2026 
+– <Nama Divisi Lomba> - <ID-Tim> - <Nama Tim> - <Judul Karya> – 
+Karya Final. 
+f. Link rekaman video presentasi dan demo karya inovasi final tersebut 
+diinformasikan kepada penyelenggara melalui aplikasi pendaftaran 
+ulang untuk konfirmasi keikutsertaan tim finalis dalam Babak Final. 
+g. Setiap tim peserta sudah siap di ruang tunggu ruang pertemuan paling 
+lambat 30 menit sebelum jadwal presentasi. 
+h. Akan diberikan tanda peringatan 2 menit sebelum waktu presentasi 
+habis. 
+i. Jika waktu presentasi sudah habis, maka akan dihentikan oleh panitia. 
+5. Upacara Pembukaan dan Upacara Penutupan secara bauran luring dan 
+daring. 
+ 
+D. Pendaftaran 
+1. Pendaftaran Kepesertaan Perguruan Tinggi 
+a. Perguruan Tinggi yang mengikutsertakan mahasiswa ke kegiatan 
+GEMASTIK XIX terlebih dahulu mendaftarkan kepesertaan Perguruan 
+Tinggi secara daring melalui aplikasi pendaftaran pada laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+untuk 
+
+--- PAGE 13 ---
+ 
+9 
+ 
+mendapatkan akun Perguruan Tinggi oleh operator perguruan tinggi; 
+b. Surat pengajuan akun operator Perguruan Tinggi ditandatangani oleh 
+Pimpinan Perguruan Tinggi Bidang Kemahasiswaan dan diunggah ke 
+aplikasi pendaftaran tersebut diatas (bagi yang belum memiliki akun 
+operator); dan 
+c. Setelah Perguruan Tinggi memiliki akun pada aplikasi pendaftaran, 
+Perguruan Tinggi juga wajib melakukan aktivasi akun pada laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+(dengan 
+minimal 1 Tim Peserta telah difinalisasi). 
+2. Pendaftaran Kepesertaan Tim 
+a. Pendaftaran Tim Peserta dilaksanakan secara daring melalui aplikasi 
+pendaftaran 
+pada 
+laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+setelah 
+pendaftaran kepesertaan Perguruan Tinggi diselesaikan; 
+b. Pendaftaran Tim Peserta diwajibkan untuk setiap tim peserta seluruh 
+cabang kompetisi; 
+c. Setelah pendaftaran Tim Peserta diselesaikan oleh Perguruan Tinggi 
+pada aplikasi pendaftaran dan status Tim Peserta telah difinalisasi, 
+selanjutnya Perguruan Tinggi wajib melakukan sinkronisasi penarikan 
+data 
+Tim 
+Peserta 
+pada 
+laman 
+kompetisi 
+Gemastik 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ melalui akun 
+Perguruan Tinggi;  
+d. Akun tim peserta bisa didapatkan melalui akun Perguruan Tinggi 
+setelah melakukan sinkronisasi data seperti yang disebutkan di atas 
+pada laman kompetisi Gemastik; 
+e. Perguruan Tinggi wajib mengunggah surat pengantar tim perguruan 
+tinggi atau surat delegasi tim yang ditandatangani Pimpinan 
+Perguruan Tinggi Bidang Kemahasiswaan pada laman kompetisi 
+Gemastik dengan format PDF; 
+f. 
+Perguruan Tinggi wajib mengunggah berita acara melalui akun Tim 
+Peserta yang menyatakan bahwa telah dilaksanakannya seleksi 
+dan/atau pembinaan terhadap Tim Peserta yang akan berkompetisi 
+
+--- PAGE 14 ---
+ 
+10 
+ 
+pada Gemastik dengan format PDF; 
+g. Peserta wajib mengunggah Kartu Tanda Mahasiswa dan Pas Foto; 
+h. Peserta yang belum memiliki Kartu Tanda Mahasiswa bisa digantikan 
+dengan unggah surat keterangan mahasiswa aktif dari Perguruan Tinggi 
+asal; dan 
+i. 
+Setiap karya yang diikutsertakan, mengacu pada Persyaratan Umum 
+pada nomor 8, 9, dan 10. 
+3. Pendaftaran Ulang Peserta Babak Final 
+a. Pendaftaran ulang peserta Babak Final dilakukan secara daring melalui 
+laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+setelah pengumuman hasil Babak Penyisihan; 
+b. Pendaftaran ulang dilakukan oleh masing-masing Tim Finalis pada 
+semua kompetisi GEMASTIK XIX dengan melakukan konfirmasi 
+checklist  kesediaan  mengikuti  babak  final secara luring untuk 
+kompetisi I s. d. III dan secara daring untuk kompetisi IV s. d. XI, serta 
+mengunggah berkas babak final sesuai dengan ketentuan masing-
+masing kompetisi; dan 
+c. Persyaratan karya pada babak final untuk kompetisi IV s.d. XI mengacu 
+pada Persyaratan Umum nomor 11 dan 12. 
+ 
+ 
+E. Kejuaraan dan Penghargaan 
+Untuk setiap tim finalis pada masing-masing cabang kompetisi Gemastik 
+akan ditetapkan para juara yang diberikan penghargaan berupa medali (medali 
+“emas” untuk Juara I, medali “perak” untuk Juara II, medali “perunggu” untuk 
+Juara III), sertifikat, dan uang pembinaan, sehingga total disediakan 3 x 11 = 
+33 medali kejuaraan. Untuk tim finalis peringkat IV diberikan penghargaan 
+Harapan yang bersifat non-medali dan tanpa uang pembinaan, sehingga hanya 
+diberikan sertifikat. 
+Berdasar perhitungan pengumpulan medali akan ditetapkan Juara Umum 
+Kompetisi Utama Gemastik kepada perguruan tinggi dengan perolehan medali 
+terbanyak menurut sistem olimpiade yang akan dianugerahkan Piala Utama 
+Gemastik ”SAMYAKBYA PADESA WIDYA”, yang berarti Informasi yang 
+
+--- PAGE 15 ---
+ 
+11 
+ 
+Benar untuk Pengetahuan, berupa piala bergilir dan piala tetap. 
+Penghargaan lain dalam bentuk sertifikat dan tidak menjadi penentu 
+dalam perhitungan juara umum, antara lain: 
+▪ Tim dengan Penghargaan Khusus “The Most Inspiring Team”; 
+▪ Penghargaan tim terbaik untuk Regional 1, 2, dan 3 pada Kompetisi I 
+Pemrograman; 
+▪ Penghargaan sebagai The Best Defender dan The Best Attacker pada 
+Kompetisi II Keamanan Siber; dan 
+▪ Penghargaan makalah terbaik (best paper) pada masing-masing Kompetisi 
+IV sampai X. 
+ 
+ 
+F. Pendanaan 
+1. Peserta tidak dipungut biaya pendaftaran. 
+2. Seleksi pada tingkat perguruan tinggi dan pembinaan untuk mengikuti 
+kegiatan Gemastik menjadi tanggung jawab perguruan tinggi masing- 
+masing. 
+3. Biaya keikutsertaan pada pelaksanaan tingkat Nasional (Akomodasi, 
+Transportasi, Konsumsi) menjadi tanggung jawab Perguruan Tinggi 
+masing-masing. 
+ 
+ 
+G. 
+Informasi Kompetisi Gemastik 
+Laman Portal Website 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+Laman Aplikasi Pendaftaran 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+Laman Kompetisi Gemastik 
+: 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ 
+
+--- PAGE 16 ---
+ 
+12 
+ 
+H. 
+Timeline Gemastik XIX/2026 
+ 
+No. 
+Divisi Kompetisi 
+Pendaftaran 
+Perguruan 
+Tinggi dan Tim 
+Peserta 
+Pemanasan  
+Pra-Penyisihan /  
+Tenggat Unggah 
+Proposal 
+Penyisihan / 
+Masa Penjurian 
+Pengumum
+an Finalis 
+Daftar Ulang 
+Finalis 
+Babak Final 
+& Puncak 
+Acara 1).2).8). 
+I 
+Pemrograman (Programming) 
+27 Juli - 
+14 Agustus 2026 
+23 Agustus 2026 
+pkl. 13:00-15:00 WIB 
+30 Agustus 2026 
+pkl. 09:00 - 12:00 WIB 
+M1 
+September 
+26-30 
+Oktober 2026 
+10-13  
+November 2026 
+II 
+Keamanan Siber (Cyber Security) 
+15 Agustus 2026 
+pkl. 09:00-22:00 WIB 
+Penyisihan: 23 Agustus 2026 
+Penilaian Write-up:  
+24-30 Agustus 2026 
+III 
+Penambangan Data (Data Mining) 
+ 
+ 
+ 
+ 
+ 
+ 
+27 Juli -  
+14 Agustus 2026 
+ 
+ 
+ 
+ 
+ 
+ 
+15 Agustus  
+- 2 September 2026 
+IV 
+Desain Pengalaman Pengguna (UX Design) 
+V 
+Animasi (Animation) 
+VI 
+Kota Cerdas (Smart City) 
+VII Karya Tulis Ilmiah (Scientific Paper) 
+VIII Pengembangan Perangkat Lunak (Software Development) 
+IX 
+Piranti Cerdas, Sistem Benam & IoT (Smart Device, 
+Embedded System & IoT) 
+X 
+Pengembangan Aplikasi Permainan (Game Development) 
+XI 
+Pengembangan Bisnis TIK (ICT Business Development) 
+Catatan untuk Kegiatan Babak Final dan Acara Puncak: 
+1. Pendaftaran ulang kepesertaan babak final dan unggah dokumen babak final semua tim finalis 26 - 30 Oktober 2026 
+2. Technical Meeting Peserta Finalis Kompetisi II s. d. XI dilaksanakan pada tanggal 10 November 2026 
+3. Upacara Pembukaan dilaksanakan pada tanggal 11 November 2026 
+4. Untuk Kompetisi I Pemrograman: a). warming-up dan technical meeting (pemanasan pra-final) 11 November 2026, b). pelaksanaan kompetisi 12 November 2026 Pkl. 08:00 - 13:00 WIB 
+5. Untuk Kompetisi II Keamanan Siber: a). technical meeting, set-up sistem dan warming-up (pemanasan pra-final) 10 November 2026, b). pelaksanaan kompetisi 11 November 2026 Pkl. 
+13:00 - 19:00 WIB, c). penyusunan write-up disubmit paling lambat 12 November 2026 Pkl. 02:00 WIB, d). presentasi write-up 12 November 2026 Pkl. 08:00 - 14:00 WIB (20 tim) 
+6. Untuk Kompetisi III Penambangan Data: a). set-up workstation tanggal 10 November 2026 Pkl. 12:00 - 18:00 WIB, b). penyelesaian kasus tanggal 11 November 2026 Pkl. 13:00 - 
+18:00 WIB. c). presentasi solusi kasus tanggal 12 November 2026 Pkl. 08:00 - 17:00 WIB (20 tim) 
+7. Presentasi dan/atau demo karya Kompetisi IV s. d. XI tanggal 11 November 2026 Pkl. 13:00 - 17:30 WIB (8 tim) dan 12 November 2026 Pkl. 08:30 - 16:30 WIB (12 tim) 
+8. Upacara Penutupan, pengumuman juara, dan penyerahan hadiah tanggal 13 November 2026 malam.
+
+--- PAGE 17 ---
+ 
+13 
+ 
+ 
+I. Frequently Asked Questions (FAQ) 
+Q: Bagaimana tahap pendaftaran GEMASTIK? 
+Pendaftaran dilakukan oleh dosen perwakilan Perguruan Tinggi atau 
+pembina pada Unit Pengelola Kemahasiswaan Perguruan Tinggi untuk 
+mendapatkan 
+akun 
+Perguruan 
+Tinggi 
+pada 
+laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/. 
+Setelah 
+akun 
+Perguruan Tinggi aktif dilanjutkan mendaftarkan dan finalisasi data Tim 
+Peserta, kemudian lanjut melakukan sinkronisasi penarikan data Tim Peserta 
+pada 
+laman 
+Gemastik 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/, akun Tim Peserta 
+bisa dilihat dan/atau dikirim melalui akun Perguruan Tinggi setelah 
+melakukan sinkronisasi data pada laman kompetisi Gemastik tersebut. 
+Unggah berkas ada di laman kompetisi Gemastik. 
+ 
+Q: Apakah manfaat Pendaftaran Perguruan Tinggi? 
+Untuk memonitor status dan data tim mahasiswa yang berpartisipasi di 
+GEMASTIK XIX dari Perguruan Tinggi terkait. Setelah masuk dengan akunnya 
+ke dashboard website GEMASTIK XIX, seorang perwakilan Perguruan Tinggi 
+bisa memantau tim mana saja yang terdaftar sebagai perwakilan mahasiswa 
+dari Perguruan Tinggi tersebut. Akun perwakilan Perguruan Tinggi bisa 
+memberikan justifikasi lolos/gagal seleksi internal, jika terdapat tim 
+mahasiswa yang lolos/gagal dalam seleksi internal Perguruan Tinggi. 
+ 
+Q: Bagaimana jika status PT belum terverifikasi? 
+Verifikasi dilakukan secara bertahap dengan memeriksa kebenaran data 
+yang didaftarkan. Silahkan menghubungi panitia GEMASTIK XIX di 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ jika masih belum 
+ada progres hingga H-5 sebelum batas akhir pendaftaran tim. 
+ 
+Q: Apakah yang dimaksud dengan surat penugasan yang harus 
+diunggah pada saat registrasi Perguruan Tinggi? 
+Adalah surat yang dikeluarkan dan ditandatangani oleh Rektor, Direktur 
+
+--- PAGE 18 ---
+ 
+14 
+ 
+Kemahasiswaan, Dekan, atau pejabat setingkat di sebuah Perguruan Tinggi 
+yang berisi penunjukan salah seorang dosen atau tenaga pendidik sebagai 
+perwakilan Perguruan Tinggi pada GEMASTIK XIX. Perlu diingat, surat 
+tersebut harus dibubuhi stempel resmi institusi. 
+ 
+Q: Bagaimana cara mengupdate data tim? 
+Melakukan update data melalui aplikasi pendaftaran pada laman pada laman 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/ kemudian wajib 
+melakukan 
+sinkron 
+data 
+ulang 
+pada 
+laman 
+Gemastik 
+https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/. 
+Jika 
+terdapat 
+pergantian tim atau update data diri tim wajib double check data di laman 
+kompetisi Gemastik pada menu Pendaftaran > Daftar Data Anggota Tim. 
+ 
+Q: Apakah pergantian personil tim peserta diperbolehkan? 
+Pergantian personil tim peserta diperbolehkan maksimal untuk satu orang 
+pada posisi anggota tim, dengan pengajuan paling lambat sebelum 
+diumumkannya hasil penjurian seleksi babak penyisihan. Pergantian personil 
+tim peserta tidak diperbolehkan untuk posisi ketua tim, atau pengajuan 
+setelah diumumkannya hasil seleksi babak penyisihan. 
+ 
+Q: Bagaimana bila tidak ada KTM (Kartu Tanda Mahasiswa)? 
+Bisa digantikan dengan Surat Keterangan Mahasiswa Aktif dari Perguruan 
+Tinggi asal dengan ditandatangani oleh Rektor, Direktur Kemahasiswaan, 
+Dekan, atau pejabat setingkat dan harus dibubuhi stempel resmi institusi. 
+ 
+Q: Berapa jumlah peserta (mahasiswa) per tim? 
+Boleh satu, dua, atau tiga orang. 
+ 
+Q: Apakah pembimbing tim harus mempunyai NIDN? 
+Tidak harus, boleh diganti dengan NIK atau NIP. 
+ 
+Q: Apakah dosen pembimbing itu harus sama dengan perwakilan 
+
+--- PAGE 19 ---
+ 
+15 
+ 
+Perguruan Tinggi yang ditunjuk melalui surat penugasan? 
+Tidak. Dosen pembimbing boleh siapa saja dan tidak perlu surat penugasan. 
+Hanya perwakilan PT/ketua kontingen PT yang perlu disebutkan pada surat 
+penugasan. 
+ 
+Q: Apakah boleh seseorang terdaftar lebih dari satu kali pada tim yang 
+berbeda? 
+Boleh, tetapi satu peserta hanya boleh SATU kali menjadi KETUA tim. Jika 
+ingin mendaftar kompetisi lain dengan tim yang berbeda, peserta tersebut 
+hanya dapat menjadi ANGGOTA tim. Apabila seseorang terdaftar pada dua 
+tim (atau lebih) masuk ke babak final, kemudian jadwal kompetisi kedua 
+timnya bersamaan, panitia tidak bertanggung jawab untuk pengubahan 
+penjadwalan kompetisi. 
+ 
+Q: Dimana unggah pemberkasan untuk Pendaftaran, Babak Penyisihan 
+dan Final? 
+Pada laman Gemastik https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/. 
+Berkas pendaftaran unggah menggunakan akun Perguruan Tinggi, Berkas 
+Babak Penyisihan dan Babak Final unggah menggunakan akun Tim Peserta. 
+ 
+Q: Apakah karya yang didaftarkan pada Gemastik juga diperbolehkan 
+didaftarkan pada lomba yang lain? 
+Boleh, sesuai dengan Persyaratan Umum yang berbunyi, “Jika konten karya 
+yang diajukan ke kompetisi GEMASTIK atau kompetisi nasional atau 
+internasional lainnya pada saat yang sama sampai pada babak final, peserta 
+wajib memilih salah satu kompetisi saja dan wajib menginformasikan ke 
+panitia penyelenggara GEMASTIK” sebelum pelaksanaan babak final.  
+Pelanggaran terhadap ketentuan ini akan menyebabkan sanksi berupa 
+diskualifikasi.   
+ 
+ 
+
+--- PAGE 20 ---
+ 
+16 
+ 
+J. Penerbitan Makalah Tim Finalis 
+1. Makalah para tim finalis dari kompetisi IV s.d. X diminta agar disusun dengan 
+mengikuti template yang disediakan dalam standar gemastik yang diunduh 
+dari laman https://kompetisicerdas.kemdiktisaintek.go.id/gemastik/. 
+2. Publikasi makalah tim finalis didasarkan pada kesediaan yang diberikan 
+pada saat melakukan pendaftaran ulang babak final Gemastik. 
+3. Makalah tim finalis harus di upload pada saat melakukan daftar ulang 
+babak final dalam format .docx. 
+4. Proses penjurian pada babak final kompetisi Gemastik sekaligus merupakan 
+proses review dan seleksi kelayakan kualitas naskah publikasi tim peserta. 
+5. Publikasi makalah tim finalis akan menjadi bagian dari portofolio para 
+peserta finalis dan akan dinilai untuk menentukan penghargaan makalah 
+terbaik pada masing-masing kompetisi. 
+6. Publikasi makalah dari setiap periode gemastik akan dipublikasikan dalam 
+dua edisi, yaitu edisi Oktober tahun berjalan dan edisi April tahun berikutnya. 
+7. Platform publikasi menggunakan OJS (Open Journals System) yang di- 
+hosting pada folder https://buletingemastik.id.
+
+--- PAGE 21 ---
+ 
+17 
+ 
+BAB III  
+KETENTUAN KOMPETISI 
+ 
+A. Pemrograman 
+1. Deskripsi 
+Kompetisi pemrograman menguji kemampuan dan nalar peserta dalam 
+menyelesaikan program komputer untuk memecahkan permasalahan yang 
+diberikan. Kriteria penilaian mencakup kecepatan penulisan program dan 
+ketepatan serta efisiensi dari program yang dibuat untuk setiap kasus 
+permasalahan terkait. 
+Saat pertandingan, peserta akan diberikan deskripsi-deskripsi sejumlah 
+permasalahan dan dalam kurun waktu 3–5 jam, peserta harus menyusun 
+dan mengumpulkan program-program yang dapat menjawab masing-
+masing permasalahan tersebut. 
+Setiap program yang dibuat selain dapat menjawab dengan tepat kasus 
+permasalahan yang diberikan, juga harus dapat dijalankan pada setiap 
+kasus dalam waktu eksekusi dan penggunaan memori yang amat terbatas. 
+Sehingga, selain diadu dalam kecepatan penulisan program, peserta juga 
+dituntut menemukan dan menggunakan algoritma serta struktur data yang 
+tepat dan efisien. Bahasa pemrograman yang boleh digunakan adalah 
+C/C++ dan Java. Materi soal yang diberikan pada babak penyisihan maupun 
+babak final meliputi, namun tidak terbatas pada, antara lain: algoritma ad-
+hoc; struktur data sederhana; struktur data lanjut; pengurutan dan 
+pencarian; rekursi; completed search; string matching; teori graf; geometri; 
+pemrograman 
+dinamis; 
+greedy; 
+teori 
+bilangan; 
+aljabar 
+linear; 
+kombinatorika; serta algoritma-algoritma dan struktur data pada bahasa 
+dan otomata, machine learning, dan natural language processing. 
+ 
+2. Babak Penyisihan 
+a) Bentuk babak penyisihan adalah online test pada laman yang akan 
+diumumkan kemudian. 
+b) Setiap peserta akan diberikan serangkaian soal yang harus diselesaikan 
+
+--- PAGE 22 ---
+ 
+18 
+ 
+dalam bentuk sebuah program. 
+c) Kompetisi akan berlangsung selama 3 jam dan terdiri dari 5–12 soal 
+pemrograman. 
+d) Peserta akan diberi kesempatan sebelum babak penyisihan selama 2 jam 
+untuk melakukan pemanasan dengan tujuan membiasakan diri dengan 
+sistem online. Pada tahap ini, peserta akan diberikan beberapa soal 
+untuk diselesaikan dan dikumpulkan (unggah). Penilaian pada tahap 
+pemanasan tidak mempengaruhi penentuan hasil penyisihan maupun 
+pemenang kompetisi. 
+e) Pada saat online test, peserta diharapkan telah terhubung ke Internet 
+untuk mengikuti babak penyisihan. Kegagalan koneksi Internet menjadi 
+tanggung jawab peserta sendiri. 
+f) Peraturan dan prosedur lengkap mengenai babak penyisihan akan diatur 
+dalam Petunjuk Teknis Babak Penyisihan dan diberitahukan panitia 
+langsung ke masing-masing ketua tim melalui email. 
+g) Babak penyisihan akan dilaksanakan sesuai dengan timeline GEMASTIK 
+XIX pada Bab I.H. 
+h) Tim yang masuk final berjumlah 20 tim dengan ketentuan: 
+- 3 tim terbaik berdasarkan scoreboard babak penyisihan yang masing-
+masing merupakan perwakilan dari tiga regional yaitu regional 1 
+(wilayah Jawa dan Sumatera), regional 2 (wilayah Kalimantan, Bali dan 
+Nusa Tenggara), dan regional 3 (wilayah Sulawesi, Maluku dan Papua). 
+- 10 tim terbaik berdasarkan urutan peringkat scoreboard babak 
+penyisihan di luar perwakilan regional. 
+- 7 tim terbaik dari 7 Perguruan Tinggi teratas yang belum masuk 
+sebagai finalis. 
+- Setiap Perguruan Tinggi dibatasi paling banyak 3 tim yang dapat 
+bertanding di babak final. 
+i) 
+Jika ditemukan indikasi kecurangan/plagiarisme termasuk di dalamnya 
+penggunaan kakas berbasis generative AI, maka tim bersangkutan akan 
+didiskualifikasi dari kompetisi. 
+j) 
+Dilarang melakukan penyerangan kepada sistem dalam bentuk apapun. 
+k) Setiap submission yang tidak Accepted (AC) mendapatkan penalti 20 
+menit per submission. Total penalti dihitung ketika submission 
+
+--- PAGE 23 ---
+ 
+19 
+ 
+dinyatakan Accepted (AC). 
+l) 
+Bahasa pemrograman yang diterima sistem adalah C/C++ dan Java. 
+m) Klarifikasi dilakukan pada satu jam pertama. Klarifikasi di luar waktu 
+tersebut akan diabaikan. 
+n) Jawaban klarifikasi adalah sebagai berikut: 
+- Ya/Tidak 
+- Baca soal lebih teliti 
+- Tidak ada komentar 
+- Jawaban sesuai konteks pertanyaan (jika diperlukan oleh juri) 
+ 
+3. Babak Final 
+Rangkaian babak final dilaksanakan sesuai dengan timeline GEMASTIK 
+XIX pada Bab I.H. Ketentuan Babak final adalah sebagai berikut: 
+a) Bentuk babak final adalah live coding menggunakan sistem online judge 
+dan dilaksanakan secara luring pada ruangan yang telah disediakan oleh 
+penyelenggara. 
+b) Kompetisi akan berlangsung maksimal 5 jam terdiri dari 8–18 soal 
+pemrograman. 
+c) Peraturan dan prosedur detail final akan diatur dan diberitahukan 
+panitia melalui website GEMASTIK XIX. 
+ 
+4. Kriteria Penilaian 
+a) Program dapat menghasilkan jawaban yang benar dalam batas waktu 
+eksekusi dan memori yang telah ditentukan. 
+b) Jumlah soal yang berhasil diselesaikan. 
+c) Waktu pengumpulan untuk soal yang berhasil diselesaikan. 
+d) Tidak melakukan plagiarisme/indikasi kecurangan, termasuk 
+didalamnya penggunan Generative Artificial Intelligence (Gen-AI).
+
+--- PAGE 24 ---
+ 
+20 
+ 
+B. Keamanan Siber 
+1. Deskripsi 
+Tujuan utama dari kompetisi Keamanan Siber ini adalah untuk menguji 
+kemampuan 
+peserta 
+dalam 
+mengidentifikasi, 
+mencegah, 
+dan 
+menyelesaikan masalah keamanan siber (termasuk data) pada sistem atau 
+jaringan komputer. Kompetisi ini melibatkan peserta atau tim yang 
+berkompetisi untuk menyelesaikan serangkaian tantangan keamanan siber 
+yang telah disiapkan oleh panitia kompetisi. 
+Tantangan yang diberikan dapat meliputi penyerangan dan peretasan 
+sistem, pengujian keamanan aplikasi web atau mobile, analisis forensik, 
+atau pemecahan masalah keamanan jaringan. Peserta diharapkan bisa 
+menggunakan teknik-teknik yang sesuai untuk mengatasi tantangan yang 
+diberikan dan menemukan solusi yang efektif dalam waktu yang ditentukan. 
+Ketepatan dan kecepatan peserta dalam menutupi kelemahan yang 
+ditemukan akan menentukan seberapa kuat sistem bertahan dari serangan 
+peserta lain. Kemampuan peserta dalam melakukan proteksi sistem dan 
+data dari ujung ke ujung dan akan sangat menentukan keberhasilan dalam 
+kompetisi ini. 
+Dalam melakukan semua aktivitas di atas, peserta harus menulis dalam 
+sebuah laporan, yang dikenal dengan istilah Write-up. Write-up adalah 
+sebuah laporan atau tulisan yang berisi penjelasan tentang cara dan solusi 
+yang digunakan oleh peserta dalam menyelesaikan tantangan atau soal-soal 
+yang ada. Write-up berisi informasi seperti deskripsi soal, langkah-langkah 
+yang diambil untuk menyelesaikan soal, teknik atau alat yang digunakan, 
+dan penjelasan detail tentang cara menemukan flag atau jawaban dari soal 
+tersebut. Write-up dapat digunakan sebagai sarana promosi bagi peserta 
+atau tim yang berhasil menyelesaikan tantangan dengan cara yang kreatif 
+dan efektif. 
+Model pelaksanaan kompetisi ini menggunakan referensi standar 
+https://ctftime.org. Selain memberikan tantangan yang menarik dan 
+menantang, kompetisi keamanan siber juga bertujuan untuk meningkatkan 
+kesadaran dan pemahaman tentang pentingnya keamanan siber di era 
+digital saat ini. Kompetisi ini juga dapat memberikan kesempatan bagi 
+peserta untuk bertemu dengan para profesional keamanan siber dan 
+
+--- PAGE 25 ---
+ 
+21 
+ 
+membangun jaringan dengan sesama peserta atau penyelenggara 
+kompetisi. 
+ 
+2. Babak Penyisihan 
+Babak penyisihan akan dilakukan secara Online (daring) dengan format 
+Capture the Flag (CTF). Format CTF adalah jenis kompetisi di bidang 
+keamanan 
+siber 
+(cyber 
+security) 
+yang 
+dirancang 
+untuk 
+menguji 
+pengetahuan dan keterampilan peserta dalam berbagai aspek keamanan 
+siber, misalnya mencari data khusus (flag) yang bisa didapat dengan 
+mengeksploitasi celah sistem jaringan komputer atau mencari informasi 
+penting yang terkait dengan keamanan data yang disiapkan. 
+a) Waktu Penyisihan 
+Babak penyisihan bisa dilihat di sub bab Time Line Gemastik 2026.  
+Peserta akan diberi kesempatan sebelum babak penyisihan,  untuk 
+melakukan pemanasan dalam waktu tertentu (waktu akan diumumkan 
+kemudian) dengan tujuan membiasakan diri dengan sistem online. Pada 
+tahap pemanasan ini, peserta akan diberi beberapa soal untuk 
+diselesaikan dan dikirim (unggah). Penilaian pada tahap pemanasan 
+tidak mempengaruhi penentuan hasil penyisihan maupun pemenang 
+kompetisi. 
+b) Materi Penyisihan 
+Materi yang diujikan diantaranya adalah: system hardening, web, digital 
+forensic, 
+cryptography, 
+binary 
+analysis, 
+steganography, 
+reverse 
+engineering dan network sniffing. 
+c) Teknis Penggunaan Sistem Penyisihan (dan Pemanasan) 
+- Peserta akan diberikan akun dan alamat sistem penyisihan melalui 
+email selambat-lambatnya H-2 penyisihan. 
+- Login di laman kompetisi menggunakan username dan password yang 
+diberikan melalui email ketua tim. 
+- Segala hal teknis tambahan terkait penyisihan yang perlu diketahui 
+oleh peserta akan diberitahukan melalui email bersama pemberian 
+akun dan alamat sistem. 
+- Klik menu “Tantangan” untuk melihat soal. Klik soal yang akan 
+dipilih untuk melihat deskripsi soal. 
+
+--- PAGE 26 ---
+ 
+22 
+ 
+- Setiap soal berisi narasi kasus beserta berkas pendukung ataupun 
+alamat layanan jaringan/web yang harus dianalisis keamanannya. 
+- Setiap soal mempunyai bobot/poin yang berbeda-beda tergantung 
+tingkat kesulitannya. 
+- Tekan tombol submit untuk mengirimkan flag yang telah ditemukan. 
+- Untuk mendapatkan nilai pada suatu soal, peserta harus melakukan 
+submit flag pada sistem penyisihan melalui submission form dari soal 
+yang bersangkutan. 
+- Scoreboard akan ditampilkan selama penyisihan berlangsung. 
+- Peserta wajib mengumpulkan Write-Up atau langkah penyelesaian tiap 
+soal dalam bentuk PDF selambat-lambatnya jam 10.00 WIB pada hari 
+H+1 setelah penyisihan melalui laman kompetisi Gemastik yang 
+formatnya akan diberitahukan kemudian. 
+ 
+3. Babak Final 
+ 
+a). Babak final akan dilaksanakan secara offline (luring).  
+b). Finalis sejumlah 20 tim terbaik akan diambil dari babak penyisihan. 
+c). Scoreboard akan ditampilkan selama babak final berlangsung. 
+d). Peserta wajib mengumpulkan Write-Up atau langkah penyelesaian 
+tiap soal dalam bentuk PDF selambat-lambatnya jam 23.00 WIB pada 
+hari H setelah babak final ke laman kompetisi Gemastik yang 
+formatnya akan diberitahukan kemudian. 
+e). Babak final akan dilaksanakan dalam 2 tahap yaitu tahap kompetisi 
+(Attack-Defense) dan presentasi. 
+1. Tahap kompetisi Attack-Defense adalah tahap dimana setiap tim 
+memiliki sebuah sistem dengan celah keamanan. Setiap tim diberi 
+waktu untuk memperbaiki sistem tersebut. Setelah itu setiap
+tim harus mencari flag lawan sambil mempertahankan flag masing-
+masing supaya tidak diketahui. Tahap ini dilaksanakan secara 
+offline. 
+2. Tahap presentasi adalah tahap dimana peserta melakukan 
+pemaparan hasil write-up yang akan dilaksanakan pada hari H+1 
+(setelah poin 1). 
+
+--- PAGE 27 ---
+ 
+23 
+ 
+ 
+4. Ketentuan Khusus 
+a) Peserta diharuskan membawa laptop sendiri sesuai dengan spesifikasi 
+yang dibutuhkan. 
+b) Dilarang melakukan DoS (Denial of Service) dalam bentuk apapun. 
+c) Dilarang melakukan kecurangan seperti berbagi flag, melihat pekerjaan 
+tim lain, memberikan akun kepada orang di luar tim, atau melakukan 
+kerja sama antar tim. 
+d) Dilarang merusak sistem atau mengeksploitasi target berlebihan 
+sehingga tidak bisa diselesaikan tim lain. Apabila peserta melakukan hal 
+itu dengan tidak sengaja, harap langsung melaporkan ke panitia. 
+e) Jika ada peserta yang menemukan celah di sistem penyisihan (di luar 
+kasus yang disiapkan) harap melaporkan ke panitia untuk kemungkinan 
+nilai tambahan. 
+f) 
+Tidak ada kasus yang membutuhkan online brute force. Akses 
+berlebihan terhadap server mengakibatkan IP akan di-banned secara 
+otomatis dalam rentang waktu tertentu. 
+g) Segala bentuk kecurangan akan ditindak tegas. 
+ 
+ 
+5. Referensi Kompetisi 
+Model 
+pelaksanaan 
+kompetisi 
+ini 
+menggunakan 
+standar 
+https://ctftime.org 
+ 
+ 
+
+--- PAGE 28 ---
+ 
+24 
+ 
+C.      Penambangan Data 
+1. Deskripsi 
+Penambangan data merupakan salah satu pekerjaan yang penting untuk 
+penyelesaian banyak permasalahan nyata saat ini. Jenis data yang 
+ditambang bisa beragam, meliputi data terstruktur, gambar, video, dan 
+teks. Perkembangan penambangan data semakin pesat seiring dengan 
+pesatnya perkembangan pembelajaran mesin. Dataset yang bisa diakses 
+masyarakat semakin banyak terdapat di internet, sehingga proses 
+penambangan data dirasa semakin penting untuk dilakukan. Para peserta 
+kompetisi diharapkan mampu melakukan proses penambangan data yang 
+tersedia di internet. 
+ 
+2. Babak Penyisihan 
+Berkas diunggah pada laman kompetisi Gemastik sesuai jadwal kegiatan 
+pada Bab II. Berkas pada babak penyisihan terdiri dari: 
+1. Surat Pernyataan 
+Surat yang berisikan tentang pernyataan bahwa karya orisinal, tidak 
+plagiat, tidak melanggar hak cipta dan belum pernah dilombakan pada 
+kompetisi lain. Surat ditandatangani oleh ketua tim di atas materai dan 
+dikumpulkan dengan format PDF, ukuran file maksimal 2 MB. 
+2. Technical Report 
+a) Pengumpulan technical report makalah dengan tema “Penambangan 
+Data untuk Solusi yang Berdampak, Inklusif, dan Berkelanjutan” 
+b) Technical report merupakan laporan singkat kegiatan penelitian 
+penambangan data yang dilakukan. 
+c) Penelitian singkat tersebut diharapkan memberikan manfaat bagi 
+masyarakat. 
+d) Technical report menyajikan beberapa poin penting sebagai berikut: 
+1) Judul makalah. 
+2) Abstrak. 
+3) Pendahuluan yang meliputi paling tidak: latar belakang, tujuan, 
+dan manfaat, serta batasan yang digunakan. 
+
+--- PAGE 29 ---
+ 
+25 
+ 
+4) Kajian terkait yang relevan. 
+5) Solusi usulan yang meliputi deskripsi solusi, dataset, metode yang 
+akan digunakan, perbedaan dengan solusi sebelumnya dari kajian 
+terkait, metrik evaluasi yang digunakan. 
+6) Hasil eksperimen dan pengujian. 
+7) Analisis atas hasil eksperimen dan pengujian. 
+8) Kesimpulan. 
+e) Dalam 
+melakukan 
+penelitian, 
+peserta 
+diperkenankan 
+untuk 
+menggunakan tools, library, framework, atau Generative AI. 
+f) Technical report belum pernah dipublikasikan sebelumnya, termasuk 
+untuk kompetisi lain. Technical report bukan hasil dari Generative AI. 
+g) Pengumpulan technical report untuk babak penyisihan dalam format 
+PDF dengan format penamaan file “GEMASTIK XIX Penambangan Data 
+- <ID Tim> - <Nama Tim> - <Judul Karya>.pdf” dan dengan ukuran 
+maksimal file 10 MB. 
+ 
+3. Babak Final 
+Pengumuman tim yang lolos ke babak final akan diumumkan sesuai 
+jadwal kegiatan pada Bab II. Begitu juga jadwal  pelaksanaan babak final, 
+dengan ketentuan sebagai berikut. 
+a) Tim finalis melakukan pendaftaran ulang untuk kepesertaan pada babak 
+final. 
+b) Peserta akan diberikan dataset disertai deskripsi singkat. 
+c) Peserta akan diberi waktu untuk melakukan instalasi environment pada 
+perangkat yang disediakan oleh panitia untuk digunakan oleh peserta 
+sesuai jadwal kegiatan pada Bab II Penjelasan Umum. 
+d) Peserta akan diberi waktu 5 jam untuk membangun model dan 
+menggunakan model tersebut untuk evaluasi. 
+e) Peserta harus mendokumentasikan pekerjaannya dalam bentuk file PPT, 
+dan kemudian mempresentasikan di hadapan juri secara luring. 
+f) Dalam membangun model, peserta diperbolehkan menggunakan alat 
+bantu (tools, library, atau framework). 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen babak 
+final semua tim finalis pada laman kompetisi Gemastik sesuai jadwal 
+
+--- PAGE 30 ---
+ 
+26 
+ 
+kegiatan pada Bab II. Berkas pada babak final terdiri dari: 
+1. Video Profil Tim, mengacu pada Bab II bagian Persyaratan Umum nomor 
+13 
+2. Deliverables penyelesaian kasus 
+Kasus soal akan diberikan pada saat final, file deliverables dikumpulkan 
+dengan format zip/rar yang di dalamnya terdiri dari: 
+- Berkas dokumentasi pengembangan model penyelesaian kasus 
+penambangan data 
+- Berkas source code 
+- Berkas PPT presentasi tim 
+ 
+4. Kriteria Penilaian 
+Penilaian Babak Penyisihan berdasarkan makalah yang dikumpulkan. 
+Penilaian Babak Final berdasarkan nilai Babak Penyisihan, performansi 
+model yang dihasilkan, inovasi dalam menghasilkan model, dan presentasi. 
+ 
+Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Keaslian (pengujian terhadap plagiarisme) 
+20% 
+2 
+Kebaruan dataset atau metode 
+20% 
+3 
+Manfaat 
+20% 
+4 
+Kejelasan tulisan 
+20% 
+5 
+Kelengkapan laporan (setiap bagian tulisan 
+lengkap) 
+20% 
+Total Skor (Bobot x Nilai) 
+ 
+ 
+ 
+ 
+ 
+Babak Final 
+ 
+No 
+Kriteria 
+Bobot 
+
+--- PAGE 31 ---
+ 
+27 
+ 
+1 
+Nilai babak penyisihan 
+20% 
+2 
+Skor kinerja (leaderboard) 
+30% 
+3 
+Ketepatan metode 
+25% 
+4 
+Kejelasan dan kelengkapan presentasi 
+25% 
+Total Skor (Bobot x Nilai) 
+ 
+ 
+
+--- PAGE 32 ---
+ 
+28 
+ 
+D.  Desain Pengalaman Pengguna 
+1. Deskripsi 
+Kompetisi Desain Pengalaman Pengguna (UX Design) adalah kompetisi 
+desain interaksi produk dan layanan digital yang berorientasi pada 
+kenyamanan dan kemudahan bagi pengguna. Dalam kompetisi ini yang 
+menjadi fokus utama adalah pengalaman yang dirasakan pengguna ketika 
+sedang menggunakan produk dan layanan digital tersebut secara 
+menyeluruh. Para peserta kompetisi dituntut agar dapat merancang suatu 
+antarmuka untuk mendukung pengalaman pengguna yang baik dengan 
+menggunakan metode terkait, sehingga didapatkan hasil desain teknologi 
+yang memiliki kualitas UX yang baik. Selain itu, inovasi pada karya 
+merupakan syarat bagi kompetisi Desain Pengalaman Pengguna. 
+Tema permasalahan: Permasalahan yang diangkat pada GEMASTIK XIX 
+adalah “Perancangan Pengalaman Pengguna menuju Masyarakat Cerdas 
+yang Berdampak, Inklusif, dan Berkelanjutan”. Peserta diharapkan 
+berkontribusi ke salah satu (atau lebih) dari 17 Sustainable Development 
+Goals (SDG): 
+1. No Poverty 
+2. Zero Hunger 
+3. Good Health and Well-being 
+4. Quality Education 
+5. Gender Equality 
+6. Clean Water and Sanitation 
+7. Affordable and Clean Energy 
+8. Decent Work and Economic Growth 
+9. Industry, Innovation and Infrastructure 
+10. Reduced Inequality 
+11. Sustainable Cities and Communities 
+12. Responsible Consumption and Production 
+13. Climate Action 
+14. Life Below Water 
+15. Life on Land 
+16. Peace, Justice and Strong Institutions 
+
+--- PAGE 33 ---
+ 
+29 
+ 
+17. Partnerships for the Goals 
+ 
+Solusi yang peserta tawarkan harus terpetakan dengan jelas ke tema 
+permasalahan tahun ini dan salah satu (atau lebih) SDG. Peserta juga 
+disarankan untuk menjabarkan target dan indikator dari SDG yang dipilih. 
+Metode Desain: peserta dapat mengadopsi metode atau pendekatan 
+design baik kualitatif, kuantitatif, atau mixed methods untuk melakukan 
+penelitian, perancangan, dan pengujian design (misalnya contextual design, 
+participatory design, co-design, atau generative design). Termasuk 
+diwajibkan menggunakan bantuan kecerdasan buatan pada proses-
+proses, metode atau pendekatan desain serta tools desain yang digunakan 
+dengan batasan dan proses-proses yang sesuai dengan kaidah User Center 
+Design. 
+Keterlibatan pengguna pada konteks: peserta harus melibatkan 
+pengguna dan/atau pemangku kepentingan (stakeholders) dalam proses 
+penelitian, perancangan, dan pengujian design. Konteks lingkungan 
+(ekosistem) dan individual (behavior, motivation, needs, dan tasks) juga 
+harus diilustrasikan dengan jelas. 
+Iterative design: proses iterasi desain (misal pembelajaran dan 
+perbaikan) dapat digambarkan minimal dua kali (dua iterasi) untuk babak 
+penyisihan dan kemudian ditambahkan minimal satu kali (satu iterasi) untuk 
+babak final. 
+Eksplorasi 
+teknologi 
+berkembang: 
+peserta 
+dapat 
+melakukan 
+perancangan dan pengujian pada teknologi yang sudah umum (seperti 
+aplikasi mobile atau web), dan juga dapat melakukan eksplorasi pada 
+teknologi yang sedang berkembang lainnya (kecerdasan buatan dan/atau 
+emerging technology, misalnya: AR/VR, Metaverse, IoT, atau blockchain). 
+ 
+2. Babak Penyisihan 
+Berkas diunggah pada laman kompetisi Gemastik sesuai jadwal kegiatan 
+pada Bab II, berupa working-in-progress terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya orisinal, 
+
+--- PAGE 34 ---
+ 
+30 
+ 
+tidak plagiat, tidak melanggar hak cipta dan belum pernah dilombakan 
+pada kompetisi lain pada saat melakukan pendaftaran atau jika 
+sudah/sedang diikutsertakan pada kompetisi lain, maka harus memenuhi 
+ketentuan yang diatur dalam Gemastik. Surat ditandatangani oleh ketua 
+tim di atas materai dan dikumpulkan dengan format PDF, ukuran file 
+maksimal 2 MB. 
+2. Proposal 
+File proposal format PDF dengan sistematika proposal maksimal jumlah 
+halaman keseluruhan adalah 30 halaman, sebagai berikut: 
+a. Judul produk 
+b. Abstrak 
+c. Latar belakang masalah 
+d. Tujuan dan hasil yang akan dicapai 
+e. Inovasi pada karya 
+f. 
+Metode pencapaian tujuan (design methodology) 
+g. Analisis desain karya meliputi: 
+i. 
+Target 
+pengguna 
+(termasuk 
+target 
+partisipan 
+penelitian), 
+termasuk kebutuhan psikologis, motivasi, behavior, dan aksi yang 
+ingin disasar. 
+ii. Pemangku kepentingan (stakeholder) dan environment serta 
+sistem terkait (mis., sosial, masyarakat, dan teknologi) 
+iii. Batasan produk dan layanan 
+iv. Teknologi yang digunakan 
+h. Skenario penggunaan rancangan produk dan layanan (bukan manual 
+penggunaan produk) 
+i. 
+Daftar Pustaka 
+3. Poster 
+File poster dengan format PDF yang berisikan abstraksi desain UX 
+secara visual dan tekstual yang terdiri dari: 
+a. Logo GEMASTIK XIX (2026) 
+b. Nama solusi, tim, pembimbing, dan perguruan tinggi asal 
+c. Tema permasalahan dan SDG yang dipilih 
+d. Deskripsi singkat dari permasalahan (termasuk permasalahan 
+user/stakeholder) dan perspektif yang digunakan untuk menangani 
+
+--- PAGE 35 ---
+ 
+31 
+ 
+permasalahan 
+e. Ilustrasi proses dan metode desain yang digunakan 
+f. 
+Lingkungan (environment) dan user & stakeholder terkait 
+g. Deskripsi singkat dan ilustrasi aspek utama dari konsep/solusi 
+4. Video Clip 
+Video clip menggambarkan permasalahan yang diangkat serta kreativitas 
+usulan solusi yang ditawarkan, dengan ketentuan: 
+a. Video berdurasi maksimal 2 menit tersebut diunggah ke YouTube 
+sebagai unlisted video (Tidak Publik) dengan format judul GEMASTIK 
+XIX UX Design - <ID Tim> - <Nama Tim> - <Judul Karya> 
+b. Tambahan 
+tag 
+berikut: 
+#gemastikUX, 
+#gemastik2026, 
+#gemastik19, dan #gemastik 
+c. Selanjutnya, 
+link atau 
+URL video 
+clip 
+disertakan 
+saat 
+mengunggah berkas ke laman kompetisi Gemastik. 
+d. Perhatikan copyright video, gambar, atau suara yang digunakan 
+dalam pembuatan video. 
+5. Deliverables 
+File deliverables merupakan kumpulan dari sebagian berkas di atas yang 
+dijadikan satu dalam format ZIP/RAR yang terdiri dari: 
+a. File Proposal 
+b. File Poster 
+c. Link video clip 
+Peserta yang lolos ke Babak Final akan diumumkan sesuai jadwal kegiatan 
+pada Bab II. 
+ 
+3. Babak Final 
+Pengumuman tim yang lolos ke babak final akan diumumkan sesuai 
+jadwal kegiatan pada Bab II. Begitu juga jadwal  pelaksanaan babak final, 
+pendaftaran ulang kepesertaan babak final dan unggah dokumen babak 
+final. Berkas babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Persyaratan Umum  
+2. Makalah Gemastik, mengacu pada Bab II, Persyaratan Umum 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Persyaratan 
+
+--- PAGE 36 ---
+ 
+32 
+ 
+Umum 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dari proposal. Bagian yang 
+sudah ada di proposal dapat ditulis kembali di laporan akhir dan harus 
+di-highlight perubahan yang terjadi dari bagian proposal (proses desain 
+yang dilalui dan bentuk desain akhir/final). Dalam laporan akhir juga 
+harus dituliskan refleksi/pembelajaran sejak dari tahapan Proposal 
+sampai dengan desain akhir/final. Laporan akhir memuat analisis desain 
+karya dalam format PDF yang mengikuti struktur dokumen sebagai 
+berikut: 
+a. Judul produk 
+b. Abstrak 
+c. Latar belakang masalah 
+d. Tujuan dan hasil yang akan dicapai 
+e. Inovasi pada karya 
+f. 
+Metode pencapaian tujuan (design methodology) 
+g. Analisis desain karya meliputi: 
+- 
+Target pengguna dan partisipan yang dilibatkan; termasuk 
+kebutuhan psikologis, motivasi, behavior, dan aksi yang ingin 
+disasar. 
+- 
+Insight statement untuk target pengguna 
+- 
+Pemangku kepentingan (stakeholder) dan environment 
+serta sistem terkait (mis., sosial, masyarakat, dan teknologi) 
+- 
+Batasan produk dan layanan 
+- 
+Teknologi yang digunakan 
+- 
+Bentuk dan eksplorasi konsep design dan prototype seperti: 
+• 
+Ecosystems map, journey map, systems map, service 
+blueprint 
+• 
+Skenario penggunaan rancangan 
+produk dan/atau 
+layanan (bukan manual penggunaan produk) 
+• 
+Navigasi, arsitektur informasi, dan wireframe 
+- 
+Refleksi/pembelajaran 
+h. Metode dan hasil pengujian pengguna (evaluation) 
+
+--- PAGE 37 ---
+ 
+33 
+ 
+i. 
+Hypothesis testing 
+ii. Partisipan yang dilibatkan 
+iii. Protokol pengujian 
+iv. Alat ukur (mis. UEQ, Attrakdiff, SUS) 
+v. Refleksi/pembelajaran 
+vi. Kesimpulan dan saran untuk iterasi 
+i. 
+Kesimpulan 
+j. 
+Daftar pustaka 
+k. Lampiran pendukung 
+5. Hasil Uji Similaritas Laporan Akhir 
+Hasil 
+uji 
+periksa 
+similaritas 
+(plagiarism) 
+laporan 
+akhir 
+bisa 
+menggunakan Turnitin, iThenticate, atau lainnya, maksimal dengan 
+indeks similaritas 25%, dikumpulkan dengan format PDF. 
+6. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Persyaratan Umum bukti pendaftaran HKI ini bisa 
+berupa screenshot pendaftaran karya pada web DJKI (Direktorat Jenderal 
+Kekayaan Intelektual), poin plus jika berhasil mengumpulkan bukti 
+pendaftaran HKI berupa sertifikat HKI, dikumpulkan dengan format PDF. 
+7. Poster (Link Instagram), tim finalis wajib membuat poster yang 
+dipamerkan pada sosmed dengan ketentuan sebagaimana pada babak 
+penyisihan, kemudian link postingan poster tersebut disertakan saat 
+mengunggah berkas pada laman kompetisi Gemastik. 
+8. Poster (PDF), file asli poster format PDF dengan ketentuan 
+sebagaimana pada babak penyisihan. 
+9. File Presentasi (PDF), menyajikan laporan akhir, hasil prototipe, 
+analisis dan evaluasi UX, dikumpulkan format PDF. 
+10. Deliverables 
+File deliverables merupakan kumpulan dari sebagian berkas di atas 
+yang dijadikan satu dalam format ZIP/RAR yang terdiri dari: 
+1. Laporan Akhir (PDF) 
+2. File Presentasi (PPT), menyajikan laporan akhir, hasil prototipe, 
+analisis dan evaluasi UX, dikumpulkan format asli presentasi PPTX. 
+3. Purwarupa (Link) 
+
+--- PAGE 38 ---
+ 
+34 
+ 
+Purwarupa hasil desain berupa link dan link video clip demo. 
+Purwarupa  yang  disajikan  berupa  high-fidelity prototype product. 
+ 
+ 
+4. Kriteria Penilaian 
+Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Identifikasi Permasalahan 
+● Urgensi/manfaat 
+● Justifikasi permasalahan baik melalui data literatur 
+maupun data primer 
+● Kedetailan pemahaman terhadap permasalahan 
+● Keterkaitan dengan tema GEMASTIK XIX dan SDG 
+20% 
+2 
+Inovasi Desain 
+● Orisinalitas 
+● Nilai sosial/ekonomi 
+● Analisis kompetitor (jika ada) 
+30% 
+3 
+Metode Desain 
+● Metode 
+pengumpulan 
+data 
+untuk identifikasi 
+kebutuhan pengguna 
+● Langkah-langkah 
+desain 
+dan 
+pengujian 
+yang 
+dilakukan berdasarkan prinsip UX 
+● Penggunaan bantuan kecerdasan buatan pada proses-
+proses, metode atau pendekatan desain serta tools 
+desain yang digunakan dengan batasan dan proses-
+proses yang sesuai dengan kaidah User Center Design. 
+30% 
+ 
+4 
+Komunikasi (Proposal, Poster, Video) 
+● Kejelasan konten 
+● Kreativitas dan estetika 
+● Orisinalitas 
+(bebas 
+dari 
+masalah 
+hak 
+cipta 
+gambar/video/ dan sejenisnya) 
+20% 
+Total Skor (Bobot x Nilai)  
+ 
+Babak Final 
+No 
+Kriteria 
+Bobot 
+1 
+Laporan Akhir 
+40% 
+
+--- PAGE 39 ---
+ 
+35 
+ 
+2 
+Prototipe 
+30% 
+3 
+Presentasi dan Tanya Jawab 
+30% 
+Total Skor (Bobot x Nilai) 
+5.  Ketentuan Khusus 
+a) Jika desain karya adalah desain karya inkremental atau karya yang 
+sedang dikembangkan, peserta harus menjelaskan di acara apa karya 
+tersebut diikutsertakan dan pembaruan desain karya ini dengan 
+sebelumnya. 
+b) Di final, jika desain karya adalah karya yang juga diikutsertakan 
+sebelumnya dalam perlombaan lain, peserta harus menjelaskan di 
+perlombaan apa karya tersebut diikutsertakan, alasan kenapa lebih 
+memilih Gemastik dibandingkan dengan perlombaan lainnya  dan 
+perbedaan  desain karya ini dengan versi yang diikutkan pada 
+perlombaan lainnya . 
+c) Karya dapat dikembangkan dari tugas kuliah yang terkait dengan 
+kegiatan akademik kurikuler pada program studi yang diikuti anggota 
+tim kontestan. 
+d) Hak cipta dan perizinan: Jika tim menggunakan materi berhak cipta 
+dan/atau  gambar  dari  pihak  ketiga  dalam  dokumen  dan presentasi, 
+maka tim harus mendapatkan izin dan otorisasi terlebih dahulu dari 
+pemilik untuk menggunakan materi tersebut. 
+e) Tim wajib mendeklarasikan penggunaan bantuan kecerdasan buatan 
+pada proses-proses, metode atau pendekatan desain serta tools desain 
+yang digunakan sesuai dengan kaidah-kaidah akademis dan penelitian 
+terkait penggunaan tools berbasis kecerdasan artifisial/buatan. 
+ 
+ 
+ 
+
+--- PAGE 40 ---
+ 
+36 
+ 
+E.  Animasi 
+1. Deskripsi 
+Animasi merupakan sebuah kompetisi karya cipta dalam bentuk 
+visualisasi 2D maupun 3D yang mengandung unsur kreativitas dan inovasi 
+sesuai dengan tema khusus Karya Animasi Mengangkat Tema Nusantara 
+yang Berdampak, Inklusif, dan Berkelanjutan menuju Masyarakat 
+Cerdas”. Karya animasi berbentuk film pendek dari bentuk digital 
+animation dan berupa karya sudah jadi dan utuh saat submit. 
+Spesifikasi lebih rinci dapat dijabarkan sebagai berikut: 
+a) Karya film animasi diharapkan berkontribusi ke salah satu (atau lebih) 
+dari 17 Sustainable Development Goals (SDG): 
+1) No Poverty 
+2) Zero Hunger 
+3) Good Health and Well-being 
+4) Quality Education 
+5) Gender Equality 
+6) Clean Water and Sanitation 
+7) Affordable and Clean Energy 
+8) Decent Work and Economic Growth 
+9) Industry, Innovation and Infrastructure 
+10) Reduced Inequality 
+11) Sustainable Cities and Communities 
+12) Responsible Consumption and Production 
+13) Climate Action 
+14) Life Below Water 
+15) Life on Land 
+16) Peace, Justice and Strong Institutions 
+17) Partnerships for the Goals 
+Solusi yang ditawarkan harus terpetakan dengan jelas yang sesuai tema 
+umum dan khusus pada GEMASTIK XIX dan salah satu (atau lebih) SDG. 
+Peserta juga disarankan untuk menjabarkan target dan indikator dari 
+SDG yang dipilih. 
+ 
+
+--- PAGE 41 ---
+ 
+37 
+ 
+b) Fim animasi memilih salah satu genre dari tiga genre yang sudah 
+ditentukan, yaitu : 1) Sci-fi adventure; 2). Sci-fi fantasy; 3). Fantasy 
+adventure. 
+c) Film animasi dapat dibuat dengan gaya gambar/visual secara bebas 
+(kartun, realistic, stylized atau kombinasinya). 
+d) Pembuatan film animasi harus menggunakan bantuan komputer. 
+e) Penggunaan AI Generative dalam lomba animasi diatur, seperti 
+berikut. 
+1). Karya animasi yang dilombakan harus merupakan karya orisinal 
+ciptaan manusia (human authorship).  
+2). Penggunaan Generative AI hanya diperbolehkan pada tahap pra-
+produksi (pengembangan ide, teks sinopsis, atau bantuan perbaikan 
+kode skrip teknis). 
+3). Peserta dilarang keras menggunakan AI untuk menghasilkan aset 
+visual akhir (karakter, latar belakang, dan animasi gerak) maupun 
+audio utama. 
+4). Peserta wajib melampirkan AI Disclosure Form (Formulir Deklarasi 
+Penggunaan AI) yang dilampirkan bersama Orisinalitas Karya 
+atau Surat Pernyataan yang sudah disediakan.  
+5). Peserta menyertakan bukti proses pembuatan (making of / workflow 
+screen capture) dalam Pitch Bible untuk memastikan kelayakan Hak 
+Cipta (KI) atas karya tersebut. 
+f) Unsur-unsur utama yang harus ada dalam film animasi antara lain: 
+cerita, karakter/tokoh, environment, property, musik, dan suara. 
+g) Musik dan suara mengandung konteks/ciri khas/identitas ke- Indonesia- 
+an. 
+h) Musik dan suara harus bersifat orisinal atau karya sendiri; tidak boleh 
+mengambil klip atau plug-in yang sudah ada. 
+i) 
+Perwujudan karakter/tokoh bersifat bebas (boleh berbentuk manusia, 
+hewan/fable, mesin/robot, benda, dan obyek imajiner lainnya). 
+j) 
+Setting cerita/environment dan property bersifat nasional. 
+k) Melampirkan 
+Pitch 
+Bible 
+sebagai 
+alat 
+atau 
+media 
+untuk 
+mengkomunikasikan ide atau gagasan karya animasi. Berikut format 
+
+--- PAGE 42 ---
+ 
+38 
+ 
+yang wajib ada di dalam Pitch Bible, yaitu : 
+1). 
+JUDUL yang berisi untuk menggambarkan isi, bersifat simpel, 
+mudah diucapkan, dan mudah diingat. 
+2). 
+GENRE DAN TARGET USIA yang berisi pilihan genre animasi dan 
+target usia yang disasar. 
+3). 
+FORMAT yang berisi durasi dari karya animasi yang sudah 
+ditentukan. 
+4). 
+PREMISE yang berupa penjelasan terkait arahan cerita, goal 
+karakter, bentuk cerita, genre, konflik, dan interaksi karakter. 
+5). 
+STORYLINES yang berisi kerangka cerita karya animasi. 
+6). 
+KARAKTER 
+yang 
+berisi 
+terkait 
+karakter 
+utama, 
+karakter 
+pendukung, dan keterangan karakter, seperti Nama, Usia, Gender, 
+dan Sifat. 
+7). 
+ARTWORK yang berisi desain karakter, setting, dan arahan visual. 
+8). 
+CREW yang berisi tim perancang animasi, portofolio, daftar tim 
+inti, latar belakang personel tim, dan informasi pendukung lainnya. 
+9). 
+SAMPLE yang berisi teaser, trailer, animation test, teknik 
+produksi, dan ekspetasi output. 
+10). BISNIS yang berupa rancangan bisnis atas karya yang dibuat 
+seperti estimasi biaya, sumber pendanaan, bentuk kerjasama yang 
+dicari, dan validasi market. 
+11). 360 DEGREE yang berupa penjelasan potensi pengembangan IP 
+(Intellectual Property) dan design pack. 
+2. Babak Penyisihan 
+Peserta wajib mengunggah karya baik berupa file animasi utuh dan 
+file video teaser melalui penyimpanan awan (cloud) via Google Drive 
+dalam satu folder bernama “GEMASTIK XIX Animasi - <ID Tim> - <Nama Tim> 
+- <Judul Karya>”. URL atau tautan dibagikan dan diinformasikan kepada 
+panitia GEMASTIK XIX melalui menu pengunggahan berkas pada halaman 
+dasbor peserta di laman kompetisi Gemastik. Berkas diunggah paling 
+lambat sesuai jadwal kegiatan pada Bab II Penjelasan Umum.  
+
+--- PAGE 43 ---
+ 
+39 
+ 
+Terhadap semua karya animasi yang masuk, panitia akan memilih 20 
+karya animasi terbaik. Semua tim yang lolos ke babak final sudah tidak ada 
+sesi untuk memperbaiki dan karya dianggap final saat submit, dan 
+mempersiapkan presentasi/pemutaran karya film animasinya pada babak 
+final. Berkas pada babak penyisihan terdiri dari: 
+1. Orisinalitas Karya atau Surat Pernyataan 
+Melampirkan surat pernyataan bahwa karya orisinal, tidak plagiat, tidak 
+melanggar hak cipta dan belum pernah dilombakan pada kompetisi lain 
+dengan menyertakan tanda tangan basah oleh ketua tim di atas materai 
+10.000, dikumpulkan dengan format PDF, ukuran file maksimal 2 MB. 
+Contoh format: 
+ 
+Kop Surat Asal Perguruan Tinggi 
+Kompetisi 
+: Kompetisi V Animasi (Animation)  
+Nama Tim 
+: 
+Perguruan Tinggi 
+: 
+Judul karya 
+: 
+Ketua Tim 
+: 
+Anggota Tim 
+: 
+ 
+Dengan ini melalui Surat Orisinalitas Karya menyatakan bahwa karya 
+yang dibuat ini hasil karya sendiri dan bukan menjiplak dari karya orang 
+/pihak lain. 
+Apabila di kemudian hari, ditemukan ada unsur ketidakaslian karya 
+maka saya bertanggung jawab atas konsekuensi atas pelanggaran 
+tersebut. 
+ 
+Demikian surat pernyataan ini saya buat. 
+dst. 
+ 
+2. Bukti Unggah Karya 
+Melampirkan 
+bukti 
+unggah 
+(foto 
+atau 
+screen 
+capture) 
+yang 
+mencantumkan jam dan tanggal pengiriman untuk proses verifikasi saat 
+registrasi ulang, apabila tim lolos ke babak final, dikumpulkan dengan 
+format PDF, ukuran file maksimal 2 MB. 
+
+--- PAGE 44 ---
+ 
+40 
+ 
+3. Identitas Karya 
+Identitas peserta kompetisi, dengan format PDF, ukuran file maksimal 2 
+MB, ukuran kertas A4, spasi 1 - 1.5, font Times New Roman dengan size 
+12 pt dan susunan sebagai berikut: 
+ 
+Kop Surat Asal Perguruan Tinggi 
+- Kompetisi 
+: Kompetisi V Animasi (Animation) 
+- Nama Tim 
+: 
+- Perguruan Tinggi 
+: 
+- Judul Karya 
+: 
+- Link teaser YouTube 
+: 
+Khusus file video teaser dengan durasi 1 sampai 2,5 menit dikirim 
+atau diunggah ke YouTube sebagai unlisted video (Tidak Publik) 
+dengan format penamaan GEMASTIK XIX Animasi - <ID Tim> - 
+<Nama Tim> - <Judul Karya>. Tautan YouTube yang didapat dari 
+proses unggah harus disertakan dalam (File Identitas Karya) saat 
+pengumpulan karya melalui laman kompetisi Gemastik. 
+- Tautan Google Drive 
+: 
+Di dalam tautan Google Drive berupa folder dengan isinya, 
+sebagai berikut: 
+1) Surat Pernyataan 
+2) Bukti Unggah Karya 
+3) Identitas Karya 
+4) Deskripsi Karya 
+5) Video Animasi Utuh 
+6) Video Teaser 
+- Ketua Tim 
+: 
+- Anggota Tim (ditulis lengkap) 
+: 
+1) …… 
+2) …… 
+3) .....dst 
+ 
+ 
+
+--- PAGE 45 ---
+ 
+41 
+ 
+4. Deskripsi Karya 
+Deskripsi karya yang berupa Tema, Konsep, dan Storyboard, 
+dikumpulkan dengan format PDF, contoh format: 
+ 
+Kop Surat Asal Perguruan Tinggi 
+- Kompetisi 
+: Kompetisi 
+V 
+Animasi 
+(Animation) 
+- Nama Tim 
+: 
+- Perguruan Tinggi 
+: 
+- Judul Karya 
+: 
+- Ketua Tim 
+: 
+- Anggota Tim (ditulis lengkap) 
+: 
+1) …… 
+2) …… 
+- Deskripsi Karya 
+: 
+……… 
+……… 
+dst. 
+ 
+Persyaratan Teknis Karya 
+1. 
+Setiap tim harus mengunggah file produksi dalam bentuk softcopy 
+pada penyimpanan awan (cloud) yang dibuat sendiri melalui Google 
+Drive oleh setiap tim dan panitia GEMASTIK XIX mendapat akses untuk 
+membaca folder dan file - file yang ada di dalam drive tersebut. 
+2. 
+Karya film animasi utuh dalam format .MP4 dengan durasi 3-5 menit 
+tidak termasuk credit dengan resolusi minimal 1280 x 720 (720p) 
+dengan frame rate 24 fps. 
+3. 
+Film animasi harus memuat logo GEMASTIK XIX yang ditampilkan di 
+awal (opening) karya film animasi. 
+4. 
+Karya film animasi mengandung konten unsur budaya Indonesia. 
+5. 
+Karya boleh dibuat dengan metode shader/rendering bebas (ray trace, 
+realistic, kartun, dan lain-lain) serta boleh menggunakan plug-in 
+kecuali dalam hal cerita, karakter, environment, property, dan musik 
+
+--- PAGE 46 ---
+ 
+42 
+ 
+serta suara. 
+6. 
+Dewan juri dan panitia tidak bertanggung jawab bila terjadi tuntutan 
+hukum dari pihak-pihak lain atas karya yang sudah dikirim, baik terkait 
+dengan hak cipta, kepemilikan, karya intelektual, atau apapun lainnya. 
+7. 
+Merupakan karya orisinal, tidak plagiat, tidak melanggar hak cipta, 
+karya dibuat hanya khusus untuk kompetisi GEMASTIK XIX, belum 
+pernah diikutsertakan dalam kompetisi atau kegiatan yang lain, dan 
+dibuat pada tahun 2026. 
+8. 
+Keputusan juri bersifat final. 
+ 
+3. Babak Final 
+Dari hasil lomba pada Babak Penyisihan akan diumumkan 20 tim finalis 
+yang akan berlanjut ke babak final. Seluruh tim finalis diwajibkan 
+melakukan pendaftatan ulang kepesertaan pada Babak Final dan 
+mengunggah berkas-berkas yang dipersyaratkan untuk Babak Final. Dalam 
+babak final, peserta wajib hadir secara daring dalam acara pemutaran 
+karya film animasi dan peserta akan mempresentasikan hasil karyanya di 
+hadapan dewan juri secara daring. 
+Jadwal pengumuman hasil seleksi Babak Penyisihan, pendaftaran ulang 
+kepersertaan Babak Final, dan pelaksanaan lomba Babak Final mengikuti 
+jadwal bersama pada Timeline Gemastik yang dijelaskan pada Bab II 
+Penjelasan Umum. 
+Berkas pada babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Persyaratan Umum nomor 
+12 
+2. Makalah Gemastik, mengacu pada Bab II, Persyaratan Umum nomor 
+10 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Persyaratan 
+Umum nomor 10 
+4. Video Animasi 
+Tim peserta sudah tidak bisa penyempurnaan karya animasi dan 
+penilaian karya berdasarkan karya video animasi utuh babak 
+penyisihan. 
+
+--- PAGE 47 ---
+ 
+43 
+ 
+5. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Persyaratan Umum nomor 11 bukti pendaftaran 
+HKI ini bisa berupa screenshot pendaftaran karya pada web DJKI 
+(Direktorat Jenderal Kekayaan Intelektual), poin plus jika berhasil 
+mengumpulkan 
+bukti 
+pendaftaran 
+HKI 
+berupa 
+sertifikat 
+HKI, 
+dikumpulkan dengan format PDF. 
+6. File Presentasi, dikumpulkan dengan format PDF. 
+ 
+4. Kriteria Penilaian 
+a) Lingkup kedalaman eksplorasi tema umum GEMASTIK XIX dan tema 
+khusus Divisi V Animasi, yakni “Karya Animasi Mengangkat Tema 
+Nusantara yang Berdampak, Inklusif, dan Berkelanjutan menuju 
+Masyarakat Cerdas” serta komunikatif dalam menyampaikan pesan. 
+b) Karya harus mampu mengilustrasikan tema dan topik secara kreatif dan 
+orisinal secara ide dan teknik animasi yang sesuai kaidah seni. 
+c) Teknik pembuatan karya animasi dalam teknik modelling, pencahayaan, 
+pergerakan, dan beragam teknik lainnya. 
+d) Karya harus berasosiasi positif, tidak boleh mengandung unsur ras, 
+politik, agama, pornografi, pornoaksi, serta tidak menjatuhkan/ 
+mendiskreditkan pihak tertentu. 
+e) Secara umum, karya animasi yang dikirim tidak boleh mengandung 
+elemen yang melanggar hak cipta dan etika pembuatan karya cipta 
+(bukan tiruan). 
+f) Sinematografi, nilai artistik, nilai etika dari karya secara keseluruhan akan 
+dinilai. 
+Kriteria penilaian yang digunakan pada babak penyisihan dan babak 
+final secara umum sama, hanya berbeda pada penekanan pada tahap yang 
+bersangkutan dan dibedakan pada bobotnya. Aspek ide/konsep lebih 
+ditekankan pada babak penyisihan, sedangkan aspek implementasi, 
+presentasi, dan hasil akhir secara keseluruhan lebih ditekankan pada babak 
+final. 
+ 
+ 
+
+--- PAGE 48 ---
+ 
+44 
+ 
+Babak Penyisihan 
+ 
+ 
+5 
+Kekuatan pesan dan artistik 
+10% 
+Total Skor (Bobot x Nilai)  
+ 
+Babak Final 
+No 
+Kriteria 
+Bobot 
+1 
+Ide/konsep/keaslian 
+15% 
+2 
+Konsistensi tema 
+10% 
+3 
+Kreativitas dalam implementasi 
+20% 
+4 
+Teknik  (modelling/lighting/motion) 
+10% 
+5 
+Kekuatan pesan dan artistik 
+20% 
+6 
+Presentasi 
+25% 
+Total Skor (Bobot x Nilai) 
+ 
+ 
+ 
+ 
+No Kriteria 
+Bobot 
+1 
+Ide/konsep/keaslian 
+30% 
+2 
+Konsistensi tema 
+20% 
+3 
+Kreativitas dalam implementasi 
+20% 
+4 
+Teknik  (modelling/lighting/motion) 
+20% 
+
+--- PAGE 49 ---
+ 
+45 
+ 
+F. Kota Cerdas 
+1. Deskripsi 
+Smart City atau Kota Cerdas adalah suatu konsep mengenai 
+pemanfaatan data untuk mengelola kota/melayani masyarakat. Inovasi Kota 
+Cerdas dirancang guna melayani dan membantu berbagai kegiatan 
+masyarakat, terutama dalam mengelola sumber daya secara efisien dan 
+memberikan kemudahan akses informasi kepada masyarakat hingga untuk 
+mengantisipasi kejadian yang tidak terduga. 
+Saat ini, pemerintah sedang melakukan transformasi digital secara 
+besar-besaran. Terdapat dua aspek penting yang sedang didorong 
+pemerintah, yaitu SPBE, konsep SATU DATA, konsep SATU PETA dan 
+termasuk adanya upaya pemerintah untuk memperbanyak Smart City untuk 
+meningkatkan kualitas layanan. 
+Dengan jumlah kota sebanyak 514 kota/kabupaten, jelas pemerintah 
+membutuhkan dukungan seluruh stakeholder, termasuk ide-ide segar 
+generasi muda (mahasiswa) melalui kanal GEMASTIK 2026 ini. Dengan 
+kontribusi segar para mahasiswa melalui ajang kompetisi Kota Cerdas di 
+Gemastik ini, diharapkan akan semakin banyak kota yang semakin 
+memahami urgensi menjadi kota yang semakin cerdas di era industry 4.0 
+dan era Society 5.0 ini, atas ide warganya yang sedang menjadi mahasiswa. 
+Dalam kerangka pikir itulah, maka Tujuan utama dari dari kompetisi di 
+cabang kompetisi Kota Cerdas ini diadakan adalah: memberi wadah bagi 
+mahasiswa agar terbiasa untuk mengusulkan solusi bagi pengembangan 
+Kota Cerdas dari yang paling sederhana, sesuai dengan definisi standar Kota 
+Cerdas : “A smart city is a municipality  that  uses  information  and  
+communication 
+technologies 
+(ICT) 
+to 
+increase 
+operational 
+efficiency, share information with the public and improve both the 
+quality of government services and citizen welfare” 
+Tema Smart City Berbasis AI: Transformasi Tata Kelola Kota untuk 
+Pelayanan Publik yang Efektif, Transparan, Berdampak, dan Berkelanjutan 
+menuju masyarakat cerdas. Untuk memberikan pemahaman menyeluruh 
+kepada 
+mahasiswa 
+peserta, 
+membangun 
+smart-city 
+membutuhkan 
+
+--- PAGE 50 ---
+ 
+46 
+ 
+pendekatan multidisiplin. Karena, selain harus aspek teknologi (khususnya 
+TIK), pengembang dituntut mempunyai kepekaan terkait proses bisnis 
+layanan kota dan berbagai regulasi dalam mengimplementasikan Kota 
+Cerdas. 
+Dengan memahami proses bisnis, regulasi dan teknologi, maka 
+mahasiswa dapat mengusulkan solusi teknologi yang paling tepat untuk 
+sebuah kota, yang tentunya akan tergantung kondisi kota masing-masing. 
+Mengingat luasnya cakupan smart-city, maka mahasiswa peserta harus 
+mampu mendeskripsikan ide, konsep dan penerapan Teknologi Informasi 
+dan Komunikasi untuk Kota Cerdas dengan: 
+1. Mampu secara terperinci menjelaskan latar-belakang munculnya ide 
+yang diusulkan, disarankan untuk mengambil ide orisinal yang menjadi 
+masalah di kota yang dijadikan objek pengembangan. 
+2. Mampu mendefinisikan usulannya dengan fokus ke satu atau lebih dari 
+6 pilar Kota Cerdas yang disosialisasikan oleh Kementerian Kominfo 
+(smart governance, smart branding, smart economy, smart living, 
+smart environment, smart people) atau model lain yang secara akademis 
+dapat dirujuk. 
+3. Secara terstruktur, peserta harus mampu mengidentifikasi transformasi 
+dari sebuah layanan kota ke aspek proses bisnis yang didigitalisasi, 
+didukung oleh regulasi terkait dan pemilihan teknologi terbaik yang 
+digunakan. Lingkupnya jelas sangat luas, tidak terbatas hanya pada 
+proses pengumpulan data, pemrosesan data, pemanfaatan IoT, kendali 
+berbasis data, hingga diseminasi informasi dan aplikasi digital untuk 
+masyarakat. Kata kunci internet of data, internet of services, internet of 
+things dan internet of people dapat dijadikan dasar pengembangan yang 
+diusulkan. 
+Program dalam smart city minimal harus didukung oleh empat tahap 
+rencana aksi yang terdiri dari: 
+a. Dukungan regulasi dan kelembagaan; apakah sudah ada atau harus 
+dibuat regulasi atau kelembagaan yang baru. 
+b. Dukungan infrastruktur; yang meliputi kesiapan infrastruktur fisik, 
+infrastruktur TIK dan infrastruktur sosial. 
+
+--- PAGE 51 ---
+ 
+47 
+ 
+c. Dukungan aplikasi. 
+d. Dukungan Literasi kepada stakeholder dan pengguna program. 
+4. Memahami, bahwa kecanggihan teknologi tidak selalu berhasil saat 
+diterapkan di kota-kota Indonesia, maka teknologi TIK sederhana yang 
+tepat guna malah bisa memberi nilai tambah. 
+5. Mampu membuat inovasi dalam penyelesaian permasalahan di lapangan 
+sehingga implementasi dari solusi yang diusulkan dapat berhasil 
+meskipun banyak kendala dan keterbatasan yang dihadapi. 
+ 
+Dengan demikian, peserta kompetisi Kota Cerdas dituntut untuk 
+menguasai permasalahan, mengusulkan solusi TIK yang tepat guna dan 
+mampu mempresentasikan usulan dan hasilnya yang dikemas secara baik 
+dan meyakinkan. 
+ 
+2. Babak Penyisihan 
+Berkas diunggah paling lambat sesuai jadwal kegiatan pada Penjelasan 
+Umum, berkas pada babak penyisihan terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta dan belum pernah 
+dilombakan pada kompetisi lain. Surat ditandatangani oleh ketua tim di 
+atas materai dan dikumpulkan dengan format PDF, ukuran file maksimal 
+2 MB. 
+2. Proposal 
+Proposal harus memperhatikan ketentuan-ketentuan berikut: 
+a) 
+Proposal menekankan pada permasalahan yang ada dalam 
+kota/kabupaten di Indonesia. 
+b) 
+Proposal ditulis dalam bahasa Indonesia, namun dimungkinkan 
+pemakaian beberapa istilah bahasa asing yang lebih mudah 
+dipahami. 
+c) 
+Proposal harus memiliki halaman sampul yang memuat informasi 
+nama tim, nama - nama anggota tim termasuk nama universitas 
+dan alamat email (ketua tim). 
+
+--- PAGE 52 ---
+ 
+48 
+ 
+d) 
+Proposal yang diajukan merupakan ide orisinal dengan tidak 
+menjiplak dari proposal yang sudah ada. 
+e) 
+Proposal yang diajukan dapat direalisasikan menjadi bentuk 
+perangkat keras maupun aplikasi yang merupakan solusi inovatif 
+dari permasalahan yang dipaparkan. 
+Proposal ditulis maksimal 30 halaman ukuran A4 dan penulisan 
+menggunakan huruf Times New Roman 12 dengan spasi 1,5 . Proposal 
+harus mengikuti struktur dokumen sebagai berikut: 
+- Judul/Nama aplikasi Kota Cerdas 
+- Latar belakang (permasalahan) termasuk pilar apa saja yang 
+diperlukan solusinya. 
+- Tujuan dan manfaat 
+- Batasan aplikasi 
+- Implementasi/Solusi (inovasi, kreativitas, proses bisnis, regulasi ) 
+- Screenshot mockup aplikasi 
+- Dokumentasi penggunaan 
+- Target pengguna aplikasi 
+Proposal disimpan dalam format PDF dengan penamaan file “GEMASTIK 
+XIX Kota Cerdas - <ID-Tim> - <Nama Tim> - <Judul Karya> - Proposal.pdf” 
+dan dengan ukuran maksimal file 10 MB. 
+3. Video 
+Video rancangan aplikasi berdurasi maksimal 5 menit diunggah ke 
+YouTube dengan format penamaan GEMASTIK XIX Kota Cerdas - 
+<ID-Tim> - <Nama Tim> - <Judul Karya>. 
+Proposal dan tautan video YouTube tersebut diunggah melalui login tim 
+peserta di laman kompetisi Gemastik paling lambat sesuai jadwal 
+kegiatan pada Bab II Penjelasan Umum. 
+ 
+3. Babak Final 
+Tim yang lolos ke babak final dan pelaksanaan babak final diumumkan 
+sesuai jadwal kegiatan pada Bab II Penjelasan Umum. 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen babak 
+final semua tim finalis sesuai jadwal kegiatan pada Bab II Penjelasan Umum, 
+
+--- PAGE 53 ---
+ 
+49 
+ 
+berkas pada babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Persyaratan Umum 
+2. Makalah Gemastik, mengacu pada Persyaratan Umum  
+3. Hasil Uji Similaritas Makalah, mengacu pada Persyaratan Umum 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+proposal. Bagian yang sudah ada di proposal dapat ditulis kembali di 
+laporan akhir dan harus dijelaskan perubahan atau perbaikan yang terjadi 
+dari bagian proposal. Laporan akhir dikumpulkan dalam format PDF. 
+5. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Persyaratan Umum  bukti pendaftaran HKI ini bisa berupa 
+screenshot pendaftaran karya pada web yang telah ditentukan, poin plus 
+jika berhasil mengumpulkan bukti pendaftaran HKI berupa sertifikat HKI, 
+dikumpulkan dengan format PDF. 
+6. File Presentasi 
+Presentasi dan demo karya inovasi atau kreasi pada Babak Final akan 
+dilaksanakan secara daring, yaitu dengan ketentuan sesuai penjelasan 
+umum. 
+ 
+4. Kriteria Penilaian 
+Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Permasalahan 
+● Urgensi permasalahan di pemerintah, masyarakat, 
+usahawan, atau pegawai pemerintah di perkotaan saat 
+ini (mendesak/ tidak mendesak) 
+● Lingkup permasalahan (kompleks/ tidak kompleks) 
+● Kesesuaian permasalahan dengan Dimensi Kota Cerdas 
+(sesuai/ tidak sesuai) 
+30% 
+2 
+Aspek pendukung 
+● Permasalahan yang diajukan harus didukung oleh data 
+riil dapat berupa dokumen, foto, video, dan lain- lain 
+● Regulasi yang mendasarinya 
+20% 
+
+--- PAGE 54 ---
+ 
+50 
+ 
+3 
+Referensi teknologi yang digunakan (elemen-elemen 
+teknologi, kesiapan infrastruktur, kesiapan stakeholder, 
+sumber daya manusia (SDM), kesiapan data, dan lain-lain) 
+30% 
+4 
+Dampak implementasi yang diharapkan (orisinalitas, 
+kreativitas teknologi yang digunakan dan pemanfaatan 
+data serta informasi yang dihasilkan 
+dalam 
+mendukung pengembangan dimensi Kota Cerdas terkait 
+atau lebih baik lagi mendukung program pemerintah  
+daerah  dalam  pengembangan  Kota Cerdas) 
+20% 
+ 
+Total Skor (Bobot x Nilai) 
+ 
+Nilai tahap penyisihan adalah nilai gabungan keempat komponen penilaian 
+sesuai bobot. Peserta 20 terbaik akan ditetapkan sebagai peserta yang akan 
+lolos ke penilaian tahap final. 
+ 
+ 
+Babak Final 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Penilaian terhadap kelompok (presentasi) 
+● Penguasaan materi (teknologi dan proses bisnis serta 
+regulasi) 
+● Penyajian konten presentasi 
+● Penilaian terhadap aplikasi 
+30% 
+2 
+Keunikan (Kearifan Lokal) 
+20% 
+3 
+Potensi manfaat 
+30% 
+4 
+Fungsi dan fitur 
+20% 
+ 
+Total Skor (Bobot x Nilai) 
+ 
+ 
+5. Ketentuan Khusus 
+Peserta yang lolos ke babak final perlu mempersiapkan peralatan yang 
+diperlukan karena akan dilaksanakan dengan daring. 
+
+--- PAGE 55 ---
+ 
+51 
+ 
+ 
+ 
+
+--- PAGE 56 ---
+ 
+52 
+ 
+G. Karya Tulis Ilmiah 
+1.  Deskripsi 
+Kompetisi 
+Karya 
+Tulis 
+Ilmiah 
+mendorong 
+peserta 
+untuk 
+menumbuhkembangkan sebuah gagasan unik, inovasi out-of-the-box, 
+dan ide kreatif penelitian mahasiswa, yang memiliki novelty dan 
+kontribusi ke pengetahuan (contribution to knowledge) di bidang TIK dan 
+computing. Selain memiliki dampak signifikan dari sisi kontribusi ke 
+pengetahuan di bidang TIK dan computing, penelitian mahasiswa juga 
+diharapkan memiliki dampak signifikan berupa solusi atas permasalahan 
+riil masyarakat, bangsa dan negara Indonesia. Hasil penelitian dituliskan 
+dalam bentuk karya tulis ilmiah siap terbit yang mengikuti kaidah dan 
+metode penulisan ilmiah yang sudah ditetapkan. Peserta diharapkan 
+mampu menyusun karya tulis ilmiah yang sistematis, scientific, 
+komprehensif, dan menggunakan landasan literatur yang terpercaya dan 
+terkini, serta memberikan dampak signifikan di bidang TIK dan 
+computing untuk kemaslahatan masyarakat dan kedaulatan bangsa. 
+ 
+2. Babak Penyisihan 
+Pada babak penyisihan, berkas yang wajib diunggah pada laman 
+kompetisi Gemastik paling lambat sesuai jadwal kegiatan pada Bab II 
+Penjelasan Umum, terdiri dari 5 bagian (Bagian A-E) seperti di bawah: 
+A. HALAMAN SAMPUL (Mengacu Lampiran A, Bagian G Karya Tulis 
+Ilmiah) 
+B. HALAMAN PENGESAHAN (Mengacu Lampiran B, Bagian G Karya 
+Tulis Ilmiah) 
+C. SURAT PERNYATAAN BELUM DIPUBLIKASIKAN (Mengacu 
+Lampiran C, Bagian G Karya Tulis Ilmiah) 
+D. HASIL UJI SIMILARITAS KARYA ILMIAH (Mengacu ke Bab II 
+Penjelasan Umum, Bagian B Persyaratan Umum, nomor 11) 
+E. KARYA TULIS ILMIAH (Mengacu ke panduan penulisan karya tulis 
+ilmiah di bawah) 
+ 
+
+--- PAGE 57 ---
+ 
+53 
+ 
+Luaran dari kompetisi Karya Tulis Ilmiah ini adalah berbentuk artikel 
+ilmiah. Artikel ilmiah ditulis dengan layout standar artikel ilmiah untuk 
+publikasi ke jurnal atau conference, dengan mengacu ke template karya 
+ilmiah dengan style IEEE, yang contoh templatenya ada di Bab II 
+Penjelasan Umum, Bagian B Persyaratan Umum, nomor 11. Peserta wajib 
+mengikuti struktur penulisan karya ilmiah dengan format dan panduan, 
+mulai dari bagian a) hingga bagian k) di bawah ini.  Karya ilmiah harus 
+ditulis dengan struktur yang sistematis, lengkap, komprehensif, tanpa 
+batasan halaman. 
+a) JUDUL 
+b) NAMA PENULIS 
+c) ABSTRAK 
+Abstrak ditulis dalam Bahasa Indonesia dan Inggris. Abstrak tidak lebih 
+dari 300 kata dan berisikan intisari dari seluruh hasil penelitian yang 
+meliputi: latar belakang, masalah penelitian, metode terkini yang ada 
+(state-of-the-art methods), metode yang diusulkan (proposed method), 
+evaluasi dan validasi metode yang diusulkan, hasil dan pembahasan, 
+serta kesimpulan. Pada bagian bawah abstrak disertakan 3-5 kata-kata 
+kunci (keywords). 
+d) PENDAHULUAN 
+Pendahuluan merupakan gambaran umum, motivasi dan latar belakang 
+mengapa penelitian ini dilakukan. Landasi semua klaim, data, dan 
+argumentasi dengan studi lapangan dan studi literatur tentang 
+pentingnya topik penelitian itu diangkat. Lebih detailnya bagian 
+Pendahuluan berisi: latar belakang, masalah penelitian, tujuan 
+penelitian, rangkuman metode terkini yang sudah dilakukan peneliti lain 
+sebelumnya (state-of-the-art methods), dan rangkuman novelty dan 
+kontribusi ke pengetahuan yang membuat metode yang diusulkan itu 
+berbeda dibanding metode terkini yang ada. Lakukan kajian literatur 
+ilmiah yang tajam dari publikasi jurnal terindeks yang bisa dipercaya, 
+uraikan apa yang dilakukan peneliti sebelumnya, dan jelaskan dengan 
+sistematis dan lengkap perbedaan dengan yang dilakukan oleh peserta. 
+e) MASALAH PENELITIAN 
+
+--- PAGE 58 ---
+ 
+54 
+ 
+Rangkuman masalah penelitian (research gap) yang diangkat oleh 
+peneliti, yang nanti akan diselesaikan di bagian Tujuan Penelitian 
+menggunakan Metode yang Diusulkan, yang hasilnya akan dievaluasi 
+dan divalidasi di bagian Hasil dan Pembahasan, yang kemudian 
+dirangkumkan hasilnya di bagian Kesimpulan. 
+f) TUJUAN PENELITIAN 
+Tujuan penelitian sebagai solusi dari masalah penelitian (research gap) 
+yang diangkat oleh peneliti, diharapkan dapat diungkapkan secara jelas, 
+dan sebaiknya selaras dan mencerminkan judul karya ilmiah 
+g) METODE YANG DIUSULKAN 
+Penjelasan detail, komprehensif dan argumentatif tentang metode yang 
+diusulkan (proposed method) oleh peneliti yang tujuannya untuk 
+memecahkan 
+masalah 
+penelitian 
+yang 
+diangkat 
+oleh 
+peneliti. 
+Perbandingan dan komparasi metode yang diusulkan dengan metode 
+terkini yang ada (state-of-the-art methods), tahapan penelitian, bahan 
+dan pelaksanaan eksperimen, metode evaluasi serta validasi juga 
+dijelaskan dengan lengkap di bagian ini. Supaya komprehensif, metode 
+dan tahapan eksperimen yang dilakukan, termasuk waktu, durasi, 
+tempat, peralatan, software tools, dataset, infrastruktur, bahan, alat 
+yang digunakan, dan metode untuk pengolahan data serta analisis yang 
+dilakukan. Metode yang diusulkan harus dijelaskan secara lengkap agar 
+peneliti lain dapat melakukan uji coba dan eksperimen ulang (replikasi) 
+untuk validasi penelitian yang dilakukan dan penelitian lanjutan. 
+h) HASIL DAN PEMBAHASAN 
+Bagian ini menjelaskan secara lengkap tentang hasil eksperimen dari 
+metode yang diusulkan, dan dibandingkan dengan metode terkini yang 
+ada (state-of-the-art methods), untuk memvalidasi dan membuktikan 
+bahwa ada kontribusi ke pengetahuan dari penelitian yang dilakukan. 
+Supaya lebih mudah dipahami, hasil, pembahasan dan perbandingan 
+metode yang diusulkan dengan metode terkini, dapat dibantu dengan 
+tabel dan gambar. Setiap tabel dan gambar harus dinarasikan maknanya. 
+Tidak ada spekulasi dan interpretasi di luar hasil eksperimen dalam 
+bagian ini, yang disajikan adalah fakta, hasil eksperimen dan fenomena 
+
+--- PAGE 59 ---
+ 
+55 
+ 
+yang ditemukan dari proses pelaksanaan penelitian. Interpretasi dan 
+analisis kritis dan argumentatif dari penulis terhadap hasil penelitian, 
+kebaruan (novelty) dan kontribusi ke pengetahuan yang diperoleh 
+dikemukakan di sini.   
+i) KESIMPULAN DAN SARAN 
+Kesimpulan dan saran merupakan bagian akhir tulisan yang berisi 
+tarikan kesimpulan dari hasil dan pembahasan penelitian, beserta saran 
+yang isinya adalah temuan penting yang berguna untuk penelitian 
+lanjutan (future works). Secara umum kesimpulan menunjukkan 
+jawaban atas masalah penelitian yang telah dikemukakan sebelumnya di 
+bagian pendahuluan, pelaksanaan dan validasi dari tujuan, serta 
+rangkuman dari hasil dan pembahasan yang telah dilakukan. Sedangkan 
+bagian Saran, di dalamnya berisi pembahasan tentang aneka ragam 
+temuan yang muncul dari hasil eksperimen, yang penting, menarik dan 
+dapat bermanfaat untuk kelanjutan bagi penelitian mendatang (future 
+works). 
+j) DAFTAR REFERENSI 
+Daftar referensi berisi list sumber pustaka yang telah dirujuk (sitasi) 
+dalam tubuh tulisan karya ilmiah. Setiap referensi yang dirujuk (disitasi) 
+di dalam karya ilmiah harus muncul di Daftar Referensi. Begitu juga 
+sebaliknya, setiap referensi yang muncul dalam daftar referensi harus 
+pernah dirujuk dalam tubuh tulisan. Daftar referensi bukan daftar 
+bacaan, tapi daftar sitasi dari tulisan di karya ilmiah.  
+k) LAMPIRAN 
+Berisi aneka ragam informasi lengkap, dataset, tools, hardware & 
+infrastruktur yang digunakan dalam eksperimen, serta hasil eksperimen 
+lengkap yang dilakukan dalam penelitian. 
+ 
+3. Babak Final 
+Tim yang lolos ke babak final akan diumumkan oleh panitia Gemastik. 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen babak 
+final semua tim finalis dilakukan pada laman kompetisi Gemastik, berkas 
+pada babak final terdiri dari: 
+
+--- PAGE 60 ---
+ 
+56 
+ 
+● Video Profil Karya, mengacu pada Bab II Penjelasan Umum, Bagian 
+B Persyaratan Umum, nomor 13 
+● Karya Tulis Ilmiah, mengacu pada template karya ilmiah yang ada 
+di Bab II Penjelasan Umum, Bagian B Persyaratan Umum, nomor 11 
+● Hasil Uji Similaritas Karya Tulis Ilmiah, mengacu pada Bab II 
+Penjelasan Umum, Bagian B Persyaratan Umum, nomor 11 
+● Bukti Pendaftaran Hak Cipta (HKI) Karya, mengacu pada Bab II 
+Penjelasan Umum, Bagian B Persyaratan Umum, nomor 12. Bukti 
+pendaftaran HKI ini bisa berupa screenshot pendaftaran karya pada web 
+DJKI (Direktorat Jenderal Kekayaan Intelektual), atau sertifikat HKI. 
+● File Presentasi, bentuk babak final adalah pemaparan (presentasi) 
+karya tulis yang diusulkan maksimal 25 menit (10 menit presentasi dan 
+15 menit tanya jawab). 
+● Video Presentasi, mengacu pada Bab II Penjelasan Umum, Bagian C 
+Ketentuan Umum Pelaksanaan Kompetisi, nomor 4. 
+ 
+ 
+ 
+ 
+
+--- PAGE 61 ---
+ 
+57 
+ 
+4. Kriteria Penilaian 
+A. Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobo
+t 
+1 
+JUDUL 
+Kesesuaian isi dan judul artikel 
+5% 
+2 
+ABSTRAK 
+Latar belakang, tujuan, metode, hasil, kesimpulan, katakunci 
+10% 
+3 
+PENDAHULUAN 
+Persoalan dan latar belakang yang mendasari penelitian, topik 
+penelitian yang diangkat, metode-metode terkini yang ada (state-
+of-the-art methods), masalah penelitian (research gap) yang ingin 
+diselesaikan, dan kontribusi ke pengetahuan yang diklaim di 
+penelitian yang dilakukan ini yang membuat berbeda dengan 
+penelitian yang ada 
+10% 
+4 
+TUJUAN PENELITIAN 
+Uraian solusi dan hipotesis berupa 
+teknik/konsep/metode/algoritma sebagai jawaban atas masalah 
+penelitian yang diangkat 
+5% 
+5 
+METODE YANG DIUSULKAN 
+Metode yang diusulkan oleh peneliti yang berbeda dengan metode 
+terkini yang ada, yang memiliki novelty dan diharapkan akan 
+menjadi kontribusi ke pengetahuan di bidang TIK dari penelitian 
+yang dilakukan. 
+25% 
+6 
+HASIL DAN PEMBAHASAN 
+Kumpulan dan kejelasan visualisasi data, metode dan teknik 
+pengolahan 
+data, 
+ketajaman 
+analisis 
+dan 
+sintesis 
+data, 
+perbandingan hasil eksperimen antara metode yang diusulkan 
+dengan hasil penelitian sejenis sebelumnya 
+30% 
+7 
+KESIMPULAN DAN SARAN 
+Tingkat ketercapaian hasil dengan tujuan 
+10% 
+8 
+DAFTAR REFERENSI 
+Ditulis dengan sesuai dengan uraian sitasi, dan dipastikan 
+prioritaskan kemutakhiran referensi 
+5% 
+Total Skor (Bobot x Nilai) 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 62 ---
+ 
+58 
+ 
+B. Babak Final 
+No 
+Kriteria 
+Bobot 
+1 
+PENULISAN KARYA ILMIAH 
+● Sistematika penyajian dan isi karya ilmiah 
+● Kesesuaian dengan standar penulisan yang sudah 
+ditetapkan 
+● Penggunaan bahasa Indonesia yang baku, baik dan benar 
+● Penggunaan literatur ilmiah yang berkualitas dan 
+terpercaya 
+20% 
+2 
+KREATIVITAS DAN INOVASI 
+50% 
+ 
+● Novelty dan kontribusi ke pengetahuan di bidang TIK 
+dari penelitian 
+● Validasi dari metode yang diusulkan (proposed method) 
+● Manfaat/nilai tambah/keberlanjutan penelitian 
+● Kelayakan implementasi dan manfaat bagi masyarakat, 
+bangsa dan negara 
+ 
+3 
+ 
+PRESENTASI DAN DISKUSI 
+● Kejelasan pemaparan hasil penelitian  
+● Tingkat pemahaman dari peserta tentang penelitian 
+● Kontribusi dari anggota tim 
+● Cara dan sikap presentasi serta kemampuan diskusi 
+● Ketepatan waktu, efisiensi dan efektifitas presentasi 
+30% 
+ 
+Total Skor (Bobot x Nilai) 
+
+--- PAGE 63 ---
+ 
+59 
+ 
+Lampiran A: Halaman Sampul 
+ 
+ 
+Logo Perguruan Tinggi 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Judul Karya Ilmiah 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Penulis 
+
+--- PAGE 64 ---
+ 
+60 
+ 
+ 
+Lampiran B: Halaman Pengesahan 
+ 
+LEMBAR PENGESAHAN KARYA TULIS ILMIAH 
+ 
+1. Judul Karya Tulis Ilmiah: ... 
+2. Ketua Pelaksana Penelitian 
+a. Nama Lengkap: ... 
+b. NIM: ... 
+c. Jurusan: ... 
+d. Perguruan Tinggi: ... 
+e. Alamat Rumah dan No HP: ... 
+f. Email: ... 
+3. Anggota Pelaksana Penelitian: ... 
+4. Dosen Pembimbing 
+a. Nama Lengkap dan Gelar : ... 
+b. NIDN/NIDK: ... 
+c. Alamat Rumah dan No HP: ... 
+Kota, Tanggal Bulan Tahun 
+Menyetujui Wakil/Pembantu Dekan atau 
+Ketua Jurusan/Departemen/Program Studi/ 
+Pembimbing Unit Kegiatan Mahasiswa 
+( 
+) 
+NIP/NIK. 
+Ketua Pelaksana Kegiatan, 
+(                                        ) 
+NIM. 
+Wakil Rektor Bidang Kemahasiswaan/ 
+Direktur Politeknik/Ketua Sekolah Tinggi, 
+( 
+) 
+NIP/NIK. 
+Dosen Pendamping, 
+(                                         ) 
+NIDN. 
+ 
+Halaman pengesahan ini menjadi bagian yang tidak terpisahkan dari keseluruhan 
+dokumen yang diunggah, oleh sebab itu setelah ditandatangani oleh Wakil Rektor 
+Bidang Kemahasiswaan/Direktur Politeknik/Ketua Sekolah Tinggi Perguruan 
+Tinggi dan dicap kemudian dipindai dan disimpan dalam format PDF dan 
+digabungkan ke file utama yang diunggah ke laman kompetisi Gemastik.
+ 
+ 
+
+--- PAGE 65 ---
+ 
+61 
+ 
+Lampiran C: Surat Pernyataan Belum Dipublikasikan 
+ 
+SURAT PERNYATAAN BELUM DIPUBLIKASIKAN 
+ 
+Saya yang menandatangani Surat Pernyataan ini: 
+Nama: ... 
+NIM: ... 
+1. Menyatakan bahwa karya tulis yang kami kirimkan pada kompetisi 
+Gemastik ini, benar-benar saya tulis bersama anggota tim lainnya, dan 
+benar bersumber dari kegiatan penelitian yang telah kami lakukan: 
+a. Nama Kegiatan Penelitian: 
+b. Tahun dan Tempat Pelaksanaan: 
+c. Pembimbing Penelitian: 
+ 
+2. Karya tulis ilmiah ini belum pernah dipublikasikan dalam bentuk prosiding 
+maupun jurnal sebelumnya. 
+ 
+Demikian Surat Pernyataan ini dibuat dengan penuh kesadaran tanpa paksaan 
+pihak manapun juga untuk dapat digunakan sebagaimana mestinya. 
+ 
+ 
+Kota, Tanggal Bulan Tahun 
+  
+Yang Membuat Pernyataan, 
+Tanpa Materai 
+Nama NIM 
+Mengetahui/Menyetujui, 
+Ketua Jurusan/Prodi, 
+Nama 
+NIP/NIDN 
+ 
+ 
+ 
+ 
+
+--- PAGE 66 ---
+ 
+62 
+ 
+H. Pengembangan Perangkat Lunak 
+1. Deskripsi 
+Kompetisi pengembangan perangkat lunak menguji kemampuan 
+peserta dalam mengembangkan ide kreatif untuk memberikan solusi 
+penyelesaian masalah di Indonesia dalam bentuk perangkat lunak 
+berkualitas tinggi. Fokus pada cabang ini adalah aspek inovasi yang 
+kreatif dan pemanfaatan TIK untuk mencerdaskan masyarakat Indonesia 
+sehingga perangkat yang dihasilkan mampu memberikan dampak untuk 
+kemandirian dan kecerdasan masyarakat umum. Dampak ini harus 
+dibuktikan bukan hanya dalam bentuk argumentasi namun juga harus 
+didukung dengan data. 
+Produk perangkat lunak yang dihasilkan harus bisa dioperasikan 
+sehingga dampak tersebut dapat terukur. Platform produk perangkat 
+lunak tidak dibatasi. 
+ 
+2. Babak Penyisihan 
+Berkas diunggah pada laman kompetisi Gemastik paling lambat 
+sesuai jadwal kegiatan pada Bab II Penjelasan Umum. Berkas pada babak 
+penyisihan terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta dan belum pernah 
+dilombakan pada kompetisi lain. Surat ditandatangani oleh ketua tim 
+di atas materai dan dikumpulkan dengan format PDF, ukuran file 
+maksimal 2 MB. 
+2. Video Rancangan Perangkat Lunak 
+Ketentuan video rancangan perangkat lunak pada babak penyisihan 
+sebagai berikut: 
+a) Video mewakili gambaran proses perancangan perangkat lunak 
+dan demonstrasi hasil pengembangan pada kemajuan minimal 
+50%; 
+
+--- PAGE 67 ---
+ 
+63 
+ 
+b) Video harus menggambarkan mengapa perangkat lunak tersebut 
+berguna dalam menyelesaikan masalah yang diangkat oleh tim; 
+c) Video harus menggambarkan bagaimana penggunaan perangkat 
+lunak oleh pengguna; 
+d) Perangkat lunak diperbolehkan untuk dijalankan menggunakan 
+emulator lalu direkam menggunakan perangkat lunak screen 
+recording seperti Camstudio, Camtasia, dan semacamnya; 
+e) Demonstrasi juga diperbolehkan menggunakan device asli 
+sehingga perekaman dilakukan dengan menggunakan kamera; 
+f) 
+Durasi video dibatasi maksimal 3 menit; 
+g) Video diunggah ke situs YouTube dengan tautan disertakan saat 
+mengunggah proposal ke laman kompetisi Gemastik; 
+h) Video YouTube diberi judul GEMASTIK XIX Perangkat Lunak - <ID- 
+Tim> - <Nama Tim> - <Judul Karya>. 
+3. Deliverables 
+File Deliverables babak penyisihan dikumpulkan dengan format ZIP/RAR 
+yang di dalam file tersebut terdiri dari: 
+1. Ketentuan Proposal Pengembangan Perangkat Lunak 
+a) Proposal pengembangan perangkat lunak yang sedang 
+dikembangkan pada kemajuan minimal 50%. 
+b) Proposal perangkat lunak yang diajukan merupakan ide 
+orisinal dengan tidak menjiplak perangkat lunak yang sudah 
+ada (baik yang telah dikembangkan oleh tim maupun orang 
+lain). 
+c) Proposal perangkat lunak harus bisa direalisasikan menjadi 
+bentuk aplikasi yang memiliki unsur inovatif, kreatif, dan 
+imajinatif. 
+d) Proposal perangkat lunak tidak mengandung unsur-unsur 
+yang melanggar atau menghina SARA (Suku Agama Ras dan 
+Antar Golongan). 
+e) Proposal diharapkan menjelaskan kelebihan perangkat lunak 
+
+--- PAGE 68 ---
+ 
+64 
+ 
+yang dikembangkan dari sudut pandang seluruh kriteria 
+penilaian dan juga kelebihannya jika dibandingkan dengan 
+perangkat lunak lain yang serupa. 
+2. Proposal disusun mengikuti struktur dokumen sebagai berikut: 
+a) Judul/Nama Perangkat Lunak; 
+b) Latar Belakang Ide Perangkat Lunak; 
+c) Tujuan dan Manfaat Dikembangkannya Perangkat Lunak; 
+d) Batasan Perangkat Lunak yang Dikembangkan; 
+e) Metodologi Pengembangan Perangkat Lunak; 
+f) 
+Analisis Kebutuhan dan Desain Solusi Perangkat Lunak; 
+g) Implementasi Perangkat Lunak; 
+h) Screenshot Mockup Interface Perangkat Lunak; 
+i) 
+Dokumentasi Cara Penggunaan Perangkat Lunak. 
+ 
+Proposal ditulis maksimal 30 halaman (total) termasuk lampiran 
+dan kelengkapan lainnya. Apabila proposal mengandung tautan 
+yang berisi informasi terkait aplikasi yang dilombakan, maka 
+konten tautan tersebut termasuk dalam maksimal 30 halaman 
+tersebut. Proposal dikumpulkan ke laman kompetisi Gemastik 
+dalam bentuk PDF dengan format penamaan file “GEMASTIK XIX 
+Perangkat Lunak - <ID Tim> - <Nama Tim> - <Judul Karya> - 
+Proposal.pdf”, dengan ukuran tidak melebihi 10 MB. 
+3. Dokumen pendukung, dengan rincian sebagai berikut: 
+a) Dokumen teknis mengenai panduan instalasi dan penggunaan 
+perangkat lunak. Dokumen teknis ditulis maksimal 30 
+halaman (total) termasuk lampiran dan kelengkapan lainnya. 
+Struktur dokumen teknis adalah sebagai berikut: 
+a) Latar Belakang; 
+b) Tujuan; 
+c) Nilai inovasi dan dampak pemanfaatan perangkat lunak 
+tersebut; 
+
+--- PAGE 69 ---
+ 
+65 
+ 
+d) Deskripsi fungsional perangkat lunak dan penjelasan 
+detail fitur; dan 
+e) Beberapa screenshot perangkat lunak. 
+b) Executable file atau URL dari aplikasi perangkat lunak. 
+c) Perangkat lunak berbasis web harus menyertakan URL 
+(Uniform Resource Locator) dari perangkat lunak, sedangkan 
+perangkat lunak berbasis desktop (atau stand- alone) harus 
+menyertakan executable file. 
+d) URL video demo perangkat lunak (tuliskan dalam file 
+berformat TXT atau DOCX). 
+e) Daftar komponen (atau software library) yang dapat 
+digunakan beserta lisensi dari komponen (atau software 
+library) tersebut. 
+f) Surat pernyataan keaslian karya perangkat lunak dengan 
+ditandatangani di atas materai oleh ketua tim. 
+g) Adopsi lisensi. 
+h) File Deliverables disimpan dengan nama folder “GEMASTIK XIX 
+Perangkat Lunak - <ID-Tim> - <Nama Tim> - <Judul Karya>”. 
+Deliverables tersebut harus dikompresi sebagai ZIP/RAR 
+terlebih dahulu dengan format penamaan: “GEMASTIK XIX 
+Perangkat Lunak - <ID-Tim> - <Nama Tim> - <Judul Karya>”, 
+diunggah ke laman kompetisi Gemastik. 
+ 
+3. Babak Final 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen 
+babak final semua tim finalis pada laman kompetisi Gemastik paling 
+lambat sesuai jadwal kegiatan pada Bab II Penjelasan Umum. Berkas pada 
+babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Persyaratan Umum 
+nomor 12 
+2. Makalah Gemastik, mengacu pada Bab II, Persyaratan Umum 
+nomor 10 
+
+--- PAGE 70 ---
+ 
+66 
+ 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Persyaratan 
+Umum nomor 10 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+proposal. Bagian yang sudah ada di proposal dapat ditulis kembali di 
+laporan akhir dan harus di-highlight perubahan atau perbaikan yang 
+terjadi dari bagian proposal. Laporan akhir dikumpulkan dalam 
+format PDF. 
+5. Hasil Uji Similaritas Laporan Akhir 
+Hasil uji periksa similaritas (plagiarism) laporan akhir bisa 
+menggunakan Turnitin, iThenticate, atau lainnya, maksimal dengan 
+indeks similaritas 25%, dikumpulkan dengan format PDF. 
+6. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Persyaratan Umum nomor 11 bukti pendaftaran 
+HKI ini bisa berupa screenshot pendaftaran karya pada web DJKI 
+(Direktorat Jenderal Kekayaan Intelektual), poin plus jika berhasil 
+mengumpulkan bukti pendaftaran HKI berupa sertifikat HKI, 
+dikumpulkan dengan format PDF. 
+7. File Presentasi 
+a) File presentasi karya akhir diunggah ke laman kompetisi Gemastik 
+untuk dilakukan kompresi ke dalam format ZIP/RAR. 
+b) Kompetisi babak final dilaksanakan dengan dua kegiatan, yaitu 
+sesi presentasi dan demo karya serta sesi tanya jawab dengan 
+dewan juri dalam ruang pertemuan yang disediakan oleh 
+penyelenggara. 
+c) Presentasi dilaksanakan secara daring langsung di hadapan 
+dewan juri dengan ketentuan sesuai Bab II Penjelasan Umum 
+Bagian C. 
+d) Peserta wajib mempersiapkan kode sumber dari perangkat lunak 
+apabila juri meminta untuk ditampilkan sebagai keperluan juri 
+dalam menilai. 
+
+--- PAGE 71 ---
+ 
+67 
+ 
+e) Urutan presentasi ditentukan dari undian di technical meeting. 
+ 
+8. Video Karya Akhir 
+Video karya akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+video rancangan perangkat lunak babak penyisihaan sebelumnya, 
+pada video karya akhir ini progress sudah 100%. Dikumpulkan berupa 
+link YouTube sebagai unlisted video (Tidak Publik) dengan format 
+judul GEMASTIK XIX Perangkat Lunak - <ID Tim> - <Nama Tim> - 
+<Judul Karya> - Final. 
+ 
+ 
+
+--- PAGE 72 ---
+ 
+68 
+ 
+4. Kriteria Penilaian 
+Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 Aspek inovasi (Solusi baru untuk permasalahan baru, 
+solusi baru untuk masalah lama, atau solusi lama untuk 
+masalah baru) 
+20% 
+2 Dampak yang diharapkan melalui penggunaan perangkat 
+lunak terhadap pengguna atau masyarakat (lingkungan 
+sekitar pengguna) dan potensi sustainability-nya 
+20% 
+3 Desain antarmuka perangkat lunak, kemampuan untuk 
+digunakan (usability), dan pengalaman pengguna (user  
+experience) dalam menggunakan perangkat 
+20% 
+ 
+4 Proses pengembangan perangkat lunak yang mengikuti 
+metodologi pengembangan perangkat lunak yang  baik  
+dan  sesuai  karakteristik  solusi  yang dikembangkan. 
+20% 
+5 Kesesuaian ide dengan perangkat lunak yang dibuat 
+10% 
+6 Urgensi masalah yang diangkat untuk tema perangkat 
+lunak 
+10% 
+Total Skor (Bobot x Nilai)  
+ 
+Babak Final 
+No 
+Kriteria 
+Bobot 
+1 Penilaian Kemampuan Presentasi  
+Finalis diharuskan melakukan presentasi dan demo di 
+depan juri selama 10 menit dilanjutkan dengan tanya jawab 
+kepada juri 
+45% 
+2 Penilaian Pertanyaan dan Tantangan Juri 
+Kecakapan/kemampuan finalis dalam menjawab 
+pertanyaan juri dan mewujudkan tantangan yang 
+diberikan juri berdasar pada perangkat lunak yang 
+didemokan 
+45% 
+
+--- PAGE 73 ---
+ 
+69 
+ 
+3 Nilai Babak Penyisihan 
+Nilai total dari masing-masing juri untuk tim di  Babak 
+Penyisihan 
+10% 
+Total Skor (Bobot x Nilai) 
+ 
+5. Ketentuan Khusus 
+Beberapa persyaratan khusus yang perlu diperhatikan oleh peserta 
+yaitu sebagai berikut. 
+a) 
+Setiap tim hanya boleh mengajukan satu buah karya perangkat 
+lunak. 
+b) 
+Karya perangkat lunak belum pernah dinyatakan sebagai pemenang 
+dalam kompetisi TIK sebelumnya maupun pada kontes sejenis baik 
+dalam skala nasional, regional, maupun internasional. 
+c) 
+Karya perangkat lunak belum pernah terpublikasi baik secara 
+komersial maupun secara nonkomersial kepada khalayak umum. 
+d) 
+Karya perangkat lunak yang diajukan merupakan ide orisinal dengan 
+tidak menjiplak aplikasi yang sudah ada. 
+e) 
+Karya perangkat lunak tidak mengandung unsur SARA (Suku Agama 
+Ras dan Antar Golongan). 
+f) 
+Jika karya adalah karya incremental atau karya yang dikembangkan 
+dari kontes sebelumnya, peserta harus menjelaskan pada juri 
+mengapa karya tersebut diikutsertakan dan memperlihatkan 
+pembaruan karya tersebut dengan sebelumnya. 
+g) 
+Perangkat lunak dapat dijalankan pada platform umum tanpa 
+tambahan perangkat keras khusus. 
+h) 
+Tim pengusul wajib membuat pernyataan bermaterai terkait 
+ketentuan khusus point (b) - (f) di atas. 
+i) 
+Keputusan juri bersifat mutlak dan tidak dapat diganggu gugat. 
+j) 
+Peraturan yang belum tercantum akan ditambahkan di kemudian 
+hari bila diperlukan. 
+ 
+ 
+
+--- PAGE 74 ---
+ 
+70 
+ 
+I. Piranti Cerdas, Sistem Benam & IoT 
+1. Deskripsi 
+Piranti cerdas (smart device) adalah sebuah hasil karya teknologi yang 
+bekerja secara interaktif, adaptif, dan otomatis, sehingga mampu 
+memberikan suatu solusi bagi permasalahan sehari-hari. Tingkat 
+kecerdasan suatu piranti dapat dicapai dengan memanfaatkan suatu 
+kecerdasan buatan (artificial intelligent) yang sesuai dengan kebutuhan 
+pemecahan masalah. 
+Sementara itu sistem benam (embedded system) adalah sebuah 
+piranti keras (hardware) yang bekerja berdasarkan perintah dari piranti 
+lunak (software) dan didesain memiliki tujuan dan fungsi yang spesifik. 
+Dengan menggabungkan konsep piranti cerdas dan sistem benam, maka 
+diharapkan dapat terciptanya sebuah sistem kompleks memiliki kualitas 
+yang baik. Dilengkapi dengan antarmuka yang baik dan penggunaan 
+sensor sebagai input dari keadaan lingkungan, piranti cerdas dapat 
+bekerja secara efisien dan memberikan manfaat yang besar bagi 
+lingkungan dan masyarakat. 
+Internet of Things (IoT) atau Internet untuk Segalanya adalah suatu 
+konsep dimana objek tertentu punya kemampuan untuk mentransfer 
+data lewat jaringan tanpa memerlukan adanya interaksi dari manusia ke 
+manusia ataupun dari manusia ke perangkat komputer. IoT bertujuan 
+untuk memperluas manfaat dari konektivitas internet yang tersambung 
+secara terus-menerus, sehingga memiliki kemampuan untuk berbagi 
+data, kendali jarak jauh, dan sebagainya, termasuk juga pada benda di 
+dunia nyata. 
+Tim peserta kompetisi Piranti Cerdas, Sistem Benam, dan IoT ini 
+diharapkan dapat mengembangkan suatu piranti dengan sekaligus 
+menerapkan tiga elemen teknologi, yaitu  
+1) piranti yang menerapkan algoritma kecerdasan buatan (artificial 
+intelligent) tertentu,  
+2) mengimplementasikannya dalam suatu sistem benam, serta  
+
+--- PAGE 75 ---
+ 
+71 
+ 
+3) menghubungkannya dengan jaringan internet untuk mengetahui dan 
+memberikan respon adaptasi dengan situasi lingkungannya. 
+Tingkat kecerdasan yang dimiliki oleh piranti tersebut dapat 
+dikembangkan 
+dari 
+proses 
+belajar 
+mandiri 
+ataupun 
+dengan 
+memanfaatkan data pengukuran jaringan sensor dan hasil belajar yang 
+telah tersedia di lingkungan, yang diperoleh melalui keterhubungan 
+dengan 
+jaringan 
+internet. 
+Pemanfaatan 
+komputasi 
+awan 
+(cloud 
+computing) dapat dilibatkan sebagai elemen teknologi yang memperkuat 
+keunggulan piranti. 
+Dengan memanfaatkan teknologi IoT (internet of things) piranti yang 
+dibangun tersebut merupakan sistem keterhubungan yang diharapkan 
+dapat memberikan manfaat bagi peningkatan kesejahteraan masyarakat 
+dalam berbagai bidang seperti: pertanian, perkebunan, kehutanan, 
+peternakan, perikanan dan kelautan, peningkatan produksi pangan, 
+sistem logistik, pembangkitan dan penghematan energi, instrumentasi 
+dan kendali elektronik kewilayahan, transportasi cerdas, pengendalian  
+dan  mitigasi  bencana,  sistem  keamanan  cerdas, penyelamatan 
+lingkungan hidup, sistem aplikasi berbasis pemetaan geografis, dunia 
+kesehatan dan well-being, dukungan teknologi asistif untuk disabilitas 
+atau pasien yang sakit, sistem perdagangan elektronik, literasi ekonomi 
+digital, perangkat rumah tangga cerdas, otomasi cerdas di industri, dan 
+sebagainya. Inovasi untuk kompetisi ini hendaknya dikembangkan dalam 
+kerangka pendekatan yang dilihat dari sudut pandang sesuai tema 
+GEMASTIK XIX/2026, yaitu “Berdampak, Inklusif, dan Berkelanjutan 
+menuju Masyarakat Cerdas” serta berangkat dari fokus pemikiran yang 
+merupakan salah satu tujuan dari 17 goals pada SDGs (Sustainable 
+Development Goals). 
+ 
+2. Babak Penyisihan 
+Babak Penyisihan untuk kompetisi Piranti Cerdas, Sistem Benam, dan 
+IoT dilaksanakan secara daring dengan berbasis penilaian karya yang 
+disajikan dalam bentuk makalah proposal dan video pengembangan 
+
+--- PAGE 76 ---
+ 
+72 
+ 
+model karya inovasi yang disusun oleh tim peserta. Berkas pada babak 
+penyisihan terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta. Bila karya yang 
+dilombakan adalah pengembangan dari karya sebelumnya yang 
+pernah memenangkan kompetisi tingkat nasional, maka Surat 
+Pernyataan harus memuat penjelasan perbedaan antara keduanya, 
+yang bila dikuantifikasikan lebih dari 50% (sesuai Bab II Bagian B 
+Persyaratan Umum butir no. 9). Surat ditandatangani oleh ketua tim 
+di atas materai dan dikumpulkan dengan format PDF, ukuran file 
+maksimal 2 MB. 
+2. Proposal 
+Ketentuan proposal adalah sebagai berikut. 
+a) Proposal karya inovasi piranti cerdas, sistem benam, dan IoT yang 
+diajukan merupakan ide orisinal dengan tidak menjiplak karya 
+inovasi yang sudah ada (baik yang telah dikembangkan oleh tim 
+maupun orang lain). 
+b) Proposal diharapkan menjelaskan kelebihan karya inovasi yang 
+dikembangkan dari sudut pandang seluruh kriteria penilaian dan 
+juga kelebihannya jika dibandingkan dengan karya inovasi lain 
+yang serupa. 
+c) Proposal disusun mengikuti sistematika sebagai berikut: 
+- Cover, memuat judul atau nama inovasi, nama tim dan anggota, 
+logo Kemendiktisaintek di pojok kiri atas, logo GEMASTIK 
+XIX/2026 dan logo Perguruan Tinggi peserta di pojok kanan 
+atas 
+- Abstrak 
+- Latar belakang 
+- Urgensi dan manfaat (penjelasan tentang mengapa karya ini 
+penting dan apa manfaatnya) 
+
+--- PAGE 77 ---
+ 
+73 
+ 
+- Metode dasar pengembangan karya (penjelasan tentang 
+bagaimana tiga elemen teknologi dari kategori lomba ini: 
+kecerdasan, sistem benam, dan IoT digunakan). Pastikan karya 
+anda mengandung ketiga unsur ini. 
+- Desain purwarupa/model (desain perangkat keras, sumber 
+daya/power source, spesifikasi penggunaan sensor, skema 
+rangkaian alat, desain 3D) 
+- Analisis fungsional, cara kerja, dan kinerja/performansi 
+- Rencana 
+implementasi 
+dan perkembangan 
+pengerjaan 
+(yang telah dikerjakan dan yang akan dikerjakan) 
+- Foto 
+dan 
+penjelasan 
+hasil 
+implementasi 
+mock- 
+up/purwarupa/model pada hasil pengembangan 50% 
+- Tautan video proses pengembangan model karya inovasi 
+- Daftar Pustaka 
+Proposal ditulis maksimal 30 halaman (total) termasuk lampiran dan 
+kelengkapan lainnya. Proposal dikumpulkan melalui aplikasi babak 
+penyisihan pada laman kompetisi Gemastik dalam bentuk PDF 
+dengan format penamaan file “GEMASTIK XIX Piranti Cerdas - 
+<ID-Tim> - <Nama Tim> - <Judul Karya> - Proposal.pdf”, dengan 
+ukuran tidak melebihi 10 MB. File proposal dalam format PDF, tidak 
+diperkenankan untuk dilakukan kompresi ke dalam format ZIP 
+maupun RAR. 
+3. Video 
+Ketentuan video rancangan karya inovasi piranti cerdas, sistem 
+benam, dan IoT pada Babak Penyisihan sebagai berikut: 
+a) Video mewakili gambaran proses perancangan karya inovasi dan 
+demonstrasi hasil pengembangan pada kemajuan minimal 50%; 
+b) Video harus menggambarkan mengapa piranti tersebut berguna 
+dalam menyelesaikan masalah yang diangkat oleh tim; 
+c) Video harus menggambarkan bagaimana ketiga elemen lomba 
+(kecerdasan, sistem benam, dan IoT) diimplementasikan; 
+
+--- PAGE 78 ---
+ 
+74 
+ 
+d) Penyajian video menarik bagi calon pengguna dan investor; 
+e) Demonstrasi juga diperbolehkan menggunakan device asli 
+sehingga perekaman dilakukan dengan menggunakan kamera; 
+f) 
+Video dalam format MP4 720p dengan durasi maksimal 3 menit; 
+g) Mencantumkan teaser/intro GEMASTIK pada awal dan/atau akhir 
+video; 
+h) Video disajikan dengan kualitas gambar dan suara yang jelas serta 
+disertai dengan running text penjelasan 
+i) 
+Narator wajib terlihat pada tampilan video; 
+j) 
+Video diunggah ke situs YouTube dengan tautan disertakan saat 
+mengunggah proposal ke laman kompetisi Gemastik, Video 
+YouTube diberi judul GEMASTIK XIX Piranti Cerdas - <ID Tim> - 
+<Nama Tim> - <Judul Karya>. 
+ 
+Berkas (surat pernyataan, naskah proposal, dan video) diunggah paling 
+lambat tanggal 8 Agustus 2026 pukul 23.59 WIB,  sesuai dengan 
+jadwal lomba yang tercantum pada Bab II. Berkas diunggah ke laman 
+kompetisi Gemastik (alamat URL bisa dilihat pada Bab II Bagian G 
+(Informasi Kompetisi). 
+ 
+3. Babak Final 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen 
+babak final semua tim finalis mengikuti jadwal lomba Gemastik yang 
+dijelaskan pada Bab II. Berkas pada babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Bagian B (Persyaratan 
+Umum) butir nomor 13. 
+2. Makalah Gemastik, mengacu pada Bab II, Bagian B (Persyaratan 
+Umum) butir nomor 11. 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Bagian B 
+(Persyaratan Umum) butir nomor 11. 
+ 
+
+--- PAGE 79 ---
+ 
+75 
+ 
+ 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+proposal. Laporan akhir mengikuti struktur yang sama dengan 
+proposal, dan menjelaskan karya pada tingkat penyelesaian 100%. 
+Bagian yang sudah ada di proposal dapat ditulis kembali di laporan 
+akhir dan harus mengandung penjelasan-penjelasan tambahan yang 
+mencerminkan ketuntasan karya. Laporan akhir dikumpulkan dalam 
+format PDF. 
+5. Hasil Uji Similaritas Laporan Akhir 
+Hasil uji periksa similaritas (plagiarism) laporan akhir bisa 
+menggunakan Turnitin, iThenticate, atau lainnya, maksimal dengan 
+indeks similaritas 25%, dikumpulkan dengan format PDF. 
+6. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Bagian B (Persyaratan Umum) butir nomor 12, 
+bukti pendaftaran HKI bisa berupa screenshot pendaftaran karya pada 
+web DJKI (Direktorat Jenderal Kekayaan Intelektual). Peserta mendapatkan 
+tambahan poin jika berhasil memperoleh bukti pendaftaran HKI yang 
+telah disetujui, berupa sertifikat HKI yang dikumpulkan dengan 
+format PDF. 
+7. Materi Presentasi 
+Presentasi dan demo karya inovasi atau kreasi pada Babak Final  
+dilaksanakan secara daring, tim finalis harus menyiapkan video 
+presentasi dan demo karya sesuai dengan ketentuan pada Bab II, 
+Bagian C butir nomor 4. Beberapa hal yang perlu diperhatikan: 
+a) Presentasi dan demo karya inovasi final menggambarkan hasil 
+pengembangan karya inovasi dengan pencapaian 100%. 
+b) Untuk penamaan file video, nama kategori lomba adalah “Piranti 
+Cerdas”, sehingga nama file untuk video presentasi dan demo 
+karya adalah:  "GEMASTIK XIX 2026 - Piranti Cerdas - <ID-Tim> - 
+<Nama Tim> - <Judul Karya> - Karya Final.pdf". 
+
+--- PAGE 80 ---
+ 
+76 
+ 
+8. Presentasi 
+a) Babak final dilaksanakan secara daring dengan setiap tim finalis 
+dialokasikan waktu 25 menit, yaitu 
+- 10 menit presentasi dan demo (melalui video) 
+- 15 menit tanya-jawab tim peserta dengan tim juri 
+b) Peserta wajib mempersiapkan kode sumber dari karya inovasi 
+apabila juri meminta untuk ditampilkan sebagai keperluan juri 
+dalam menilai; 
+c) 
+Urutan presentasi ditentukan dari undian pada saat technical 
+meeting; 
+ 
+4. Kriteria Penilaian 
+Penilaian Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Kreativitas 
+● Urgensi masalah yang dipilih 
+● Orisinalitas/kebaruan gagasan/State of The Art 
+● Tingkat penerapan kecedrasan, sistem benam, dan 
+IoT dalam gagasan 
+30% 
+2 
+Penulisan Proposal 
+● Kesesuaian proposal dengan format yang telah 
+ditetapkan 
+● Kualitas isi dari masing-masing bagian dalam proposal 
+30% 
+3 
+Potensi Kegunaan Hasil Bagi Masyarakat 
+20% 
+4 
+Kemungkinan Proposal Dapat Diselesaikan 
+20% 
+Total Skor (Bobot x Nilai)  
+ 
+ 
+ 
+Penilaian Babak Final 
+
+--- PAGE 81 ---
+ 
+77 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Kecerdasan Piranti 
+20% 
+2 
+Kompleksitas, Problem Solving dan 
+Fungsionalitas 
+20% 
+3 
+Desain/Model dan Implementasinya 
+20% 
+4 
+Efektivitas, Efisiensi, Biaya, dan Adaptabilitas 
+20% 
+5 
+Presentasi dan Demo 
+20% 
+Total Skor (Bobot x Nilai) 
+ 
+5. Ketentuan Khusus 
+a) Karya penelitian/pengembangan memiliki kesesuaian pada salah satu 
+lingkup bidang tertentu (lihat paragraf terakhir subbab I.1 Deskripsi 
+untuk contoh-contoh bidang yang dapat dipilih) yang sesuai dengan 
+tema Gemastik XIX; 
+b) Karya penelitian/pengembangan dapat berasal dari proyek akhir atau 
+tugas akhir yang terkait dengan kegiatan akademik kurikuler pada 
+program studi diploma atau sarjana yang diikuti oleh para anggota 
+tim kompetisi; 
+c) Karya yang diikutsertakan dalam kompetisi dapat merupakan hasil 
+dari 
+kegiatan 
+yang 
+sudah 
+berjalan 
+proses 
+penelitian 
+atau 
+pengembangannya; 
+d) Setiap tim hanya boleh mengajukan satu buah karya piranti; 
+e) Karya piranti belum pernah terpublikasi baik secara komersial 
+maupun secara non-komersil kepada khalayak umum; 
+f) 
+Piranti dapat dijalankan pada platform umum tanpa tambahan 
+perangkat keras khusus; 
+g) Karya piranti yang diajukan merupakan ide orisinal dengan tidak 
+menjiplak aplikasi yang sudah ada; 
+h) Karya piranti tidak mengandung unsur SARA (Suku Agama Ras dan 
+Antar Golongan); 
+
+--- PAGE 82 ---
+ 
+78 
+ 
+i) 
+Jika karya adalah karya incremental / karya yang dikembangkan dari 
+kontes sebelumnya, peserta harus menjelaskan pada juri mengapa 
+karya tersebut diikutsertakan dan pembaruan karya tersebut 
+dibandingkan dengan karya sebelumnya; 
+j) 
+Keputusan juri bersifat mutlak dan tidak dapat diganggu gugat; 
+k) Peraturan yang belum tercantum akan ditambahkan kemudian hari 
+bila diperlukan. 
+ 
+ 
+ 
+
+--- PAGE 83 ---
+ 
+79 
+ 
+J. Pengembangan Aplikasi Permainan 
+1. Deskripsi 
+Kompetisi pengembangan aplikasi permainan mendorong peserta 
+untuk berkreasi dan berinovasi mengembangkan aplikasi permainan 
+yang mampu berjalan dengan baik untuk memenuhi tujuan yang dicapai, 
+memperlihatkan sisi pendidikan, mempunyai dampak dan manfaat, 
+sekaligus mengandung unsur menghibur (entertainment value) dari 
+sebuah permainan. 
+Tema pengembangan aplikasi permainan pada GEMASTIK XIX kali ini 
+diharapkan dapat memberikan kontribusi pada salah satu atau beberapa 
+dari 17 Sustainable Development Goals (SDGs), yaitu: 
+1. 
+No Poverty 
+2. 
+Zero Hunger 
+3. 
+Good Health and Well-being 
+4. 
+Quality Education 
+5. 
+Gender Equality 
+6. 
+Clean Water and Sanitation 
+7. 
+Affordable and Clean Energy 
+8. 
+Decent Work and Economic Growth 
+9. 
+Industry, Innovation and Infrastructure 
+10. Reduced Inequality 
+11. Sustainable Cities and Communities 
+12. Responsible Consumption and Production 
+13. Climate Action 
+14. Life Below Water 
+15. Life on Land 
+16. Peace, Justice, and Strong Institutions 
+17. Partnerships for the Goals 
+Solusi yang diajukan harus secara jelas terkait dengan tema umum 
+dan spesifik GEMASTIK XIX, sekaligus dapat terhubung dengan satu atau 
+
+--- PAGE 84 ---
+ 
+80 
+ 
+lebih SDG. Peserta juga disarankan untuk merinci target dan indikator 
+yang terkait dengan SDG yang dipilih. 
+ 
+2. Babak Penyisihan 
+Berkas diunggah pada laman kompetisi Gemastik paling lambat 
+sesuai tenggat Unggah Proposal yang ditetapkan dalam Timeline 
+Gemastik pada Bab II Penjelasan Umum. Berkas pada babak penyisihan 
+terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta, belum pernah 
+dipublikasikan 
+dan 
+dilombakan 
+pada 
+kompetisi 
+lain. 
+Surat 
+ditandatangani oleh ketua tim di atas materai dan dikumpulkan 
+dengan format PDF, ukuran file maksimal 2 MB. 
+2. Proposal 
+Proposal pengembangan aplikasi permainan yang merupakan karya 
+tim peserta. Dokumen proposal ditulis maksimal 25 halaman dengan 
+mengikuti aturan penulisan bahasa Indonesia yang baku dan benar. 
+Tidak ada aturan tertentu dalam hal format dokumen. Peserta 
+diharapkan menggunakan kreativitas untuk membuat proposal 
+terlihat menarik dan menunjukkan bahwa karya yang akan dikerjakan 
+mempunyai 
+kualitas 
+yang 
+baik. 
+Penulisan 
+Proposal 
+tidak 
+diperkenankan untuk menggunakan tools Generative AI. 
+Proposal Pengembangan Aplikasi Permainan memuat hal-hal berikut: 
+a) Nama aplikasi permainan. 
+b) Latar belakang dan motivasi dari aplikasi permainan yang 
+dilombakan. 
+c) Deskripsi aplikasi permainan: 
+- High 
+Concept 
+Statement, 
+beberapa 
+kalimat 
+yang 
+mendeskripsikan aplikasi permainan yang dikembangkan. 
+- Story atau cerita dari aplikasi permainan. 
+
+--- PAGE 85 ---
+ 
+81 
+ 
+- Mechanics and Players’ Role, aturan dan prosedur yang ada 
+pada permainan. Kemudian, informasi terkait apa yang 
+dilakukan oleh seorang / beberapa pemain pada aplikasi 
+permainan yang dilombakan. 
+- Genre 
+(Action, Strategy, RPG, Read World Simulation, 
+Construction & Management, Adventure, Puzzle, dsb). 
+- Competition Modes (Single Player, Competitive Multi Player, 
+Cooperative Multi Player, dsb). 
+- General Summary of Progression (level atau story dari aplikasi 
+permainan). 
+- Target Audience, informasi terkait siapa target pasar dari 
+aplikasi permainan yang dikembangkan. 
+- Peserta 
+menyampaikan 
+gambar-gambar 
+storyboard, 
+screenshot, wireframe, maupun ilustrasi visual dari aplikasi 
+permainan yang dilombakan agar mempermudah dewan juri 
+dalam menilai Game Concept yang diajukan. Perlu diingat 
+bahwa sisi Aesthetics merupakan hal yang penting. 
+- Informasi lain yang membantu menjelaskan aplikasi permainan 
+yang dikembangkan. 
+d) Teknologi 
+dan 
+sumber 
+daya 
+yang 
+digunakan 
+(untuk 
+pengembangan dan penggunaan nantinya). 
+e) Tahapan rancangan dan implementasi yang dilakukan dari awal 
+hingga aplikasi selesai dikembangkan. 
+Proposal diunggah dalam format PDF ke laman kompetisi Gemastik 
+dengan format penamaan file “GEMASTIK XIX Aplikasi Permainan - 
+<ID-Tim> - <Nama Tim> - <Judul Karya> - Proposal.pdf” berukuran 
+maksimal 10 MB. 
+3. Executable File (Karya yang dihasilkan) 
+Karya yang dihasilkan, yaitu: 
+- Aplikasi permainan yang siap di-install, dimainkan, dan dinilai oleh 
+dewan juri di lingkungan kerja dewan juri (executable file atau 
+
+--- PAGE 86 ---
+ 
+82 
+ 
+sejenisnya). 
+- Setiap tim harus mengunggah executable file pada penyimpanan 
+awan (cloud) yang dibuat sendiri melalui Google Drive oleh setiap 
+tim dan wajib memastikan juri mendapat akses untuk membaca 
+folder dan/atau file - file yang ada di dalam drive tersebut. Link 
+tersebut disertakan saat mengunggah berkas ke laman kompetisi 
+Gemastik. 
+- Nama folder Google Drive “GEMASTIK XIX Aplikasi Permainan - 
+<ID-Tim> - <Nama Tim> - <Judul Karya>. 
+Hal yang perlu diperhatikan dalam pengumpulan karya aplikasi 
+permainan (executable file dan sejenisnya): 
+- Teknologi apapun (game engine, dsb) dan dependency apapun 
+(library tertentu, operating system, atau modul lain) yang 
+digunakan, pastikan file aplikasi yang anda kirimkan mudah 
+diinstal dan dimainkan di lingkungan kerja dewan juri. Artinya, 
+peserta harus melakukan hal yang terbaik agar dewan juri atau 
+pengguna secara umum tidak mengalami kesulitan saat mencoba 
+aplikasi permainan yang dikembangkan. 
+- Jika peserta menggunakan perangkat keras khusus tambahan (alat 
+pendukung augmented reality, dsb) dalam memainkan aplikasi 
+permainan 
+yang 
+dikembangkan, 
+mohon 
+hubungi 
+panitia 
+secepatnya untuk proses lebih lanjut. 
+4. Dokumen Teknis 
+Dokumen teknis berisi petunjuk instalasi dan cara memainkan 
+aplikasi yang dikembangkan. Peserta tidak perlu mengumpulkan 
+kode sumber. Dokumen teknis tidak perlu terlalu panjang. Inti dari 
+dokumen teknis hanyalah walkthrough atau penjelasan agar 
+pengguna bisa memainkan aplikasi permainan yang dikembangkan 
+(langkah-langkah yang harus diikuti pengguna dari awal). Penulisan 
+dokumen teknis tidak diperkenankan untuk menggunakan tools 
+Generative AI. 
+ 
+
+--- PAGE 87 ---
+ 
+83 
+ 
+5. Video 
+Video berisi demo aplikasi permainan yang sudah dikembangkan. 
+Video demo yang akan ditunjukkan harus memperhatikan hal-hal 
+berikut: 
+a) Video menyampaikan deskripsi singkat dari aplikasi permainan 
+yang mencakup latar belakang dan motivasi, fitur, cerita yang 
+terkandung pada permainan, serta aturan dan prosedur yang ada 
+pada permainan. 
+b) Video memperlihatkan aplikasi sedang dimainkan oleh pengguna 
+pada beberapa level. Perhatikan bahwa bagian ini merupakan inti 
+dari video di babak penyisihan. Jadi, peserta diharapkan 
+melakukan yang terbaik dalam membungkus proses demo 
+aplikasi permainan yang dikembangkan dalam video singkat ini. 
+c) Video demo dibuat dalam format MP4 720p dengan durasi 
+maksimal 3 menit, dengan rincian: 
+- Video harus mencantumkan logo GEMASTIK XIX/2026. 
+- Video memperlihatkan nama dan logo tim pengembang. 
+Video demo diunggah di YouTube dengan format judul GEMASTIK XIX 
+Aplikasi Permainan - <ID-Tim> - <Nama tim> - <Judul Karya>. 
+ 
+Keseluruhan file entries di atas selain disubmit pada laman kompetisi 
+Gemastik juga diupload dan/atau disimpan pada folder Google Drive 
+executable file sebagai backup. Akses untuk membaca folder dan/atau 
+file-file yang ada di dalam drive tersebut harus diperhatikan agar tidak 
+private. 
+ 
+Pada babak penyisihan ini, peserta diharapkan sudah menyelesaikan 
+proses pengembangan aplikasi permainan. Walaupun nantinya proses 
+pengembangan ini bisa jadi bersifat iteratif, namun peserta diharapkan 
+bisa menunjukkan bahwa aplikasi permainan sudah dapat dimainkan 
+oleh pengguna. 
+
+--- PAGE 88 ---
+ 
+84 
+ 
+ 
+6. Penggunaan Generative AI 
+Tools Generative AI boleh digunakan dalam proses pencarian dan 
+pemantapan ide, debugging, dan untuk mengenerate art yang 
+digunakan pada permainan, namun tidak diperkenankan untuk 
+digunakan pada proses pemrograman permainan serta dalam 
+penulisan proposal, laporan akhir dan makalah. Proses penggunaan AI 
+wajib untuk disebutkan prosesnya pada proposal serta laporan akhir. 
+Jika terdapat penggunaan Generative AI namun tidak disebutkan 
+prosesnya pada proposal serta laporan akhir, maka akan dianggap 
+dianggap pelanggaran, dan akan didiskualifikasi. Penggunaan AI pada 
+proses penulisan proposal dan laporan akhir juga akan didiskualifikasi. 
+ 
+3. Babak Final 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen 
+babak final pada laman kompetisi Gemastik paling lambat sesuai tenggat 
+pendaftaran ulang finalis dan unggah berkas babak final yang ditetapkan 
+dalam Timeline Gemastik pada Bab II Penjelasan Umum. Berkas yang 
+diunggah untuk pada babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Persyaratan Umum 
+nomor 12 
+2. Makalah Gemastik, mengacu pada Bab II, Persyaratan Umum 
+nomor 10 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Persyaratan 
+Umum nomor 10 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+proposal. Bagian yang sudah ada di proposal dapat ditulis kembali di 
+laporan akhir dan harus di-highlight perubahan atau perbaikan yang 
+terjadi dari bagian proposal. Laporan akhir dikumpulkan dalam 
+
+--- PAGE 89 ---
+ 
+85 
+ 
+format PDF. Penulisan Laporan akhir tidak diperkenankan untuk 
+menggunakan tools Generative AI. 
+5. Hasil Uji Similaritas Laporan Akhir 
+Hasil uji periksa similaritas (plagiarism) laporan akhir bisa 
+menggunakan Turnitin, iThenticate, atau lainnya, maksimal dengan 
+indeks similaritas 25%, dikumpulkan dengan format PDF. 
+6. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Persyaratan Umum nomor 11 bukti pendaftaran 
+HKI ini bisa berupa screenshot pendaftaran karya pada web DJKI 
+(Direktorat Jenderal Kekayaan Intelektual), poin plus jika berhasil 
+mengumpulkan bukti pendaftaran HKI berupa sertifikat HKI, 
+dikumpulkan dengan format PDF. 
+7. Poster (Link Instagram), tim finalis wajib membuat poster yang 
+dipamerkan  pada  sosmed,  kemudian  link  postingan  poster 
+tersebut disertakan saat mengunggah berkas pada laman kompetisi 
+Gemastik. 
+8. Poster (PDF),  
+File asli poster format PDF. 
+9. File Presentasi 
+a) File presentasi karya akhir diunggah ke laman kompetisi Gemastik 
+dalam bentuk PDF maksimal 10 MB dengan penamaan file 
+"GEMASTIK XIX Aplikasi Permainan - <ID-Tim> - <Nama Tim> 
+- Presentasi Karya Final.pdf". File presentasi dalam format PDF, 
+tidak diperkenankan untuk dilakukan kompresi ke dalam format 
+ZIP/RAR. 
+b) Kompetisi babak final dilaksanakan dengan dua kegiatan, yaitu 
+sesi presentasi dan demo karya serta sesi tanya jawab dengan 
+dewan juri dalam ruang pertemuan yang disediakan oleh 
+penyelenggara. 
+c) Pada sesi tanya-jawab dengan tim juri, peserta juga akan diminta 
+melaporkan jawaban tantangan modifikasi kode program yang 
+
+--- PAGE 90 ---
+ 
+86 
+ 
+diberikan oleh tim juri saat sesi technical meeting pada hari 
+sebelumnya. 
+d) Presentasi dilaksanakan dihadapan tim juri. 
+e) Babak final dilaksanakan secara daring dengan setiap tim finalis 
+dialokasikan waktu 25 menit (10 menit pemutaran video rekaman 
+presentasi dan demo, 15 menit tanya-jawab antara ketua tim 
+peserta dan para anggota dengan tim juri). 
+f) 
+Peserta wajib mempersiapkan kode sumber dari aplikasi 
+permainan apabila juri meminta untuk ditampilkan sebagai 
+keperluan juri dalam menilai. 
+g) Urutan presentasi ditentukan dari undian pada saat technical 
+meeting. 
+h) Setiap tim peserta sudah siap di ruang tunggu ruang pertemuan 
+paling lambat 15 menit sebelum jadwal presentasi. 
+i) 
+Akan diberikan tanda peringatan 2 menit sebelum waktu 
+presentasi habis. 
+j) 
+Jika waktu presentasi sudah habis, maka akan dihentikan oleh 
+panitia. 
+10. Video Karya Akhir 
+Video karya akhir merupakan video karya akhir yang memuat 
+rekaman demo karya dan penjelasan. Video karya aplikasi permainan 
+final harus memperhatikan hal - hal berikut: 
+- Video demo karya aplikasi permainan final telah menggambarkan 
+hasil pengembangan model karya inovasi dengan pencapaian 
+100%. 
+- Video dapat mencantumkan intro, subtitle, dan logo GEMASTIK 
+XIX/2026. 
+- Video format MP4 720p berdurasi maksimum 10 menit (termasuk 
+intro dan subtitle), terdiri dari rekaman demo karya dan penjelasan. 
+- Video diunggah ke YouTube dengan format judul GEMASTIK XIX 
+Aplikasi Permainan - <ID-Tim> - <Nama Tim> - <Judul Karya> - Karya 
+
+--- PAGE 91 ---
+ 
+87 
+ 
+Final, kemudian link disertakan pada saat unggah berkas di laman 
+kompetisi Gemastik. 
+ 
+4. Kriteria Penilaian 
+Penilaian dari aplikasi permainan yang dikembangkan mencakup 3 
+elemen: Story, Mechanics, dan Aesthetics dengan melihat dari sisi 
+pendidikan yang diunggulkan, kreativitas, gameplay menarik dan 
+menghibur. Gameplay disini lebih kepada aktivitas yang dilakukan oleh 
+pemain ketika bermain. 
+Tiga elemen ini diambil dari referensi buku Jesse Schell yang berjudul 
+“The Art of Game Design: A Book of Lenses”. Mechanics membicarakan 
+prosedur-prosedur dan aturan - aturan pada aplikasi permainan yang 
+dikembangkan. Mechanics juga menggambarkan tujuan dari aplikasi 
+permainan Anda, apa yang bisa dilakukan dan tidak bisa dilakukan oleh 
+seorang pemain untuk mencapai tujuan permainan, dan apa yang terjadi 
+seandainya pemain mencoba suatu aksi. Story merupakan rangkaian 
+kejadian pada aplikasi permainan. Aplikasi permainan dengan story yang 
+baik biasanya akan terasa lebih menyenangkan dan mudah dimengerti. 
+Aesthetics membicarakan tentang bagaimana aplikasi permainan Anda 
+terlihat dan dirasakan secara langsung oleh pemain. Isu desain grafis 
+yang menarik, pengalaman pengguna yang baik sangat kuat pada aspek 
+Aesthetics ini. Secara lebih rinci, penilaian kompetisi pengembangan 
+aplikasi permainan akan mempertimbangkan hal-hal di bawah ini. 
+ 
+ 
+ 
+
+--- PAGE 92 ---
+ 
+88 
+ 
+Babak Penyisihan dan Babak Final 
+ 
+No 
+Kriteria Penilaian 
+Bobot 
+1 
+Unsur pendidikan pada permainan, manfaat dan dampak 
+dari permainan. Serta kesesuaian dengan tema umum dan 
+khusus yang telah ditentukan. Unsur pendidikan dapat 
+terlihat dan dirasakan, salah satunya, pada story dalam 
+permainan. Unsur pendidikan dan tema juga dapat terlihat 
+dari core-mechanics-nya. Misal, mechanics yang 
+dimaksudkan untuk mengasah keterampilan tertentu yang 
+dapat dimanfaatkan oleh pemain untuk kehidupan sehari-
+hari (contoh: math problems, typing, dan simulation) 
+20% 
+2 
+Kreativitas dalam pengembangan permainan. Misal, jika 
+peserta mampu melahirkan mechanics atau aturan dan 
+prosedur permainan yang belum pernah ada (berdasarkan 
+pandangan juri) pada aplikasi permainan yang sudah ada, 
+maka peserta akan mendapat nilai bagus pada aspek ini 
+20% 
+3 
+Unsur aesthetics (desain grafis, pengalaman pengguna, 
+suara, musik) dan originalitas yang baik dan menarik 
+20% 
+4 
+Gameplay secara keseluruhan yang menarik dan 
+menghibur 
+20% 
+5 
+Kesesuaian dengan fitur-fitur atau fungsi yang sudah 
+dinyatakan pada proposal pengembangan aplikasi 
+permainan 
+20% 
+Total Skor (Bobot x Nilai) 
+ 
+5. Ketentuan Khusus 
+Daftar informasi yang ada di bawah adalah persyaratan khusus untuk 
+kompetisi pengembangan aplikasi permainan yang harus dipenuhi 
+peserta kompetisi selain persyaratan umum yang sudah disampaikan 
+pada bagian awal dokumen pedoman ini. 
+a) Semua berkas pengumpulan dikumpulkan secara online melalui 
+laman kompetisi Gemastik sebelum batas akhir yang sudah 
+ditentukan. Pengumpulan setelah batas akhir menyebabkan peserta 
+yang bersangkutan gugur dalam perlombaan. 
+
+--- PAGE 93 ---
+ 
+89 
+ 
+b) Permainan harus bisa dijalankan pada sebuah mesin komputasi (PC, 
+smartphone, portable device, atau yang lainnya). 
+c) Aplikasi permainan yang dikembangkan boleh dijalankan di platform 
+manapun (bebas), misal seperti Linux, Mac, Windows, Android 
+(smartphone), Internet Browser, portable device, atau lainnya. 
+d) Karya yang dilombakan belum pernah dipublikasikan, baik komersil 
+maupun nonkomersil, termasuk belum pernah dipublikasikan di 
+application store atau tersedia bebas di media online. 
+e) Peserta harus mempunyai hak penuh terhadap aplikasi permainan 
+yang dikembangkan. Panitia tidak akan menggunakan sedikitpun 
+semua yang ada pada aplikasi permainan tanpa izin tertulis secara 
+formal dari pihak peserta. 
+f) 
+Peserta 
+boleh 
+menggunakan 
+teknologi 
+manapun 
+untuk 
+pengembangan aplikasi permainan, seperti game engine, framework, 
+dan model. Namun, peserta harus memiliki hak penuh terhadap 
+teknologi-teknologi tersebut, atau pastikan teknologi yang digunakan 
+memang tersedia secara gratis. Peserta dilarang keras menggunakan 
+teknologi yang didapatkan secara ilegal, misal bajakan. 
+g) Peserta boleh menggunakan aset manapun (seperti suara, musik, 
+atau gambar yang digunakan pada permainan). Namun, peserta harus 
+memiliki hak penuh terhadap aset tersebut, atau pastikan aset 
+tersebut memang tersedia secara gratis. Jika peserta menggunakan 
+aset gratis yang sudah tersedia, peserta wajib mencantumkan sumber 
+pengambilan pada bagian credit. Agar tidak melakukan kesalahan 
+terkait isu hak cipta, perhatikan dengan baik lisensi setiap aset yang 
+didapatkan: public domain, creative common (perhatikan dengan 
+seksama apakah boleh dimodifikasi atau tidak), dan sebagainya. 
+h) Karya yang dilombakan tidak boleh mengandung unsur SARA, 
+radikalisme, pornografi, dan kekerasan. 
+i) 
+Peserta harus memastikan bahwa aplikasi permainan tidak menyalahi 
+aturan hukum yang berlaku di Indonesia. 
+ 
+
+--- PAGE 94 ---
+ 
+90 
+ 
+K. Pengembangan Bisnis TIK 
+1. Deskripsi 
+Kompetisi ini adalah kompetisi pengembangan model bisnis dengan 
+produk TIK. Tujuan dari kompetisi bisnis TIK ini mengevaluasi cara 
+mahasiswa dalam implementasi metodologi lean di dalam bisnisnya 
+dalam mencari inovasi di dalam industrinya (Problem-Solution Fit) serta 
+menjalankan bisnisnya mengarah ke arah sustainable (Product-Market Fit 
+- Desirable, Viable & Feasible). 
+Kompetisi ini memberikan kesempatan kepada peserta yang memiliki 
+ide bisnis startup dan sudah mencoba melakukan usaha yang 
+berorientasi pada produk TIK, dalam tahapan MVP (Minimum Viable 
+Product) berupa jasa dan produk. Kompetisi ini akan mengevaluasi sejauh 
+mana ide pengembangan bisnis tersebut memberikan dampak kepada 
+stakeholdernya. 
+Tema kompetisi pengembangan Bisnis TIK menyesuaikan tema 
+GEMASTIK tahun ini, yaitu ”Gemastik 2026: Berdampak, Inklusif, dan 
+Berkelanjutan menuju Masyarakat Cerdas”. Untuk itu, cakupan jenis 
+pengusaha yang berkaitan lebih kepada “Social Entrepreneur” yang 
+mengedepankan value proposition of the community. Dengan mengacu 
+kepada metodologi dari Lean Startup, peserta diharapkan dapat belajar 
+dari kesalahan yang dilakukan selama dalam proses pembelajaran 
+(validasi) dan dapat menyadari proses pembelajaran (soft skill dan hard 
+skill) yang perlu ditingkatkan dalam mengeksekusi peluang bisnis. 
+ 
+2. Babak Penyisihan 
+Berkas babak penyisihan diunggah pada laman kompetisi Gemastik 
+paling lambat sesuai tenggat Unggah Proposal yang ditetapkan dalam 
+Timeline Gemastik pada Bab II Penjelasan Umum. Berkas pada babak 
+penyisihan terdiri dari: 
+1. Surat Pernyataan 
+
+--- PAGE 95 ---
+ 
+91 
+ 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta dan belum pernah 
+dilombakan pada kompetisi lain. Surat ditandatangani oleh ketua tim 
+di atas materai dan dikumpulkan dengan format PDF, ukuran file 
+maksimal 2 MB. 
+2. Pitch Deck 
+Pitch deck dikumpulkan dengan format PDF pada laman kompetisi 
+Gemastik. Pitch deck dengan 11 - 15 slide presentasi yang diunggah 
+dengan topik sebagai berikut: 
+1. Business Summary 
+2. Business Problem 
+3. Market size (TAM, SAM – SOM) 
+4. Solutions (Problem-Solution Fit) 
+5. Business Model 
+6. Product-Market Fit - MVP (Minimum Viable Product) 
+7. Experiment selection (Discovery Experiments & Validation 
+Experiments) 
+8. Experiment Sequences 
+9. Exit strategy (jika mencari investor) 
+10. Team 
+ 
+Penjelasan terkait pitch deck yang akan diunggah adalah sebagai 
+berikut: 
+1. Business Summary 
+Penjelasan tentang bisnis yang dijalankan. 
+2. Business Problem 
+Permasalahan yang dihadapi oleh industri dan kurasi masalah 
+yang diangkat untuk menjadi dasar ide bisnis. Penjelasan masalah 
+yang dipilih. 
+3. Market Size 
+
+--- PAGE 96 ---
+ 
+92 
+ 
+Potensi pasar yang akan disasar yang dijabarkan dalam TAM 
+(Total Addressed Market), SAM (Serviceable Available Market), 
+SOM (Share of Market). 
+4. Solutions (Problem-Solutions Fit) 
+Problem solution fit adalah ketika pendiri telah menemukan 
+keselarasan antara kebutuhan atau titik kesulitan (pain point) 
+pelanggan dan solusi bisnis yang ditawarkan melalui produk atau 
+layanannya di industri yang akan dimasuki. Atau dengan kata lain, 
+produk yang dibuat benar benar efektif memberikan solusi atas 
+problem bisnis yang diangkat. Proses ini adalah proses  iterasi  
+maraton  untuk  mengidentifikasi  masalah pelanggan sambil 
+mempercepat untuk menemukan early adopters anda untuk 
+mendapatkan daya tarik awal. 
+5. Business Model 
+Model bisnis adalah serangkaian kegiatan dan proses yang 
+digunakan perusahaan untuk menghasilkan pendapatan dan 
+menciptakan nilai bagi pelanggannya. Ini menguraikan barang 
+atau jasa yang ditawarkan bisnis, bagaimana memberikannya 
+kepada pelanggan, dan bagaimana menghasilkan uang dalam 
+prosesnya. Secara umum, model bisnis dijelaskan dengan 
+menggunakan Business Model Canvas (BMC) terdiri dari sembilan 
+komponen: 
+pelanggan, 
+proposisi 
+nilai, 
+saluran, 
+aliran 
+pendapatan, sumber daya utama, mitra utama, hubungan 
+pelanggan, struktur biaya, kegiatan utama. 
+6. Product Market Fit - MVP (Minimum Viable Product) 
+Berada di pasar yang baik dengan produk yang dapat memuaskan 
+pasar itu. “Ketika seorang wirausahawan mengidentifikasi 
+kebutuhan di pasar dan membangun solusi yang ingin dibeli 
+pelanggan, itu adalah pasar produk yang sesuai”. 
+7. Experiment selection (Discovery experiments & Validation 
+Experiments) 
+
+--- PAGE 97 ---
+ 
+93 
+ 
+Type Hipotesis: type hipotesis apa yang Anda uji? 
+Tingkat Ketidakpastian: Berapa banyak bukti yang sudah Anda 
+miliki (untuk hipotesis tertentu)? 
+Urgensi: Berapa banyak waktu yang Anda miliki sampai titik 
+keputusan besar berikutnya atau sampai Anda kehabisan uang?, 
+NPS (Net Promoter Score), Retention Rate & Churn Rate, 
+Customer Lifetime Value, Bounce Rate, Growth Rate. 
+8. Experiment Sequences 
+Beberapa tahapan proses testing berdasarkan karakteristik 
+industrinya. 
+(Referensi buku Testing Business Ideas - Alexander Osterwalder 
+halaman 98 & 99) 
+9. Exit strategy (jika mencari investor) 
+Menjelaskan proses growth strategy sehingga mencapai valuasi 
+tertentu dalam kurun waktu tertentu sesuai dengan ekspektasi 
+investor. 
+10. Team 
+Menjelaskan latar belakang team akan relevansinya dalam 
+kemampuannya dalam mengeksekusi ide bisnis yang dijalankan. 
+ 
+Referensi literatur untuk proses dalam menjalankan bisnis: 
+ 
+● 
+The Lean Startup - Eric Ries - Crown Business 
+● 
+Business Model Generation - Alexander Osterwalder - Wiley 
+● 
+Value Proposition Design - Alexander Osterwalder - Wiley 
+● 
+Testing Business Ideas - Alexander Osterwalder - Wiley 
+● 
+High Impact Tools for Teams - Alexander Osterwalder - Wiley 
+● 
+The Invincible Company - Alexander Osterwalder - Wiley  
+ 
+ 
+
+--- PAGE 98 ---
+ 
+94 
+ 
+Pedoman Pitch Deck 
+a. 
+Dokumen slide presentasi sebanyak maksimal 15 slide dalam 
+format pdf (termasuk judul presentasi). 
+b. Isi dokumen menekankan pada potensi bisnis berbasis produk 
+atau layanan di bidang teknologi informasi. 
+c. 
+Tim harus menunjukkan ide dan implementasi pengujian pasar 
+yang orisinil (bukan hasil karya orang lain) dan baru (belum 
+pernah dipublikasi sebelumnya). 
+d. Setiap dokumen ditulis dalam bahasa Indonesia, namun 
+dimungkinkan pemakaian beberapa istilah bahasa asing yang 
+lebih mudah dipahami. 
+e. 
+Setiap dokumen di bagian depan harus memberikan informasi 
+nama tim, nama - nama anggota tim termasuk nama universitas 
+dan alamat email (ketua tim). 
+f. 
+Presentasi tidak mengandung unsur SARA (Suku, Agama, Ras & 
+Antar golongan) maupun politik beserta afiliasinya. 
+g. Pitch deck berisi proses validasi, dibuat dalam format PDF yang 
+diunggah ke laman kompetisi Gemastik dengan format penamaan 
+file: “GEMASTIK 2026 Bisnis TIK - <ID-Tim> - <Nama Tim> - <Judul 
+Bisnis> - Pitch Deck.pdf”. 
+ 
+3. Video MVP (Minimum Viable Product) 
+- Setiap tim harus mengunggah video dalam bentuk softcopy pada 
+penyimpanan awan (cloud) yang dibuat sendiri melalui Google Drive 
+oleh setiap tim dan panitia GEMASTIK 2026 mendapat akses untuk 
+membaca folder dan file - file yang ada di dalam drive tersebut. 
+- Format penamaan file: “GEMASTIK 2026 Bisnis TIK - <ID-Tim> - 
+<Nama Tim> - <Judul Bisnis> - Video MVP”. 
+- Link Google Drive tersebut disertakan saat mengunggah berkas 
+pada laman kompetisi Gemastik. 
+- Ketentuan 
+yang 
+lain 
+silahkan 
+dilihat 
+pada 
+penjelasan 
+
+--- PAGE 99 ---
+ 
+95 
+ 
+ketentuan Video MVP di bawah. 
+ 
+Batas pengumpulan seluruh berkas kompetisi babak penyisihan oleh tim 
+peserta adalah tanggal 10 Agustus 2026 pukul 23.59 WIB di halaman 
+website kompetisi Gemastik, paling lambat sesuai tenggat Unggah 
+Proposal yang ditetapkan dalam Timeline Gemastik pada Bab II Penjelasan 
+Umum. Tim yang lolos Babak Penyisihan untuk maju ke Babak Final akan 
+diumumkan pada minggu pertama pada bulan September 2026. 
+ 
+3. Babak Final 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen 
+babak final semua tim finalis tanggal 26 - 30 Oktober 2026 pada laman 
+kompetisi Gemastik, paling lambat sesuai tenggat pendaftaran ulang 
+kepesertaan pada babak final dan unggah berkas babak final yang 
+ditetapkan dalam Timeline Gemastik pada Bab II Penjelasan Umum. 
+Berkas pada babak final terdiri dari: 
+1. Video Profil Karya,  
+Mengacu pada Bab II Persyaratan Umum nomor 12 
+2. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Persyaratan Umum nomor 11 bukti pendaftaran 
+HKI ini bisa berupa screenshot pendaftaran karya pada web DJKI 
+(Direktorat Jenderal Kekayaan Intelektual), poin plus jika berhasil 
+mengumpulkan bukti pendaftaran HKI berupa sertifikat HKI, 
+dikumpulkan dengan format PDF. 
+3. Video Hasil MVP (Minimum Viable Product) dalam melakukan 
+validasi pasar. 
+- Video Hasil MVP wajib diunggah ke penyimpanan awan (cloud) yang 
+dibuat sendiri melalui Google Drive oleh setiap tim dan panitia 
+GEMASTIK 2026 mendapat akses untuk membaca folder dan file - 
+file yang ada di dalam drive tersebut. 
+
+--- PAGE 100 ---
+ 
+96 
+ 
+- Format penamaan file: “GEMASTIK 2026 Bisnis TIK - <ID Tim> - 
+<Nama Tim> - <Judul Bisnis> - Video Hasil MVP”. 
+- Link Google Drive tersebut disertakan saat mengunggah berkas 
+pada laman kompetisi Gemastik. 
+- Ketentuan 
+yang 
+lain 
+silahkan 
+dilihat 
+pada 
+penjelasan 
+ketentuan Video Hasil MVP di bawah. 
+4. Presentasi pitching yang sudah diperbaiki. 
+File presentasi pitching diunggah dalam bentuk PDF maksimal 10 
+slide dengan penamaan file "GEMASTIK 2026 Bisnis TIK - <ID-Tim> - 
+<Nama Tim> - Presentasi Karya Final.pdf". File presentasi tidak 
+diperkenankan untuk dilakukan kompresi ke dalam format ZIP 
+maupun RAR. 
+ 
+Babak Final dilaksanakan dengan ketentuan berikut: 
+- 
+Tim finalis melakukan pendaftaran ulang untuk kepesertaan pada 
+Babak Final. 
+- 
+Kompetisi babak final dilaksanakan dengan dua kegiatan, yaitu sesi 
+presentasi pitching (secara live) dan penjelasan hasil MVP atau 
+layanan serta sesi tanya jawab dengan dewan juri dalam ruang 
+pertemuan daring yang disediakan oleh penyelenggara. 
+- 
+Tim menyampaikan presentasi pitching-nya di hadapan dewan juri. 
+- 
+Tim finalis dapat mengirimkan file presentasi serta Video MVP yang 
+berbeda jika melakukan pivoting ide atau ada Video MVP tambahan 
+yang memperkuat ide awal pada waktu submit dari babak penyisihan. 
+Bentuk format video mengikuti babak penyisihan sebelumnya. 
+- 
+Babak final dilaksanakan secara daring dengan setiap tim finalis 
+dialokasikan waktu 25 menit (3 menit presentasi (pitching), 7 menit 
+penjabaran hasil MVP dan 15 menit tanya-jawab antara ketua tim 
+peserta dan para anggota dengan tim juri). 
+- 
+Urutan presentasi ditentukan dari undian pada saat technical 
+meeting. 
+
+--- PAGE 101 ---
+ 
+97 
+ 
+- 
+Setiap tim peserta sudah siap di ruang tunggu ruang pertemuan 
+paling lambat 15 menit sebelum jadwal presentasi. 
+- 
+Akan diberikan tanda peringatan 2 menit sebelum waktu presentasi 
+habis; 
+- 
+Jika waktu presentasi sudah habis, maka akan dihentikan oleh panitia. 
+- 
+Semua anggota tim peserta diminta hadir dalam presentasi babak 
+final. Ketidakhadiran anggota tim peserta dapat diterima atas alasan-
+alasan yang objektif dan dapat diterima, setelah tim peserta yang 
+bersangkutan menyampaikan permohonan resmi kepada panitia. 
+ 
+Ketentuan Video MVP dan Video Hasil MVP (Minimum Viable 
+Product) 
+a. Video MVP dan Video Hasil MVP adalah video yang dibuat dari 
+pengalaman anda dalam melakukan riset kualitatif dalam memahami 
+perilaku target konsumen serta analisa cohort nya yg di dapat dari hasil 
+traction melalui prototype yg dibangun (website landing page, mockup 
+apps, split test, video, dll) 
+b. Video MVP dan Video Hasil MVP wajib mencantumkan intro, subtitle, 
+dan logo GEMASTIK 2026 di pojok kanan atas. 
+c. Video dibuat dalam format MP4 720p dengan durasi 3 - 5 (max) menit 
+(termasuk intro dan subtitle); 
+d. Peserta diperkenankan mengirimkan Video MVP dan Video Hasil MVP 
+di atas lebih dari 1 video dengan ketentuan point (c) di atas dan max 
+3 video terutama ketika menemukan adanya perubahan kebutuhan 
+pada target konsumen yang sama dan/atau perubahan business model 
+yang mempengaruhi. 
+e. Video MVP yang menggunakan media sosial wajib diberikan linknya 
+dan diinformasikan pada file presentasi final untuk juri. 
+ 
+ 
+ 
+
+--- PAGE 102 ---
+ 
+98 
+ 
+f. Referensi untuk Video MVP & Video Hasil MVP: 
+● 
+Validate your business idea: THE LEAN STARTUP by Eric Ries: 
+https://www.youtube.com/watch?v=QaoVWtLX038 
+● 
+MVP: Quickly Validate your Start-Up: 
+https://www.youtube.com/watch?v=jHyU54GhfGs&t=3s 
+● 
+How I: Validate my idea in 2 days (with no code) 
+https://www.youtube.com/watch?v=1s_LoWy2dBU 
+● 
+Making sense of MVP (Minimum Viable Product): 
+https://www.youtube.com/watch?v=0P7nCmln7PM 
+● 
+Minumum Viable Product Examples and Benefits 
+https://www.youtube.com/watch?v=ixpphYTDiOM 
+Contoh Video MVP dari exploding Kittens: 
+● 
+How to play exploding kittens: 
+https://www.youtube.com/watch?v=kAkRKuv5Rts 
+Contoh Video Hasil MVP dari exploding Kittens: 
+● 
+Crowdfunding, explained by Exploding Kittens: 
+https://www.youtube.com/watch?v=oStLD-yYAy0 
+ 
+4. Kriteria Penilaian 
+a) Penjelasan Masalah Bisnis yang akan diangkat 
+1) Masalah bisnis 
+2) Solusi yang akan diberikan 
+3) Penjelasan Business Model 
+4) Dampak bisnis yang diciptakan di dalam industrinya 
+b) Produk atau Layanan 
+1) Memaparkan dengan jelas relevansi produk/layanan yang 
+ditawarkan dengan masalah bisnis yang diangkat; 
+2) Mampu menunjukkan proses iterasi perubahan atas evaluasi 
+Business Model dan Value Proposition Design nya; 
+3) Suatu produk/layanan yang sangat menarik/atraktif/up-to-date 
+
+--- PAGE 103 ---
+ 
+99 
+ 
+dalam bentuk MVP (Minimum Viable Product); 
+4) Value proposition yang kuat kepada end-user/consumer. 
+c) Pasar 
+1) Mampu mengidentifikasi, mengevaluasi dan menganalisa TAM 
+(Total Address Market); SAM (Serviceable Available Market); SOM 
+(Serviceable Obtainable Market). 
+2) Mampu mengidentifikasi kebutuhan customer dengan tepat 
+dengan 
+menjabarkan 
+atas 
+kriteria 
+karakteristik 
+value 
+propositionnya. 
+3) Evaluasi atas komparasi value proposition dengan perusahaan 
+kompetitor. 
+d) Strategi Bisnis 
+1) Analisa Proses product-market fit (Evolusi Business model dan 
+value proposition yg dijalankan) 
+2) Analisa Desirability Hypotheses (customer profile, value map, 
+customer segments, value propositions, channels, customer 
+relationships) dengan memberikan penjabarannya dan analisanya 
+dalam pencapaian target customer.  
+3) Analisa Viability Hypotheses (Monetizing strategy, Revenue 
+streams, 
+Cost 
+Structure, 
+Profit) 
+dengan 
+memberikan 
+penjabarannya dalam pencapaian sustainable profit. 
+4) Anallisa Feasibility Hypotheses (Key activities, Key Resources & Key 
+partners) dengan memberikan penjabarannya, berapa investasi 
+yg dibutuhkan dan aktivitas strategis dalam membangun value 
+proposition. 
+e) Anggota Perusahaan 
+Anggota menjelaskan latar belakang yang mendukung yang memiliki 
+kualifikasi dan kompetensi yang tepat untuk menjadikan bisnis ini 
+sukses. 
+f) 
+Daya Tarik atau Traksi 
+1) Hasil / pekerjaan yang telah dilakukan hingga saat ini. 
+2) Hasil penjualan, jumlah pelanggan / user, surat kerjasama, 
+
+--- PAGE 104 ---
+ 
+100 
+ 
+kemitraan. 
+3) Analisa cohort dan kesimpulan sementara. 
+g) Pitch Deck (Presentasi) 
+1) Kejelasan mengangkat problem bisnis dan konsistensi isi ide 
+bisnis dan pengalaman berinteraksi dengan target customer. 
+2) Kejelasan visi bisnis dan eksekusi bisnis dalam presentasi. 
+3) Semangat, percaya diri, antusiasme, dan sifat persuasif yang 
+tinggi. 
+ 
+Penilaian Babak Penyisihan dan Final 
+ 
+No 
+Kriteria Penilaian 
+Penyisihan 
+Final 
+1 
+Penjelasan Masalah Bisnis 
+20% 
+5% 
+2 
+Produk atau Layanan 
+10% 
+10% 
+3 
+Pasar 
+20% 
+20% 
+4 
+Strategi Bisnis 
+10% 
+20% 
+5 
+Anggota Perusahaan 
+10% 
+10% 
+6 
+Daya Tarik atau Traksi 
+10% 
+20% 
+7 
+Pitch Deck 
+20% 
+15% 
+Total Skor (Bobot x Nilai) 
+ 
+5. Ketentuan Khusus 
+a. Setiap tahap kompetisi dapat disiarkan melalui media radio, televisi, dan 
+Internet. 
+b. Data atau informasi yang dibahas atau dipresentasikan harus dianggap 
+sebagai informasi yang dimungkinkan masuk dalam ranah publik. 
+c. Hak cipta dan perizinan: Jika tim menggunakan materi berhak cipta 
+dan/atau gambar dari pihak ketiga dalam dokumen atau presentasi, 
+maka tim harus mendapatkan izin dan otorisasi terlebih dahulu dari 
+
+--- PAGE 105 ---
+ 
+101 
+ 
+pemilik untuk menggunakan materi tersebut. 
+d. Dalam kompetisi ini panitia GEMASTIK menjamin ide peserta adalah 
+sepenuhnya milik peserta (mahasiswa dan/atau universitas) yang 
+diwakilinya. 
+e. Peserta mengijinkan panitia mempublikasikan ide karya peserta dalam 
+bentuk abstraksi untuk mendorong kreativitas dan inovasi di kalangan 
+universitas di media internal GEMASTIK. 
+f. Panitia dan juri mewakili Kementerian Pendidikan Tinggi Sains dan 
+Teknologi yang akan memberikan support dan masukan bagi peserta 
+untuk pengembangan usahanya, dan menjamin tidak akan memberikan 
+proposal peserta kepada pihak ketiga. 
+g. Peserta wajib menginformasikan file Pitch decknya kepada dosen 
+pembimbingnya untuk dilakukan proses kurasi. 
+h. Peserta dan juri akan menandatangani NDA (Non-Disclosure Agreement) 
+yang diketahui oleh Panitia GEMASTIK. 
+ 
+ 
+
+--- PAGE 106 ---
+ 
+102 
+ 
+Lampiran I 
+PERNYATAAN ORISINALITAS KARYA 
+GEMASTIK XIX TAHUN 2026 
+ 
+Yang bertandatangan di bawah ini: 
+Nama Ketua Tim  
+ 
+: ..…………………………………………………………………………………………………………………. 
+Nomor Induk Mahasiswa  
+: ..…………………………………………………………………………………………………………………. 
+Nama Tim 
+ 
+ 
+: ..…………………………………………………………………………………………………………………. 
+Program Studi 
+ 
+ 
+: ..…………………………………………………………………………………………………………………. 
+Nama Dosen Pembimbing    
+: ..…………………………………………………………………………………………………………………. 
+Perguruan Tinggi        
+ 
+: ..…………………………………………………………………………………………………………………. 
+ 
+Dengan ini menyatakan bahwa karya tim kami, yang diikutsertakan dalam GEMASTIK XIX Tahun 2026: 
+Judul Karya 
+ 
+ 
+: ..………………………………………………………………………………………………………………….  
+Cabang Kompetisi LIDM  
+: ..………………………………………………………………………………………………………………….  
+ 
+bahwa karya yang kami unggah adalah: 
+1. Merupakan gagasan orisinal dan hasil karya dari tim kami sendiri; 
+2. Tidak mengandung unsur pelanggaran plagiarisme; 
+3. Tidak melanggar hak cipta pihak manapun; 
+4. Belum/Sudah*) pernah menjadi juara dalam kompetisi lain, serta tanpa/dengan*) tambahan unsur 
+pengembangan minimal 50%; [Catatan: *) coret yang tidak sesuai] 
+5. Terkait penggunaan Artificial Intelligence (AI) apabila dilakukan, maka: 
+a. Penggunaan Kecerdasan Buatan Generatif (Generative AI) dalam pengembangan karya ini (baik berupa 
+teks, media, kode program, atau lainnya) tidak melebihi 25% dari keseluruhan substansi karya dan murni 
+difungsikan sebagai alat bantu (asistensi), bukan pencipta utama; 
+b. Apabila karya inovasi ini mengintegrasikan sumber daya AI berbasis awan (Cloud AI) atau API pihak 
+ketiga sebagai komponen fungsionalitas operasional perangkat, maka arsitektur sistem, skenario 
+integrasi, rekayasa instruksi/prompting, dan kustomisasinya adalah murni hasil rancangan mandiri tim 
+kami; 
+c. Bersedia melampirkan pernyataan transparansi penggunaan AI (seperti daftar prompt atau riwayat 
+modifikasi); 
+Demikian surat pernyataan ini saya buat dengan sebenar-benarnya. Apabila di kemudian hari ditemukan bahwa 
+pernyataan ini tidak benar, saya bersedia menerima sanksi sesuai ketentuan yang berlaku pada kompetisi 
+GEMASTIK XIX Tahun 2026. 
+ 
+Mengetahui, 
+Kota/Kab. ………………………….., Tanggal-Bulan-Tahun 
+Pimpinan Bidang Kemahasiswaan 
+Dosen Pembimbing 
+Ketua Tim 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Nama Lengkap 
+NIP/NUPTK ……………..……….…….. 
+Nama Lengkap 
+NIP/NUPTK ………………..….……….. 
+Nama Lengkap 
+NIM/NPM. ………………….………….. 
+
+--- PAGE 107 ---
+ 
+103 
+ 
+Lampiran II 
+PERNYATAAN PENGEMBANGAN KARYA 
+GEMASTIK XIX TAHUN 2026 
+ 
+Yang bertandatangan di bawah ini: 
+Nama Ketua Tim  
+ 
+: …………………………………………………………………………………………………………………. 
+Nomor Induk Mahasiswa  
+: …………………………………………………………………………………………………………………. 
+Nama Tim 
+ 
+ 
+: …………………………………………………………………………………………………………………. 
+Program Studi 
+ 
+ 
+: …………………………………………………………………………………………………………………. 
+Nama Dosen Pembimbing    
+: …………………………………………………………………………………………………………………. 
+Perguruan Tinggi        
+ 
+: …………………………………………………………………………………………………………………. 
+ 
+Dengan ini menyatakan bahwa karya tim kami, yang diikutsertakan dalam GEMASTIK XIX Tahun 2026: 
+Judul Karya 
+ 
+ 
+: ………………………………………………………………………………………………………………….  
+Cabang Kompetisi GEMASTIK  
+: ………………………………………………………………………………………………………………….  
+ 
+Centang dan lengkapi isian jika dilakukan: 
+ 
+ 
+ 
+Sebelumnya tidak/sudah* (coret salah satu) pernah meraih penghargaan Juara ……..…………….. pada kompetisi 
+[nama kompetisi Sebelumnya] yang merupakan kompetisi tingkat [nasional/internasional] pada tahun [Tahun]. 
+ 
+ 
+ 
+Tahun ini tidak/sedang* (coret salah satu) diikutsertakan dalam pada kompetisi [nama kompetisi lain] yang 
+merupakan kompetisi tingkat [nasional/internasional] atau 
+GEMASTIK pada cabang lain, yaitu: 
+………………………………………………………… 
+ 
+Lengkapi isian jika pernah meraih penghargaan jauara dan/atau juga sedang diikutsertakan dalam pada kompetisi lain: 
+Namun, karya tersebut telah mengalami pengembangan substansi lebih dari 50% dibanding versi sebelumnya. 
+Pengembangan yang dilakukan meliputi aspek-aspek sebagai berikut: 
+No. 
+Aspek / 
+Komponen 
+Versi Karya 
+Sesuai Pilihan yang Dicentang 
+Versi Baru 
+(Setelah Pengembangan) 
+Persentase  
+Perubahan (%) 
+1 … 
+… 
+… 
+… 
+2 … 
+… 
+… 
+… 
+3 … 
+… 
+… 
+… 
+4 Dst. 
+Dst. 
+Dst. 
+Dst. 
+Total estimasi pengembangan mencapai 
+… 
+ 
+Demikian surat pernyataan ini saya buat dengan sebenar-benarnya. Apabila di kemudian hari ditemukan bahwa 
+pernyataan ini tidak benar, saya bersedia menerima sanksi sesuai ketentuan yang berlaku pada kompetisi GEMASTIK 
+XIX Tahun 2026. 
+ 
+Mengetahui, 
+Kota/Kab., Tanggal-Bulan-Tahun 
+Pimpinan Bidang Kemahasiswaan 
+Dosen Pembimbing 
+Yang Menyatakan 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Nama Lengkap 
+NIP/NUPTK ……………..……….…….. 
+Nama Lengkap 
+NIP/NUPTK ………………..….……….. 
+Nama Lengkap 
+NIM/NPM. ………………….………….. 
+
+--- PAGE 108 ---
+ 
+104 
+ 
+Lampiran III 
+PERNYATAAN TRANSPARANSI  
+PENGGUNAAN KECERDASAN ARTIFISIAL 
+GEMASTIK XIX TAHUN 2026 
+ 
+Yang bertandatangan di bawah ini: 
+Nama Ketua Tim 
+ 
+: ………………………………………………………………………………………………………………. 
+Nomor Induk Mahasiswa 
+: ………………………………………………………………………………………………………………. 
+Nama Tim 
+ 
+ 
+: ………………………………………………………………………………………………………………. 
+Program Studi  
+ 
+: ………………………………………………………………………………………………………………. 
+Nama Dosen Pembimbing    
+: ………………………………………………………………………………………………………………. 
+Perguruan Tinggi        
+ 
+: ………………………………………………………………………………………………………………. 
+ 
+Dengan ini menyatakan bahwa karya tim kami, yang diikutsertakan dalam GEMASTIK XIX Tahun 2026: 
+Judul Karya 
+ 
+ 
+: ……………………………………………………………………………………………………………….  
+Cabang Kompetisi GEMASTIK 
+: ……………………………………………………………………………………………………………….  
+ 
+Dengan ini kami menyampaikan pernyataan transparansi penggunaan Kecerdasan Artifisial (KA)/Artificial 
+Intellegence (AI) dan Kecerdasan Artifisial Generatif (KA-Gen)/Generative Artificial Intellegence (Gen-AI), 
+sebagai berikut: 
+ 
+ 
+ 
+Karya inovasi menggunakan sumber daya KA/AI berbasis awan (Cloud AI) atau API pihak ketiga sebagai 
+komponen fungsionalitas operasional perangkat, dengan arsitektur sistem, 104ingkat104 integrasi, 
+rekayasa instruksi/prompting, dan kustomisasinya adalah murni hasil rancangan mandiri tim kami, 
+meliputi: 
+ 
+No. 
+Nama Aplikasi AI/API 
+Fungsi yang Didukung dalam Inovasi 
+Kustomisasi/Pengaturan 
+1 
+ 
+ 
+ 
+2 
+ 
+ 
+ 
+3 
+ 
+ 
+ 
+4 
+Dst…. 
+ 
+ 
+ 
+ 
+ 
+ 
+Naskah dokumen yang kami unggah dan/atau karya kreasi kami telah disusun sesuai kaidah akademik dan 
+menjunjung integritas ilmiah serta bukan merupakan hasil generating oleh Kecerdasan Artifisial Generatif 
+(Gen-AI) secara sepenuhnya, yaitu dengan menggunakan aplikasi deteksi …………………….………….. yang 
+memberikan hasil deteksi 104ingkat penggunaan Gen-AI sebesar ……… %, sesuai bukti AI writing detection 
+terlampir, yaitu dengan penjelasan dan argumentasi berikut: 
+ 
+No. 
+Penjelasan dan Argumentasi Penggunaan Gen-AI 
+1 
+ 
+2 
+ 
+3 
+ 
+4 
+ 
+5 
+Dst…. 
+ 
+
+--- PAGE 109 ---
+ 
+105 
+ 
+Demikian surat pernyataan ini saya buat dengan sebenar-benarnya. Apabila di kemudian hari ditemukan 
+bahwa pernyataan ini tidak benar, saya bersedia menerima sanksi sesuai ketentuan yang berlaku pada 
+kompetisi GEMASTIK XIX Tahun 2026. 
+ 
+Mengetahui, 
+Kota/Kab., Tanggal-Bulan-Tahun 
+Pimpinan Bidang Kemahasiswaan 
+Dosen Pembimbing 
+Yang Menyatakan 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Nama Lengkap 
+NIP/NUPTK ……………..……….…….. 
+Nama Lengkap 
+NIP/NUPTK ………………..….……….. 
+Nama Lengkap 
+NIM/NPM. ………………….………….. 
+ 
+ 
+ 
+ 
+

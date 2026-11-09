@@ -1,0 +1,338 @@
+=== PAGE 75 ===
+75 ---
+ 
+71 
+ 
+3) menghubungkannya dengan jaringan internet untuk mengetahui dan 
+memberikan respon adaptasi dengan situasi lingkungannya. 
+Tingkat kecerdasan yang dimiliki oleh piranti tersebut dapat 
+dikembangkan 
+dari 
+proses 
+belajar 
+mandiri 
+ataupun 
+dengan 
+memanfaatkan data pengukuran jaringan sensor dan hasil belajar yang 
+telah tersedia di lingkungan, yang diperoleh melalui keterhubungan 
+dengan 
+jaringan 
+internet. 
+Pemanfaatan 
+komputasi 
+awan 
+(cloud 
+computing) dapat dilibatkan sebagai elemen teknologi yang memperkuat 
+keunggulan piranti. 
+Dengan memanfaatkan teknologi IoT (internet of things) piranti yang 
+dibangun tersebut merupakan sistem keterhubungan yang diharapkan 
+dapat memberikan manfaat bagi peningkatan kesejahteraan masyarakat 
+dalam berbagai bidang seperti: pertanian, perkebunan, kehutanan, 
+peternakan, perikanan dan kelautan, peningkatan produksi pangan, 
+sistem logistik, pembangkitan dan penghematan energi, instrumentasi 
+dan kendali elektronik kewilayahan, transportasi cerdas, pengendalian  
+dan  mitigasi  bencana,  sistem  keamanan  cerdas, penyelamatan 
+lingkungan hidup, sistem aplikasi berbasis pemetaan geografis, dunia 
+kesehatan dan well-being, dukungan teknologi asistif untuk disabilitas 
+atau pasien yang sakit, sistem perdagangan elektronik, literasi ekonomi 
+digital, perangkat rumah tangga cerdas, otomasi cerdas di industri, dan 
+sebagainya. Inovasi untuk kompetisi ini hendaknya dikembangkan dalam 
+kerangka pendekatan yang dilihat dari sudut pandang sesuai tema 
+GEMASTIK XIX/2026, yaitu “Berdampak, Inklusif, dan Berkelanjutan 
+menuju Masyarakat Cerdas” serta berangkat dari fokus pemikiran yang 
+merupakan salah satu tujuan dari 17 goals pada SDGs (Sustainable 
+Development Goals). 
+ 
+2. Babak Penyisihan 
+Babak Penyisihan untuk kompetisi Piranti Cerdas, Sistem Benam, dan 
+IoT dilaksanakan secara daring dengan berbasis penilaian karya yang 
+disajikan dalam bentuk makalah proposal dan video pengembangan 
+
+
+=== PAGE 76 ===
+76 ---
+ 
+72 
+ 
+model karya inovasi yang disusun oleh tim peserta. Berkas pada babak 
+penyisihan terdiri dari: 
+1. Surat Pernyataan 
+Surat Pernyataan yang berisikan tentang pernyataan bahwa karya 
+orisinal, tidak plagiat, tidak melanggar hak cipta. Bila karya yang 
+dilombakan adalah pengembangan dari karya sebelumnya yang 
+pernah memenangkan kompetisi tingkat nasional, maka Surat 
+Pernyataan harus memuat penjelasan perbedaan antara keduanya, 
+yang bila dikuantifikasikan lebih dari 50% (sesuai Bab II Bagian B 
+Persyaratan Umum butir no. 9). Surat ditandatangani oleh ketua tim 
+di atas materai dan dikumpulkan dengan format PDF, ukuran file 
+maksimal 2 MB. 
+2. Proposal 
+Ketentuan proposal adalah sebagai berikut. 
+a) Proposal karya inovasi piranti cerdas, sistem benam, dan IoT yang 
+diajukan merupakan ide orisinal dengan tidak menjiplak karya 
+inovasi yang sudah ada (baik yang telah dikembangkan oleh tim 
+maupun orang lain). 
+b) Proposal diharapkan menjelaskan kelebihan karya inovasi yang 
+dikembangkan dari sudut pandang seluruh kriteria penilaian dan 
+juga kelebihannya jika dibandingkan dengan karya inovasi lain 
+yang serupa. 
+c) Proposal disusun mengikuti sistematika sebagai berikut: 
+- Cover, memuat judul atau nama inovasi, nama tim dan anggota, 
+logo Kemendiktisaintek di pojok kiri atas, logo GEMASTIK 
+XIX/2026 dan logo Perguruan Tinggi peserta di pojok kanan 
+atas 
+- Abstrak 
+- Latar belakang 
+- Urgensi dan manfaat (penjelasan tentang mengapa karya ini 
+penting dan apa manfaatnya) 
+
+
+=== PAGE 77 ===
+77 ---
+ 
+73 
+ 
+- Metode dasar pengembangan karya (penjelasan tentang 
+bagaimana tiga elemen teknologi dari kategori lomba ini: 
+kecerdasan, sistem benam, dan IoT digunakan). Pastikan karya 
+anda mengandung ketiga unsur ini. 
+- Desain purwarupa/model (desain perangkat keras, sumber 
+daya/power source, spesifikasi penggunaan sensor, skema 
+rangkaian alat, desain 3D) 
+- Analisis fungsional, cara kerja, dan kinerja/performansi 
+- Rencana 
+implementasi 
+dan perkembangan 
+pengerjaan 
+(yang telah dikerjakan dan yang akan dikerjakan) 
+- Foto 
+dan 
+penjelasan 
+hasil 
+implementasi 
+mock- 
+up/purwarupa/model pada hasil pengembangan 50% 
+- Tautan video proses pengembangan model karya inovasi 
+- Daftar Pustaka 
+Proposal ditulis maksimal 30 halaman (total) termasuk lampiran dan 
+kelengkapan lainnya. Proposal dikumpulkan melalui aplikasi babak 
+penyisihan pada laman kompetisi Gemastik dalam bentuk PDF 
+dengan format penamaan file “GEMASTIK XIX Piranti Cerdas - 
+<ID-Tim> - <Nama Tim> - <Judul Karya> - Proposal.pdf”, dengan 
+ukuran tidak melebihi 10 MB. File proposal dalam format PDF, tidak 
+diperkenankan untuk dilakukan kompresi ke dalam format ZIP 
+maupun RAR. 
+3. Video 
+Ketentuan video rancangan karya inovasi piranti cerdas, sistem 
+benam, dan IoT pada Babak Penyisihan sebagai berikut: 
+a) Video mewakili gambaran proses perancangan karya inovasi dan 
+demonstrasi hasil pengembangan pada kemajuan minimal 50%; 
+b) Video harus menggambarkan mengapa piranti tersebut berguna 
+dalam menyelesaikan masalah yang diangkat oleh tim; 
+c) Video harus menggambarkan bagaimana ketiga elemen lomba 
+(kecerdasan, sistem benam, dan IoT) diimplementasikan; 
+
+
+=== PAGE 78 ===
+78 ---
+ 
+74 
+ 
+d) Penyajian video menarik bagi calon pengguna dan investor; 
+e) Demonstrasi juga diperbolehkan menggunakan device asli 
+sehingga perekaman dilakukan dengan menggunakan kamera; 
+f) 
+Video dalam format MP4 720p dengan durasi maksimal 3 menit; 
+g) Mencantumkan teaser/intro GEMASTIK pada awal dan/atau akhir 
+video; 
+h) Video disajikan dengan kualitas gambar dan suara yang jelas serta 
+disertai dengan running text penjelasan 
+i) 
+Narator wajib terlihat pada tampilan video; 
+j) 
+Video diunggah ke situs YouTube dengan tautan disertakan saat 
+mengunggah proposal ke laman kompetisi Gemastik, Video 
+YouTube diberi judul GEMASTIK XIX Piranti Cerdas - <ID Tim> - 
+<Nama Tim> - <Judul Karya>. 
+ 
+Berkas (surat pernyataan, naskah proposal, dan video) diunggah paling 
+lambat tanggal 8 Agustus 2026 pukul 23.59 WIB,  sesuai dengan 
+jadwal lomba yang tercantum pada Bab II. Berkas diunggah ke laman 
+kompetisi Gemastik (alamat URL bisa dilihat pada Bab II Bagian G 
+(Informasi Kompetisi). 
+ 
+3. Babak Final 
+Pendaftaran ulang kepesertaan babak final dan unggah dokumen 
+babak final semua tim finalis mengikuti jadwal lomba Gemastik yang 
+dijelaskan pada Bab II. Berkas pada babak final terdiri dari: 
+1. Video Profil Karya, mengacu pada Bab II, Bagian B (Persyaratan 
+Umum) butir nomor 13. 
+2. Makalah Gemastik, mengacu pada Bab II, Bagian B (Persyaratan 
+Umum) butir nomor 11. 
+3. Hasil Uji Similaritas Makalah, mengacu pada Bab II, Bagian B 
+(Persyaratan Umum) butir nomor 11. 
+ 
+
+
+=== PAGE 79 ===
+79 ---
+ 
+75 
+ 
+ 
+4. Laporan Akhir 
+Laporan akhir merupakan bagian lanjutan dan/atau perbaikan dari 
+proposal. Laporan akhir mengikuti struktur yang sama dengan 
+proposal, dan menjelaskan karya pada tingkat penyelesaian 100%. 
+Bagian yang sudah ada di proposal dapat ditulis kembali di laporan 
+akhir dan harus mengandung penjelasan-penjelasan tambahan yang 
+mencerminkan ketuntasan karya. Laporan akhir dikumpulkan dalam 
+format PDF. 
+5. Hasil Uji Similaritas Laporan Akhir 
+Hasil uji periksa similaritas (plagiarism) laporan akhir bisa 
+menggunakan Turnitin, iThenticate, atau lainnya, maksimal dengan 
+indeks similaritas 25%, dikumpulkan dengan format PDF. 
+6. Bukti Pendaftaran Hak Cipta (HKI) Karya 
+Mengacu pada Bab II, Bagian B (Persyaratan Umum) butir nomor 12, 
+bukti pendaftaran HKI bisa berupa screenshot pendaftaran karya pada 
+web DJKI (Direktorat Jenderal Kekayaan Intelektual). Peserta mendapatkan 
+tambahan poin jika berhasil memperoleh bukti pendaftaran HKI yang 
+telah disetujui, berupa sertifikat HKI yang dikumpulkan dengan 
+format PDF. 
+7. Materi Presentasi 
+Presentasi dan demo karya inovasi atau kreasi pada Babak Final  
+dilaksanakan secara daring, tim finalis harus menyiapkan video 
+presentasi dan demo karya sesuai dengan ketentuan pada Bab II, 
+Bagian C butir nomor 4. Beberapa hal yang perlu diperhatikan: 
+a) Presentasi dan demo karya inovasi final menggambarkan hasil 
+pengembangan karya inovasi dengan pencapaian 100%. 
+b) Untuk penamaan file video, nama kategori lomba adalah “Piranti 
+Cerdas”, sehingga nama file untuk video presentasi dan demo 
+karya adalah:  "GEMASTIK XIX 2026 - Piranti Cerdas - <ID-Tim> - 
+<Nama Tim> - <Judul Karya> - Karya Final.pdf". 
+
+
+=== PAGE 80 ===
+80 ---
+ 
+76 
+ 
+8. Presentasi 
+a) Babak final dilaksanakan secara daring dengan setiap tim finalis 
+dialokasikan waktu 25 menit, yaitu 
+- 10 menit presentasi dan demo (melalui video) 
+- 15 menit tanya-jawab tim peserta dengan tim juri 
+b) Peserta wajib mempersiapkan kode sumber dari karya inovasi 
+apabila juri meminta untuk ditampilkan sebagai keperluan juri 
+dalam menilai; 
+c) 
+Urutan presentasi ditentukan dari undian pada saat technical 
+meeting; 
+ 
+4. Kriteria Penilaian 
+Penilaian Babak Penyisihan 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Kreativitas 
+● Urgensi masalah yang dipilih 
+● Orisinalitas/kebaruan gagasan/State of The Art 
+● Tingkat penerapan kecedrasan, sistem benam, dan 
+IoT dalam gagasan 
+30% 
+2 
+Penulisan Proposal 
+● Kesesuaian proposal dengan format yang telah 
+ditetapkan 
+● Kualitas isi dari masing-masing bagian dalam proposal 
+30% 
+3 
+Potensi Kegunaan Hasil Bagi Masyarakat 
+20% 
+4 
+Kemungkinan Proposal Dapat Diselesaikan 
+20% 
+Total Skor (Bobot x Nilai)  
+ 
+ 
+ 
+Penilaian Babak Final 
+
+
+=== PAGE 81 ===
+81 ---
+ 
+77 
+ 
+No 
+Kriteria 
+Bobot 
+1 
+Kecerdasan Piranti 
+20% 
+2 
+Kompleksitas, Problem Solving dan 
+Fungsionalitas 
+20% 
+3 
+Desain/Model dan Implementasinya 
+20% 
+4 
+Efektivitas, Efisiensi, Biaya, dan Adaptabilitas 
+20% 
+5 
+Presentasi dan Demo 
+20% 
+Total Skor (Bobot x Nilai) 
+ 
+5. Ketentuan Khusus 
+a) Karya penelitian/pengembangan memiliki kesesuaian pada salah satu 
+lingkup bidang tertentu (lihat paragraf terakhir subbab I.1 Deskripsi 
+untuk contoh-contoh bidang yang dapat dipilih) yang sesuai dengan 
+tema Gemastik XIX; 
+b) Karya penelitian/pengembangan dapat berasal dari proyek akhir atau 
+tugas akhir yang terkait dengan kegiatan akademik kurikuler pada 
+program studi diploma atau sarjana yang diikuti oleh para anggota 
+tim kompetisi; 
+c) Karya yang diikutsertakan dalam kompetisi dapat merupakan hasil 
+dari 
+kegiatan 
+yang 
+sudah 
+berjalan 
+proses 
+penelitian 
+atau 
+pengembangannya; 
+d) Setiap tim hanya boleh mengajukan satu buah karya piranti; 
+e) Karya piranti belum pernah terpublikasi baik secara komersial 
+maupun secara non-komersil kepada khalayak umum; 
+f) 
+Piranti dapat dijalankan pada platform umum tanpa tambahan 
+perangkat keras khusus; 
+g) Karya piranti yang diajukan merupakan ide orisinal dengan tidak 
+menjiplak aplikasi yang sudah ada; 
+h) Karya piranti tidak mengandung unsur SARA (Suku Agama Ras dan 
+Antar Golongan); 
+
+
+=== PAGE 82 ===
+82 ---
+ 
+78 
+ 
+i) 
+Jika karya adalah karya incremental / karya yang dikembangkan dari 
+kontes sebelumnya, peserta harus menjelaskan pada juri mengapa 
+karya tersebut diikutsertakan dan pembaruan karya tersebut 
+dibandingkan dengan karya sebelumnya; 
+j) 
+Keputusan juri bersifat mutlak dan tidak dapat diganggu gugat; 
+k) Peraturan yang belum tercantum akan ditambahkan kemudian hari 
+bila diperlukan. 
+ 
+ 
+ 
+

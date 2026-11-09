@@ -1,0 +1,192 @@
+--- bab4_old
++++ bab4_new
+@@ -13,11 +13,11 @@
+ Seluruh data yang didapatkan dikirimkan secara serial USB ke Raspberry Pi 5. Pemrosesan 
+ yang dilakukan meliputi downsample, detrending, dan filtering sinyal yang kemudian 
+ diekstraksi menjadi parameter tanda vital, serta output klasifikasi tingkat triase.  
+-Pada tahap akhir, keseluruhan parameter akan dikirimkan ke server backend Flask dalam 
+-format JSON melalui protokol HTTPS Post. Hasil pengukuran ini dapat dilihat melalui web 
+-dashboard IGD yang di-deploy menggunakan layanan Microsoft Azure App Service. Data 
+-pasien disimpan di dalam database MySQL sebagai rekaman medis elektronik untuk menjamin 
+-kerahasiaan dan keamanan pasien. 
++Pada tahap akhir, keseluruhan parameter dikirimkan dalam format JSON ke broker 
++HiveMQ Cloud melalui protokol MQTT. Backend Flask menerima data tersebut, 
++menyimpannya ke basis data MySQL, dan secara otomatis mengalokasikan bed sesuai zona 
++kategori triase. Zona dan nomor bed dikirim balik ke perangkat TriaGo, sementara dashboard 
++di meja perawat dan monitor IGD diperbarui secara real-time. 
+  
+ 4.2. Analisis Fungsional Perangkat Keras 
+ 4.2.1. Sensor PPG MAX30105 
+@@ -118,7 +118,7 @@
+ Beth Israel Deaconess Medical Center (BIDMC), dari hasil pengujian didapatkan performa 
+ akurasi sebesar  99,15% dengan MAE hanya 0,695 BPM saja. 
+  
+-Gambar 4.5 Deteksi puncak gelombang R 
++Gambar 4.6 Deteksi puncak gelombang R 
+  
+ 4.3.4. Pengujian Algoritma Laju Pernapasan 
+ Dari sinyal ECG dan PPG yang telah dibersihkan, modulasi pernapasan diekstraksi 
+@@ -133,7 +133,7 @@
+ === PAGE 20 ===
+ 20 ---
+  
+-Gambar 4.6 Spektrum Daya (PSD) domain frekuensi sinyal respirasi 
++Gambar 4.7 Spektrum Daya (PSD) domain frekuensi sinyal respirasi 
+   
+ Sebagai pengujian lanjutan, algoritma estimasi denyut jantung dan laju pernapasan diuji 
+ menggunakan dataset BIDMC. Dataset ini berisi rekaman multimodal sinyal PPG dan ECG 
+@@ -148,12 +148,12 @@
+ DC yang sudah dilakukan pada pemrosesan sinyal PPG sebelumnya. Hasil dari pemisahan 
+ komponen AC dan DC ditunjukkan pada Gambar 4.7 yang memisahkan komponen AC dan 
+ DC dari sinyal PPG inframerah.  Hasil pengujian algoritma menggunakan dataset sekunder 
+-berhasil mencapai performa akurasi sebesar 98,88% dan MAE hanya 1,08% saja. Performa 
+-pengolahan sinyal ini telah memenuhi standar ISO 80601-2-61 dengan toleransi eror yang 
+-sangat kecil.  
+- 
+- 
+-Gambar 4.7 Perbedaan komponen DC dan AC sinyal PPG 
++berhasil mencapai performa akurasi sebesar 98,89% dengan MAE hanya 1,08% dan RMSE 
++1,47%. Performa pengolahan sinyal ini telah memenuhi standar ISO 80601-2-61 dengan 
++toleransi eror yang sangat kecil.  
++ 
++ 
++Gambar 4.8 Perbedaan komponen DC dan AC sinyal PPG 
+  
+ 4.3.6. Pengujian Estimasi Suhu Tubuh 
+ Pengujian estimasi suhu tubuh dilakukan menggunakan dataset sekunder VitalDB 
+@@ -180,6 +180,7 @@
+ Click dan PPG melalui sensor MAX30105 dengan total 94 subjek. Label tekanan darah diukur 
+ menggunakan alat komersial menggunakan manset. Subjek bervariasi, namun didominasi oleh 
+ usia remaja 18 – 22 tahun. Hasil evaluasi model ditunjukkan pada Gambar 4.9. 
++ 
+  
+ Gambar 4.9 Evaluasi model estimasi tekanan darah 
+  
+@@ -358,22 +359,108 @@
+ British Hypertension Society 
+ (BHS) 
+  
+-4.5. Pengujian Sistem IoT 
+-Pengujian sistem IoT bertujuan memastikan hasil triase terkirim secara end-to-end dan 
+-real-time dari perangkat hingga ke web dashboard IGD. Setelah pengolahan sinyal dan 
+-klasifikasi selesai di Raspberry Pi 5, hasilnya dikemas dalam format JSON. Paket ini berisi 
+-nilai tanda vital, skor GCS, skor nyeri, dan kategori triase. Data dikirim melalui protokol 
+-MQTT ke broker HiveMQ Cloud dengan koneksi terenkripsi TLS dan QoS 1, sehingga setiap 
+-pesan dijamin sampai. Data juga disimpan sementara di perangkat, sehingga tidak hilang saat 
+-jaringan terputus dan dikirim ulang otomatis setelah koneksi pulih. 
+-Backend Flask menerima dan memvalidasi data, lalu menyimpannya ke basis data 
+-MySQL. Setelah itu, backend mengalokasikan bed sesuai zona triase secara otomatis. Hasilnya 
+-langsung ditampilkan pada web dashboard IGD melalui WebSocket, dan nomor bed dikirim 
+-kembali ke layar perangkat. Gambar 4.13 menunjukkan proses pengiriman data dari perangkat 
+-hingga tampil di dashboard 
+-(a) 
+-- 
+-(b) 
+-Gambar 4.13 Hasil uji pengiriman data: (a) Log pengiriman data hasil pengukuran ke 
+-server dan (b) Web Dashboard monitoring IGD 
+-
++4.5. Integrasi Backend, Database, dan Deployment 
++Alur data sistem IoT TriaGo ditunjukkan pada Gambar 4.13. Setelah proses klasifikasi 
++selesai, Raspberry Pi 5 mengirimkan hasil triase berupa tanda vital, skor GCS, pain score, serta 
++kategori dan skor XGBoost dalam format JSON ke broker HiveMQ Cloud melalui protokol 
++MQTT dengan koneksi TLS dan QoS 1. Backend Flask pada server menerima data tersebut, 
++kemudian modul Bed Management System mengalokasikan pasien secara otomatis ke zona 
++sesuai kategori triase, yaitu bed 01–03 untuk Resusitasi, 04–09 untuk Darurat, dan 10–12 untuk 
++Non-Darurat. Apabila zona utama penuh, pasien merah dan kuning dialihkan ke zona lain yang 
++tersedia, sedangkan pasien hijau berstatus menunggu. Hasil triase beserta nomor bed kemudian 
++disimpan ke basis data MySQL. 
++Hasil alokasi ditampilkan secara real-time melalui WebSocket pada web dashboard IGD, 
++yaitu di Meja Perawat untuk melengkapi identitas pasien dan melakukan discharge bed, serta 
++di Monitor IGD yang menampilkan peta bed dan hitung mundur target waktu respons. Zona 
++dan nomor bed juga dikirim kembali ke Raspberry Pi 5 sehingga layar TriaGo langsung 
++menampilkan tujuan pasien tanpa perlu konfirmasi manual. Backend dan basis data telah di-
++deploy pada server daring dengan akses melalui reverse proxy Nginx dan koneksi HTTPS, 
++sehingga dashboard dapat dibuka melalui https://bme.its.ac.id/informatics/TriaGo/. 
++Gambar 4.13 Alur integrasi sistem IoT TriaGo 
++ 
++ 
++
++
++=== PAGE 25 ===
++25 ---
++ 
++4.6. Perbandingan Solusi Terdahulu 
++Perangkat TriaGo dirancang agar tetap terjangkau dengan tetap mempertahankan 
++performa ekstraksi parameter fisiologis denyut nadi (HR), laju pernapasan (RR), saturasi 
++oksigen (𝑆𝑝𝑂2), tekanan darah noninvasif (NIBP), suhu tubuh, dan klasifikasi triase yang 
++akurat. Sistem yang dikembangkan meminimalisir penggunaan terlalu banyak sensor medis 
++dan meringkas menjadi cukup tiga sensor utama saja, yaitu sensor ECG, sensor PPG, dan 
++sensor suhu. Beberapa solusi lain yang sudah ada saat ini jika dibandingkan dengan TriaGo 
++dapat dilihat pada Tabel 4.5 berikut. Harga estimasi yang diusulkan telah disesuaikan dengan 
++alat-alat pembanding yang sudah ada dan dikondisikan dengan pembeli utama adalah pihak 
++rumah sakit secara langsung. 
++  
++Tabel 4.5. Perbandingan dengan alat yang sudah ada  
++Perangkat 
++Parameter Fisiologis 
++Harga 
++Mindray VS 9 
++HR, RR, 𝑆𝑝𝑂2, NIBP, suhu 
++tubuh dan Early Warning 
++Score (EWS)  
++Rp37.975.000 
++Welch Allyn Connex Spot 
++Monitor 
++RR, 𝑆𝑝𝑂2, NIBP, suhu tubuh 
++dan Early Warning Score 
++(EWS) 
++Rp38.127.600 
++GE HealthCare 
++CARESCAPE V100 
++HR, RR, 𝑆𝑝𝑂2, NIBP, dan 
++suhu tubuh 
++Rp20.720.000 
++TriaGo 
++HR, RR, 𝑆𝑝𝑂2, NIBP, suhu 
++tubuh dan klasifikasi triase 3 
++kelas 
++Rp15.000.000 (estimasi) 
++ 
++4.7. Pengujian Daya 
++Konsumsi daya perangkat dilakukan untuk memastikan alat dalam skenario penggunaan 
++IGD yang selalu siap siaga untuk digunakan. Pengujian dikondisikan pada kondisi diam tidak 
++digunakan (idle) dan saat aktif digunakan. Daya yang digunakan diambil dari satu sumber 
++Powerbank 20.000 mAh untuk menyuplai Raspberry Pi 5 dan layar LCD. Dalam kondisi idle 
++alat tidak digunakan, perangkat Raspberry Pi bekerja dengan suhu 33 ℃ dalam kondisi aktif 
++dan tidak digunakan. Pada kondisi bekerja mengambil data, mengolah data, dan menjalankan 
++sistem cerdas, Raspberry Pi bekerja cukup optimal di suhu tertinggi hanya 37 ℃ dan tidak 
++berbeda jauh dengan kondisi saat idle. Dengan perubahan suhu yang tidak signifikan antara 
++kondisi idle dan bekerja, perangkat mampu bekerja dengan optimal selama 5,5 jam hingga 6 
++jam pemakaian. Dengan penerapan komputasi dan rancangan perangkat keras yang efisien, 
++TriaGo mampu bertahan lama dan tetap bekerja maksimal dalam rentang suhu komputasi yang 
++rendah dan stabil.  
++ 
++4.8. Pendapat Ahli 
++Tim Para Pencari Berkah tidak hanya melakukan pengujian dan validasi perangkat secara 
++mandiri, tim juga meminta pendapat dari dr. Saskia Diva Kamila selaku dokter umum yang 
++bertugas di Medical Centre ITS. Konsultasi bersama dengan dokter kami dokumentasikan pada 
++Gambar 4.14. Dokter menilai inovasi TriaGo yang dikembangkan relevan dengan jumlah 
++peningkatan pasien yang dapat menambah beban kerja dan tingginya subjektivitas antar tenaga 
++medis. Sistem yang dikembangkan tidak hanya membantu tenaga medis dalam mengekstraksi 
++parameter fisiologis utama saja, melainkan juga memberikan rekomendasi keputusan triase dan 
++informasi manajemen kasur di IGD. Rekomendasi keputusan triase dapat memudahkan dan 
++menghilangkan keraguan tenaga medis dalam menentukan tingkat triase pasien secara akurat. 
++
++
++=== PAGE 26 ===
++26 ---
++Informasi kasur yang tersedia dengan indikator klasifikasi triase membantu tenaga medis 
++mengalokasikan pasien sesuai dengan kegawatdaruratannya dan mengetahui ketersediaan 
++kasur secara real-time. Perangkat TriaGo juga memiliki kepraktisan dalam penggunaan hanya 
++dengan menggunakan dua unit penjepit untuk mengekstraksi lebih dari satu parameter untuk 
++mempercepat prosedur triase. Menurut dokter, perangkat TriaGo memiliki potensi yang besar 
++dalam meningkatkan keakuratan dan ketepatan penanganan pasien triase di Instalasi Gawat 
++Darurat (IGD). 
++ 
++ 
++Gambar 4.14 Dokumentasi bersama dr. Saskia Diva Kamila 
++ 
++ 
++ 
++ 
++
