@@ -23,5 +23,8 @@ venv/
 *.pth
 *.ckpt
 
+# Mengabaikan dataset latih
+/bp deep learning/Bp revisi/Data/
+
 # Mengabaikan file sementara
 *.tmp
