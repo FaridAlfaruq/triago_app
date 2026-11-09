@@ -137,9 +137,13 @@ class PainGuiTests(unittest.TestCase):
                                              "total_segments": 1, "sbp": 120, "dbp": 80}
         predictor = Mock(wraps=TriageOnnxModel())
         with patch("GUI.loading_page.ECGProcessor", return_value=ecg), patch("GUI.loading_page.PPGProcessor", return_value=ppg):
-            worker = ProcessingWorker(values, np.arange(1250), values, values,
-                                      patient_info={"bed": "A1", "gcs": 15, "pain_score": 8,
-                                                    "temp_skin": 34.5, "temp_ambient": 28},
+            # PPG IR berdenyut (bukan konstan) agar estimasi suhu inti berbasis PI bisa dihitung.
+            raw_ir = 30000 + 600 * np.sin(2 * np.pi * 1.2 * np.arange(1250) / 400)
+            worker = ProcessingWorker(values, np.arange(1250), values, raw_ir,
+                                      patient_info={"gcs": 15, "pain_score": 8,
+                                                    # main_gui mengisi sampel suhu sensor per paket.
+                                                    "raw_temp_obj": np.full(1250, 34.5),
+                                                    "raw_temp_amb": np.full(1250, 28.0)},
                                       triage_predictor=predictor, bpnet_predictor=bp)
         results = []
         worker.processing_finished.connect(results.append)
