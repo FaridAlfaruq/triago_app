@@ -5,7 +5,10 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Import RegistrationPage agar halaman registrasi dengan Kasur, GCS & Pain Score dapat diakses juga dari home_page
-from regist_page import RegistrationPage
+try:
+    from .regist_page import RegistrationPage
+except ImportError:
+    from regist_page import RegistrationPage
 
 class HomePage(QWidget):
     # Sinyal untuk memberi tahu Main Window bahwa user menekan tombol MULAI

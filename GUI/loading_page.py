@@ -240,7 +240,7 @@ class ProcessingWorker(QThread):
                 print("[WARN BPNET] Menggunakan fallback BP 120/80 mmHg.")
 
 
-            # Susun tanda vital mentah untuk ONNX XGBoost Triase (11 fitur)
+            # Delapan input mentah; wrapper menyusun 11 fitur model termasuk pain score.
             raw_data = {
                 'temperature_c': temp_val,
                 'spo2': spo2_val,

@@ -26,8 +26,6 @@ warnings.filterwarnings('ignore')
 MODEL_DIR = Path(__file__).resolve().parent
 ONNX_FILENAME = MODEL_DIR / "triage_xgboost_model.onnx"
 
-if "KAGGLE_API_TOKEN" not in os.environ:
-    os.environ["KAGGLE_API_TOKEN"] = "KGAT_fc19df71ba18eaa47482e266ccf79521"
 
 print("=" * 70)
 print("[INFO] MEMULAI PELATIHAN TUNED XGBOOST (11 FITUR DENGAN PAIN SCORE) & ONNX")

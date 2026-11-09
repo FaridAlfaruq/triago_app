@@ -13,18 +13,34 @@ Folder ini berisi seluruh pipeline benchmarking dan pengujian algoritma SpO2 ber
 
 ## Formulasi Algoritma SpO2 Saat Ini
 
-Algoritma di [`processing_data/processing_data.py`](../processing_data/processing_data.py) menggunakan metode kuadratik *Ratio-of-Ratios* ($R$):
+Algoritma di [`processing_data/processing_data.py`](../processing_data/processing_data.py) memakai *Ratio-of-Ratios* ($R$) per denyut:
 
-$$R = \frac{AC_{\text{red}} / DC_{\text{red}}}{AC_{\text{ir}} / DC_{\text{ir}}}$$
+$$R_{beat} = \frac{AC_{\text{red}} / DC_{\text{red}}}{AC_{\text{ir}} / DC_{\text{ir}}}$$
 
-$$\text{SpO}_2 = A \cdot R^2 + B \cdot R + C$$
+- Dihitung pada sinyal mentah (sebelum downsample); DC = lowpass 0,3 Hz, AC = bandpass 0,5–5 Hz.
+- $R$ akhir = median $R_{beat}$ setelah membuang outlier > 3 MAD (artefak gerak).
 
-Dengan koefisien kalibrasi saat ini:
-- $A = 3.069398$
-- $B = -5.149127$
-- $C = 99.79428$
+Kalibrasi linear:
 
----
+$$\text{SpO}_2 = 107{,}83 - 25 \cdot R$$
+
+- Slope 25 mengikuti bentuk kurva empiris standar ($110 - 25R$) supaya desaturasi terdeteksi.
+- Intercept dikalibrasi ulang pada dataset PhysioNet (22 subjek).
+
+### Kenapa kurva lama diganti
+
+Kurva lama ($3{,}069R^2 - 5{,}149R + 99{,}79$) hampir datar: di $R=1{,}0$ (SpO2 sebenarnya ~85%) hasilnya 97,7%, dan di $R=2{,}0$ hasilnya 100%. Akibatnya pasien hipoksia terbaca normal.
+
+| R | Kurva lama | Kurva baru |
+|---:|---:|---:|
+| 0,4 | 98,2 | 97,8 |
+| 0,6 | 97,8 | 92,8 |
+| 0,8 | 97,6 | 87,8 |
+| 1,0 | 97,7 | 82,8 |
+
+### Batasan
+
+Ground truth dataset hanya 96–98,5%, jadi bagian kurva di bawah 95% **belum tervalidasi**. Benchmark di dataset ini juga belum bisa membuktikan akurasi: tebakan konstan 97,1% saja sudah dapat MAE 0,61. Untuk validasi yang benar, perlu data dari alat TriaGO sendiri yang direkam bersamaan dengan oksimeter referensi, idealnya mencakup SpO2 < 95%.
 
 ## Cara Menjalankan Benchmark
 

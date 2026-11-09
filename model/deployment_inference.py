@@ -66,6 +66,9 @@ class TriageOnnxModel:
             raise FileNotFoundError(f"File ONNX tidak ditemukan di: {self.model_path}")
         self.session = rt.InferenceSession(str(self.model_path), providers=["CPUExecutionProvider"])
         self.input_name = self.session.get_inputs()[0].name
+        width = self.session.get_inputs()[0].shape[-1]
+        if width != len(TRIAGE_FEATURES):
+            raise ValueError(f"Model ONNX meminta {width} fitur; wrapper pain score menyusun {len(TRIAGE_FEATURES)}")
 
     def predict(self, vitals: dict[str, float]):
         """Memprediksi status triase dengan model ONNX XGBoost + Dynamic Medical Safety Guardrails."""
