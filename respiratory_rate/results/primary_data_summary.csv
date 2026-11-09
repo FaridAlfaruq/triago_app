@@ -1,0 +1,5 @@
+method,n_evaluated,mae_bpm,rmse_bpm,bias_bpm,mape_percent,within_2_bpm_percent
+legacy,21,3.623,4.374,-0.846,18.04,33.33
+ecg_fusion,21,3.408,4.611,-0.47,17.4,47.62
+ppg_fusion,21,2.626,4.468,0.025,12.19,61.9
+multimodal,21,2.439,3.816,-0.227,12.74,66.67

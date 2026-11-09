@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pyqtgraph as pg
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QApplication, QGridLayout
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QApplication, QGridLayout, QLineEdit, QPushButton
 )
 from PyQt6.QtCore import QThread, pyqtSignal, Qt, QPropertyAnimation, QEasingCurve, pyqtProperty, QRectF
 from PyQt6.QtGui import QPixmap, QPainter, QPainterPath, QColor, QFont, QPen
@@ -142,12 +142,6 @@ class PlotPage(QWidget):
         self.recorded_data = []
         self.max_plot_points = 2000
         
-        # -----------------------------------------------------------------
-        # BUFFER KHUSUS SUHU SENSOR STM32
-        # -----------------------------------------------------------------
-        self.temp_skin_buffer = []
-        self.temp_amb_buffer = []
-        
         self.total_target_samples = int((self.WARMUP_DURATION_SEC + self.RECORD_DURATION_SEC) * self.SAMPLE_RATE_HZ)
         self.live_filter = LiveSignalFilter()
         
@@ -199,7 +193,6 @@ class PlotPage(QWidget):
             lbl_logo.setText("TriaGO")
             lbl_logo.setStyleSheet("font-size: 32px; font-weight: 900; color: #214889;")
         header_layout.addWidget(lbl_logo)
-        
         main_layout.addLayout(header_layout)
 
         # =====================================================================
@@ -265,24 +258,35 @@ class PlotPage(QWidget):
         main_layout.addWidget(ppg_frame, stretch=1)
 
     def start_session(self, patient_info):
+        # Simpan informasi pasien
         self.patient_data = patient_info
+
+        # Reset buffer pengukuran
         self.recorded_data = []
         self.time_buffer.clear()
         self.ecg_buffer.clear()
         self.ppg_buffer.clear()
 
-        # Reset Buffer Suhu Saat Sesi Perekaman Baru Dimulai
-        self.temp_skin_buffer.clear()
-        self.temp_amb_buffer.clear()
+        # Reset filter agar sesi baru tidak mewarisi state sebelumnya
+        self.live_filter = LiveSignalFilter()
 
-        self.progress_bar.setValue(0)
+        # Reset counter dan progress
         self.ui_update_counter = 0
+        self.progress_bar.setValue(0)
+
+        # Pastikan tidak ada worker dari sesi sebelumnya
+        self.close_threads()
+
+        # Aktifkan penerimaan data sensor
         self.is_recording = True
-        
+
+        # Buat dan jalankan worker STM32
         self.worker = STM32Worker()
         self.worker.data_received.connect(self.handle_new_packet)
         self.worker.error_occurred.connect(self._handle_sensor_error)
         self.worker.start()
+
+        print("[LOG STM32] Worker akuisisi sensor berhasil dijalankan.")
 
     def _handle_sensor_error(self, message):
         self.is_recording = False
@@ -296,30 +300,6 @@ class PlotPage(QWidget):
         current_samples_count = len(self.recorded_data)
         warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
 
-        # -----------------------------------------------------------------
-        # EKSTRAKSI FLEKSIBEL SUHU TUBUH & LINGKUNGAN KE BUFFER
-        # ----------------------------------------------------------------
-        # get_stm32.py mengirim: packet["temperature"]["object"] & packet["temperature"]["ambient"]
-        temp_data = packet.get("temperature", {})
-        
-        if isinstance(temp_data, dict):
-            obj_val = temp_data.get("object")
-            amb_val = temp_data.get("ambient")
-        else:
-            # Fallback jika struktur berbentuk flat dictionary
-            obj_val = packet.get("temp_skin", packet.get("temp_obj"))
-            amb_val = packet.get("temp_ambient", packet.get("temp_amb"))
-
-        # Masukkan ke buffer jika nilai terdeteksi (bukan None)
-        if obj_val is not None:
-            self.temp_skin_buffer.append(float(obj_val))
-            if len(self.temp_skin_buffer) == 1:
-                print(f"[LOG HARDWARE] ✅ Sensor Suhu Kulit Terdeteksi! Sampel Pertama: {obj_val:.2f}°C")
-
-        if amb_val is not None:
-            self.temp_amb_buffer.append(float(amb_val))
-            if len(self.temp_amb_buffer) == 1:
-                print(f"[LOG HARDWARE] ✅ Sensor Suhu Lingkungan Terdeteksi! Sampel Pertama: {amb_val}°C")
         # -----------------------------------------------------------------
         # PROSES FILTER SINYAL ECG & PPG
         # -----------------------------------------------------------------
@@ -373,27 +353,6 @@ class PlotPage(QWidget):
             
         warmup_samples = int(self.WARMUP_DURATION_SEC * self.SAMPLE_RATE_HZ)
         clean_data_subset = self.recorded_data[warmup_samples:]
-
-        # -----------------------------------------------------------------
-        # HITUNG RATA-RATA SUHU & SIMPAN KE PATIENT_DATA
-        # -----------------------------------------------------------------
-        if len(self.temp_skin_buffer) > 0:
-            avg_skin = float(np.mean(self.temp_skin_buffer))
-            print(f"[LOG PLOT_PAGE] ✅ Rata-rata Suhu Kulit (Obj): {avg_skin:.2f}°C (dari {len(self.temp_skin_buffer)} sampel)")
-        else:
-            avg_skin = 34.5
-            print("[WARN PLOT_PAGE] ⚠️ Buffer Suhu Kulit KOSONG! Memakai fallback default 34.5°C")
-
-        if len(self.temp_amb_buffer) > 0:
-            avg_amb = float(np.mean(self.temp_amb_buffer))
-            print(f"[LOG PLOT_PAGE] ✅ Rata-rata Suhu Lingkungan (Amb): {avg_amb:.2f}°C (dari {len(self.temp_amb_buffer)} sampel)")
-        else:
-            avg_amb = 28.0
-            print("[WARN PLOT_PAGE] ⚠️ Buffer Suhu Lingkungan KOSONG! Memakai fallback default 28.0°C")
-
-        # Simpan langsung ke patient_data agar terhubung dengan main_gui.py
-        self.patient_data["temp_skin"] = avg_skin
-        self.patient_data["temp_ambient"] = avg_amb
 
         self.progress_bar.animate_to(100)
         print(f"[LOG SUCCESS] {len(clean_data_subset)} paket data dioper ke RAM.")
