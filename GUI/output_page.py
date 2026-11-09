@@ -7,7 +7,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGridLayout, QApplication, QSizePolicy
 )
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QPixmap
 
 # Impor API Client dari folder service
@@ -26,8 +26,16 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', '#214889')
 
 
+ZONE_LABELS = {"red": "RESUSITASI", "yellow": "DARURAT", "green": "NON-DARURAT"}
+ZONE_COLORS = {"red": "#FF5252", "yellow": "#F39C12", "green": "#2ECC71"}
+
+
 class OutputPage(QWidget):
     home_requested = pyqtSignal()
+
+    # Lama menunggu balasan alokasi bed dari backend sebelum menyerah ke dashboard.
+    ASSIGNMENT_TIMEOUT_MS = 20000
+    ASSIGNMENT_POLL_MS = 500
 
     def __init__(self):
         super().__init__()
@@ -35,9 +43,15 @@ class OutputPage(QWidget):
         self.calculation_results = {}
         self.iot_json_payload = ""
         
-        # Inisialisasi API Client (Menghubungkan ke IP Server Laptop B)
+        # HTTP/MQTT dipilih dari .env, termasuk URL backend bila memakai HTTP.
         self.api_client = TriageApiClient() if TriageApiClient else None
-        
+
+        self.assignment_category = None
+        self.assignment_elapsed_ms = 0
+        self.assignment_timer = QTimer(self)
+        self.assignment_timer.setInterval(self.ASSIGNMENT_POLL_MS)
+        self.assignment_timer.timeout.connect(self._poll_assignment)
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -65,26 +79,34 @@ class OutputPage(QWidget):
         title_vbox.addWidget(lbl_subtitle)
         header_layout.addLayout(title_vbox)
 
+        header_layout.addStretch()
+
         self.triage_container = QHBoxLayout()
         self.triage_container.setSpacing(10)
         
         self.badge_color = QFrame()
-        self.badge_color.setFixedSize(40, 40)
+        self.badge_color.setFixedSize(48, 48)
         self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
         
         self.lbl_status_text = QLabel("RESUSITASI")
         self.lbl_status_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_status_text.setFixedHeight(40)
-        self.lbl_status_text.setMinimumWidth(160)
+        self.lbl_status_text.setFixedHeight(48)
+        self.lbl_status_text.setMinimumWidth(0)
         self.lbl_status_text.setStyleSheet("""
-            font-size: 20px; font-weight: 900; color: #FFFFFF;
+            font-size: 24px; font-weight: 900; color: #FFFFFF;
             background-color: #FF8A8A; border-radius: 8px; 
             padding-left: 12px; padding-right: 12px;
         """)
         
+        # Tujuan pasien: zona dari kategori triase, nomor bed dari backend.
+        self.lbl_assignment = QLabel("")
+        self.lbl_assignment.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_assignment.setFixedHeight(48)
+        self.lbl_assignment.setMinimumWidth(0)
+
         self.triage_container.addWidget(self.badge_color)
-        self.triage_container.addWidget(self.lbl_status_text, stretch=1)
-        header_layout.addLayout(self.triage_container, stretch=1)
+        self.triage_container.addWidget(self.lbl_status_text, stretch=2)
+        self.triage_container.addWidget(self.lbl_assignment, stretch=3)
 
         lbl_logo = QLabel()
         lbl_logo.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -100,6 +122,7 @@ class OutputPage(QWidget):
         header_layout.addWidget(lbl_logo)
 
         main_layout.addLayout(header_layout)
+        main_layout.addLayout(self.triage_container)
 
         # =========================================================================
         # 2. BODY LAYOUT (3 BARIS)
@@ -127,7 +150,9 @@ class OutputPage(QWidget):
 
         self.box_ecg = QFrame()
         self.box_ecg.setMinimumHeight(150)
-        self.box_ecg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
+        # Selector #id agar border tidak ikut menempel ke PlotWidget (turunan QFrame) dan memotong label sumbu.
+        self.box_ecg.setObjectName("plotBox")
+        self.box_ecg.setStyleSheet("QFrame#plotBox { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
         ecg_layout = QVBoxLayout(self.box_ecg)
         ecg_layout.setContentsMargins(4, 4, 4, 4)
 
@@ -135,6 +160,8 @@ class OutputPage(QWidget):
         self.plot_ecg.showGrid(x=True, y=True, alpha=0.2)
         self.plot_ecg.setLabel('bottom', 'Waktu (s)', color='#555555')
         self.plot_ecg.setLabel('left', 'Amplitudo', color='#555555')
+        self.plot_ecg.getAxis('left').enableAutoSIPrefix(False)  # tanpa "(x0.001)" di label
+        self.plot_ecg.setFrameShape(QFrame.Shape.NoFrame)
         ecg_layout.addWidget(self.plot_ecg)
 
         ecg_cell = QVBoxLayout()
@@ -149,7 +176,9 @@ class OutputPage(QWidget):
 
         self.box_ppg = QFrame()
         self.box_ppg.setMinimumHeight(150)
-        self.box_ppg.setStyleSheet("QFrame { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
+        # Selector #id agar border tidak ikut menempel ke PlotWidget (turunan QFrame) dan memotong label sumbu.
+        self.box_ppg.setObjectName("plotBox")
+        self.box_ppg.setStyleSheet("QFrame#plotBox { border: 1.5px solid #C2D5BB; border-radius: 10px; background-color: #FFFFFF; }")
         ppg_layout = QVBoxLayout(self.box_ppg)
         ppg_layout.setContentsMargins(4, 4, 4, 4)
 
@@ -157,6 +186,8 @@ class OutputPage(QWidget):
         self.plot_ppg.showGrid(x=True, y=True, alpha=0.2)
         self.plot_ppg.setLabel('bottom', 'Waktu (s)', color='#555555')
         self.plot_ppg.setLabel('left', 'Amplitudo', color='#555555')
+        self.plot_ppg.getAxis('left').enableAutoSIPrefix(False)  # tanpa "(x0.001)" di label
+        self.plot_ppg.setFrameShape(QFrame.Shape.NoFrame)
         ppg_layout.addWidget(self.plot_ppg)
 
         ppg_cell = QVBoxLayout()
@@ -218,6 +249,7 @@ class OutputPage(QWidget):
         """Memperbarui UI parameter medis, merender grafik ECG/PPG, dan kirim API Backend."""
         self.calculation_results = data
 
+        # Suhu & BP bisa None bila sensor/model BP revisi tidak menghasilkan nilai.
         temp_core = data.get("temperature")
         temp_skin = data.get("temp_skin")
 
@@ -227,13 +259,12 @@ class OutputPage(QWidget):
         sys_bp = data.get("systolic")
         dia_bp = data.get("diastolic")
         gcs = data.get("gcs", 15)
-        pain = data.get("pain_score", 0)
+        pain = data.get("pain_score")
 
         # 1. Update Teks 7 Kartu Parameter Medis
         self.lbl_gcs_val.setText(f"{int(gcs)} / 15")
         self.lbl_gcs_sub.setText("Skor Kesadaran")
-
-        self.lbl_pain_val.setText(f"{int(pain)} / 10")
+        self.lbl_pain_val.setText(f"{int(pain)} / 10" if pain is not None else "-- / 10")
         self.lbl_pain_sub.setText("Skor Nyeri")
         
         self.lbl_hr_val.setText(f"{hr:.1f} BPM")
@@ -246,21 +277,15 @@ class OutputPage(QWidget):
 
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         
+        # Label mode BP dari model BP revisi (ECG + PPG IR, tanpa manset).
         bp_mode = data.get("bp_mode", "unavailable")
-
         bp_label = {
             "calibrated": "Calibrated estimate",
             "uncalibrated": "Uncalibrated estimate",
             "fallback": "Fallback 120/80 mmHg (BP tidak lolos SQA)"
-        }.get(bp_mode)
-
+        }.get(bp_mode, "")
         has_bp = sys_bp is not None and dia_bp is not None
-
-        self.lbl_bp_val.setText(
-            f"{sys_bp:.1f}/{dia_bp:.1f} mmHg"
-            if has_bp else "BP unavailable"
-        )
-
+        self.lbl_bp_val.setText(f"{sys_bp:.1f}/{dia_bp:.1f} mmHg" if has_bp else "BP unavailable")
         self.lbl_bp_sub.setText(bp_label if has_bp else "")
 
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C" if temp_core is not None else "Temperature unavailable")
@@ -268,54 +293,79 @@ class OutputPage(QWidget):
 
         # 2. Update Header Triase UI
         triage_valid = data.get("triage_valid") is True
-
-        triage_status_text = (
-            data.get("triage_status", "TIDAK TERSEDIA")
-            if triage_valid
-            else "TIDAK TERSEDIA"
-        )
-
-        self.update_triage_header(triage_status_text)
-
-        triage_status_text = data["triage_status"] if triage_valid else "TIDAK TERSEDIA"
+        triage_status_text = data.get("triage_status", "TIDAK TERSEDIA") if triage_valid else "TIDAK TERSEDIA"
         self.update_triage_header(triage_status_text)
         input_warnings = data.get("triage_input_warnings", [])
         if input_warnings:
-            self.lbl_status_text.setToolTip(
-                "Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings)
-            )
+            self.lbl_status_text.setToolTip("Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings))
         else:
             self.lbl_status_text.setToolTip("")
 
-        # 3. Render Grafik Sinyal ECG 5 Detik
+        # 3. Render Grafik Sinyal ECG & PPG 5 Detik (Mencari Segmen Morfologi Terbaik & Stabil)
         time_arr = np.array(data.get("time_125", []))
         ecg_arr = np.array(data.get("ecg_smooth", []))
-        if len(time_arr) > 0 and len(ecg_arr) > 0:
-            sample_count = min(len(time_arr), 125 * 5)
-            t_slice = time_arr[-sample_count:]
-            ecg_slice = ecg_arr[-sample_count:]
-            t_rel = t_slice - t_slice[0]
-            
-            self.plot_ecg.clear()
-            self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
-            self.plot_ecg.setXRange(0, 5, padding=0)
-            self.plot_ecg.enableAutoRange(axis='y')
-
-        # 4. Render Grafik Sinyal PPG IR 5 Detik
         ppg_arr = np.array(data.get("ir_clean", []))
+        
         if len(time_arr) > 0 and len(ppg_arr) > 0:
-            sample_count = min(len(time_arr), 125 * 5)
-            t_slice = time_arr[-sample_count:]
-            ppg_slice = ppg_arr[-sample_count:]
+            mask = ~np.isnan(time_arr) & ~np.isnan(ppg_arr)
+            if len(ecg_arr) == len(time_arr):
+                mask = mask & ~np.isnan(ecg_arr)
+                
+            t_valid = time_arr[mask]
+            ppg_valid = ppg_arr[mask]
+            ecg_valid = ecg_arr[mask] if len(ecg_arr) == len(time_arr) else None
+            
+            total_len = len(t_valid)
+            win_len = min(total_len, 125 * 5)
+            
+            if total_len > win_len:
+                # Cari window 5 detik (625 sampel) dengan baseline drift terkecil & morfologi PPG paling stabil
+                best_start = 0
+                min_drift = float('inf')
+                fs = 125
+                step = fs // 2 # 0.5s step pergeseran
+                
+                for start in range(0, total_len - win_len, step):
+                    sub_p = ppg_valid[start : start + win_len]
+                    drift = abs(sub_p[-1] - sub_p[0]) + abs(np.mean(sub_p[:50]) - np.mean(sub_p[-50:]))
+                    # Abaikan 5 detik pertama jika terjadi lonjakan pemulihan filter awal
+                    if start >= fs * 5 and drift < min_drift:
+                        min_drift = drift
+                        best_start = start
+                        
+                t_slice = t_valid[best_start : best_start + win_len]
+                ppg_slice = ppg_valid[best_start : best_start + win_len]
+                ecg_slice = ecg_valid[best_start : best_start + win_len] if ecg_valid is not None else None
+            else:
+                t_slice = t_valid
+                ppg_slice = ppg_valid
+                ecg_slice = ecg_valid
+
             t_rel = t_slice - t_slice[0]
             
-            self.plot_ppg.clear()
-            self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
-            self.plot_ppg.setXRange(0, 5, padding=0)
-            self.plot_ppg.enableAutoRange(axis='y')
+            # Render ECG 5-Detik Segmen Terbaik
+            if ecg_slice is not None and len(ecg_slice) > 0:
+                self.plot_ecg.clear()
+                self.plot_ecg.plot(t_rel, ecg_slice, pen=pg.mkPen(color='#214889', width=2))
+                self.plot_ecg.setXRange(0, 5, padding=0)
+                self.plot_ecg.enableAutoRange(axis='y')
 
-        # 5. Pengiriman Payload ke Flask API Backend
-        if self.api_client and triage_valid:
+            # Render PPG 5-Detik Segmen Terbaik (Morfologi Puncak Sistolik Jelas)
+            if len(ppg_slice) > 0:
+                self.plot_ppg.clear()
+                self.plot_ppg.plot(t_rel, ppg_slice, pen=pg.mkPen(color='#214889', width=2))
+                self.plot_ppg.setXRange(0, 5, padding=0)
+                self.plot_ppg.enableAutoRange(axis='y')
+
+        # 4. Pengiriman payload melalui transport HTTP/MQTT yang dikonfigurasi
+        self.assignment_timer.stop()
+        triage_cat = self._map_status_to_color(triage_status_text)
+        if not triage_valid:
+            print(f"[WARN API] Hasil triase tidak dikirim: {data.get('triage_error', 'alasan tidak diketahui')}")
+            self._show_assignment(None, "Bed tidak dialokasikan")
+            return
+        self._show_assignment(triage_cat.lower(), "Bed menunggu server…")
+        if self.api_client:
             vitals_dict = {
                 "hr": hr,
                 "spo2": spo2,
@@ -324,115 +374,193 @@ class OutputPage(QWidget):
                 "sys": sys_bp,
                 "dia": dia_bp
             }
-            triage_cat = self._map_status_to_color(triage_status_text)
             xgb_score = data.get("xgboost_score", 0.0)
-
-            is_sent = self.api_client.send_triage_result(
-                gcs_score=gcs,
-                vitals=vitals_dict,
-                classification=triage_cat,
-                score=xgb_score,
-                pain_score=pain,
-            )
-            if is_sent:
-                print(f"[GUI LOG] Status pengiriman: {self.api_client.last_delivery_status}")
+            
+            payload = {
+                "Vitals": vitals_dict,
+                "TriageCategory": triage_cat,
+                "RiskScore": float(xgb_score),
+                "PainScore": pain
+            }
+            self.iot_json_payload = json.dumps(payload, indent=2)
+            
+            accepted = False
+            try:
+                print(f"[LOG OUTPUT] Mengirim hasil triage ({triage_cat})...")
+                if hasattr(self.api_client, "send_triage_result"):
+                    accepted = self.api_client.send_triage_result(
+                        gcs_score=int(gcs),
+                        vitals=vitals_dict,
+                        classification=triage_cat,
+                        score=float(xgb_score),
+                        patient_name=data.get("patient_name"),
+                        relative_name=data.get("relative_name"),
+                        pain_score=pain
+                    )
+                    if not accepted:
+                        print("[ERROR OUTPUT] Hasil belum terkirim/tersimpan di antrean. Periksa konfigurasi.")
+            except Exception as e:
+                print(f"[ERROR OUTPUT] Failed to send IoT data: {e}")
+            if accepted is True:
+                self.assignment_elapsed_ms = 0
+                self.assignment_timer.start()
+                self._poll_assignment()
             else:
-                print("[GUI LOG] Pengiriman hasil triase gagal.")
-        elif self.api_client:
-            print(
-                "[WARN API] Hasil triase tidak dikirim karena inferensi model gagal: "
-                f"{data.get('triage_error', 'alasan tidak diketahui')}"
-            )
-
-    def _map_status_to_color(self, status_text):
-        """Konversi dari string teks UI ke standar warna backend/frontend."""
-        status_upper = str(status_text).upper()
-        if "RESUSITASI" in status_upper or status_upper == "RED":
-            return "red"
-        elif "DARURAT" in status_upper and "NON" not in status_upper or status_upper == "YELLOW":
-            return "yellow"
+                self._show_assignment(self.assignment_category, "Bed belum dialokasikan")
         else:
-            return "green"
+            self._show_assignment(self.assignment_category, "Bed belum dialokasikan")
+
+    def _show_assignment(self, zone, bed_text):
+        """Tampilkan tujuan pasien, mis. 'ZONA DARURAT · BED 05'."""
+        self.assignment_category = zone
+        if zone is None:
+            self.lbl_assignment.setText(bed_text.upper())
+            color = "#778899"
+        else:
+            self.lbl_assignment.setText(f"ZONA {ZONE_LABELS.get(zone, zone.upper())} · {bed_text.upper()}")
+            color = ZONE_COLORS.get(zone, "#214889")
+        self.lbl_assignment.setStyleSheet(
+            f"font-size: 24px; font-weight: 900; color: {color}; background-color: #FFFFFF; "
+            f"border: 2px solid {color}; border-radius: 8px; padding-left: 12px; padding-right: 12px;")
+
+    def _poll_assignment(self):
+        assignment = None
+        if self.api_client is not None and hasattr(self.api_client, "get_assignment"):
+            try:
+                assignment = self.api_client.get_assignment()
+            except Exception as exc:
+                print(f"[ERROR OUTPUT] Gagal membaca alokasi bed: {exc}")
+        if isinstance(assignment, dict):
+            self.assignment_timer.stop()
+            if assignment.get("assigned_bed"):
+                # Zona bisa berbeda dari kategori bila zona utama penuh (pasien merah dipindah).
+                zone = assignment.get("zone") or self.assignment_category
+                self.lbl_assignment.setToolTip("")
+                self._show_assignment(zone, f"Bed {assignment['assigned_bed']}")
+            else:
+                self.lbl_assignment.setToolTip("Bed zona ini penuh. Pasien masuk daftar tunggu di dashboard.")
+                self._show_assignment(self.assignment_category, "Daftar tunggu")
+            return
+        self.assignment_elapsed_ms += self.ASSIGNMENT_POLL_MS
+        if self.assignment_elapsed_ms >= self.ASSIGNMENT_TIMEOUT_MS:
+            self.assignment_timer.stop()
+            self.lbl_assignment.setToolTip("Balasan server belum diterima. Nomor bed dapat dilihat di dashboard.")
+            self._show_assignment(self.assignment_category, "Bed: lihat dashboard")
+
+    def _map_status_to_color(self, status):
+        st = str(status).upper()
+        if "RESUSITASI" in st or "MERAH" in st or "RED" in st:
+            return "Red"
+        elif "NON" in st or "HIJAU" in st or "GREEN" in st:
+            return "Green"
+        elif "DARURAT" in st or "KUNING" in st or "YELLOW" in st:
+            return "Yellow"
+        else:
+            return "Green"
 
     def update_triage_header(self, status):
-        status = status.upper()
-        if "TIDAK TERSEDIA" in status or "ERROR" in status:
+        st = str(status).upper()
+        if "TIDAK TERSEDIA" in st or "ERROR" in st:
+            # Inferensi triase gagal: jangan tampilkan kategori apa pun.
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #7F8C8D;")
             self.lbl_status_text.setText("TIDAK TERSEDIA")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #E5E8E8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #566573;")
-        elif "RESUSITASI" in status or status == "RED":
-            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #E74C3C;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #E5E8E8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #566573;")
+        elif "RESUSITASI" in st or "MERAH" in st or "RED" in st:
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #FF5252;")
             self.lbl_status_text.setText("RESUSITASI")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FADBD8; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #E74C3C;")
-        elif "DARURAT" in status and "NON" not in status or status == "YELLOW":
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FFEBEE; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #FF5252;")
+        elif "NON" in st or "HIJAU" in st or "GREEN" in st:
+            self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
+            self.lbl_status_text.setText("NON-DARURAT")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+        elif "DARURAT" in st or "KUNING" in st or "YELLOW" in st:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #F39C12;")
             self.lbl_status_text.setText("DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #FDEBD0; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #F39C12;")
         else:
             self.badge_color.setStyleSheet("border-radius: 8px; background-color: #2ECC71;")
             self.lbl_status_text.setText("NON-DARURAT")
-            self.lbl_status_text.setStyleSheet("font-size: 20px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
+            self.lbl_status_text.setStyleSheet("font-size: 24px; font-weight: 900; background-color: #D5F5E3; border-radius: 8px; padding-left: 12px; padding-right: 12px; color: #2ECC71;")
 
     def handle_home_click(self):
+        self.assignment_timer.stop()
         print("[LOG] Inputs cleared. Returning to home_page...")
         self.home_requested.emit()
 
-
 # =========================================================================
-# UJI MANDIRI LOCAL
+# UJI MANDIRI LOCAL (MEMBACA DATASET PASIEN NON-DARURAT: 37.7°C, 70.7 BPM, 100% SpO2)
 # =========================================================================
 if __name__ == "__main__":
     import pandas as pd
-
+    import scipy.signal as signal
+    
     app = QApplication(sys.argv)
-    
     test_window = OutputPage()
-    test_window.setWindowTitle("TriaGO - Test Sinyal Asli (ECG Real & PPG BIDMC)")
-    test_window.showMaximized()
     
-    # 1. Load ECG dari data pengukuran
-    csv_file = os.path.join(project_root, "data_pengukuran", "data_test.csv")
-    if os.path.exists(csv_file):
-        df_ecg = pd.read_csv(csv_file).dropna(subset=["Resample Time (s)", "ECG_Clean"])
-        t_arr = df_ecg["Resample Time (s)"].values
-        ecg_arr = df_ecg["ECG_Clean"].values
-    else:
-        fs = 125
-        t_arr = np.linspace(0, 10, 10 * fs)
-        ecg_arr = np.sin(2 * np.pi * 1.5 * t_arr) + 0.2 * np.random.normal(size=len(t_arr))
-
-    # 2. Load PPG bersih dari dataset BIDMC lokal
-    bidmc_path = os.path.join(project_root, "bidmc", "bidmc_01_Signals.csv")
-    if os.path.exists(bidmc_path):
-        df_bidmc = pd.read_csv(bidmc_path, nrows=len(t_arr) + 2000)
-        df_bidmc.columns = [c.strip() for c in df_bidmc.columns]
-        ir_arr = df_bidmc["PLETH"].iloc[1000:1000 + len(t_arr)].values
-    else:
-        fs = 125
-        ir_arr = 1.2 + 0.4 * np.sin(2 * np.pi * 1.5 * t_arr)
-
-    sample_results = {
-        "bed": "A1",
-        "patient_name": "Budi Santoso",
-        "gcs": 15,
-        "pain_score": 3,
-        "timestamp": "2026-07-25 10:55:00",
-        "temperature": 36.5,
-        "temp_skin": 34.2,
-        "temp_ambient": 27.5,
-        "hr": 78.0,
-        "rr": 16.0,
-        "spo2": 98.2,
-        "systolic": 120,
-        "diastolic": 80,
-        "time_125": t_arr,
-        "ecg_smooth": ecg_arr,
-        "ir_clean": ir_arr,
-        "triage_status": "NON-DARURAT",
-        "triage_valid": False,
-        "xgboost_score": 0.88
-    }
-
-    test_window.update_results(sample_results)
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(base_dir, "data_pengukuran")
     
+    csv_path = os.path.join(data_dir, "data_test.csv")
+    json_path = os.path.join(data_dir, "data_test.json")
+    
+    if os.path.exists(csv_path):
+        print(f"[TEST OUTPUT] Loading Exact Screenshot Dataset: {csv_path}")
+        test_window.setWindowTitle("TriaGO - Output Pengecekan (Sinyal & Parameter Ideal)")
+        df = pd.read_csv(csv_path)
+        df_clean = df.dropna(subset=['ECG_Clean', 'PPG_IR_Clean'])
+        
+        t_125 = df_clean['Resample Time (s)'].values
+        ecg_125 = df_clean['ECG_Clean'].values
+        
+        # Scale PPG signal to range [-500, 500] matching exact waveform in screenshot
+        ppg_raw = df_clean['PPG_IR_Clean'].values
+        ppg_125 = ((ppg_raw - np.mean(ppg_raw)) / (np.max(ppg_raw) - np.min(ppg_raw))) * 1000.0
+        
+        json_data = {}
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as f:
+                json_data = json.load(f)
+
+        test_results = {
+            "patient_name": "Pasien Uji",
+            "gcs": 15.0,
+            "timestamp": str(json_data.get("Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
+            "temperature": 37.7,
+            "temp_skin": 33.1,
+            "temp_ambient": 28.5,
+            "hr": 70.7,
+            "rr": 14.0,
+            "spo2": 100.0,
+            "systolic": 119.0,
+            "diastolic": 68.0,
+            "time_125": t_125,
+            "ecg_smooth": ecg_125,
+            "ir_clean": ppg_125,
+            "triage_status": "NON-DARURAT",
+            "triage_valid": True,
+            "xgboost_score": 0.99
+        }
+    else:
+        test_results = {
+            "patient_name": "Pasien Uji",
+            "gcs": 15.0,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "temperature": 37.7,
+            "temp_skin": 33.1,
+            "temp_ambient": 28.5,
+            "hr": 70.7,
+            "rr": 14.0,
+            "spo2": 100.0,
+            "systolic": 119.0,
+            "diastolic": 68.0,
+            "time_125": np.linspace(0, 60, 7500),
+            "ecg_smooth": np.zeros(7500),
+            "ir_clean": np.zeros(7500),
+            "triage_status": "NON-DARURAT",
+            "triage_valid": True,
+            "xgboost_score": 0.99
+        }
+
+    test_window.update_results(test_results)
+    test_window.show()
     sys.exit(app.exec())

@@ -22,7 +22,13 @@ Buat kredensial terpisah dengan izin topic:
 | Perangkat | Izin | Topic |
 | --- | --- | --- |
 | Raspi 01 | Publish | `triago/biomed/devices/raspi-01/triage` |
+| Raspi 01 | Subscribe | `triago/biomed/devices/raspi-01/assignment` |
 | Backend | Subscribe | `triago/biomed/devices/+/triage` |
+| Backend | Publish | `triago/biomed/devices/+/assignment` |
+
+Topic `assignment` membawa balasan bed hasil alokasi backend ke Raspi pengirim.
+Tanpa dua izin tambahan itu data tetap tersimpan, tetapi GUI Raspi hanya
+menampilkan zona dan meminta perawat melihat nomor bed di dashboard.
 
 Setiap Raspi harus punya `TRIAGO_DEVICE_ID` dan `TRIAGO_MQTT_CLIENT_ID`
 yang berbeda. Topic prefix harus sama pada Raspi dan backend.
@@ -74,9 +80,14 @@ cp config/backend.env.example .env
 ```
 
 Isi kredensial subscriber HiveMQ dan konfigurasi MySQL yang sudah dipakai TriaGO.
-Tabel `patient_data` memakai struktur backend lama dengan tambahan nullable
-`pain_score`. Untuk MySQL lama, jalankan migrasi pain score satu kali seperti
-[panduan pain score](PAIN_SCORE.md). SQLite mode laptop bermigrasi otomatis.
+Untuk MySQL **baru**, buat tabel `patient_data` dengan
+[`000_create_patient_data.sql`](../backend/migrations/000_create_patient_data.sql)
+(sudah mencakup `pain_score` dan `patient_details`). Untuk tabel MySQL **lama**,
+jalankan satu kali migrasi yang belum pernah dijalankan:
+[`001_add_pain_score.sql`](../backend/migrations/001_add_pain_score.sql) (lihat
+[panduan pain score](PAIN_SCORE.md)) dan
+[`002_add_patient_details.sql`](../backend/migrations/002_add_patient_details.sql)
+untuk form data pasien. SQLite mode laptop bermigrasi otomatis.
 Password database sekarang harus diisi lewat environment, tanpa password bawaan dalam kode.
 
 ```bash
@@ -115,7 +126,6 @@ QoS `1`, `retain=False`.
   "event_id": "9c34353a-c2f1-4a67-b55a-3f0074e633d8",
   "device_id": "raspi-01",
   "data": {
-    "bed_id": "A1",
     "gcs_score": 15,
     "pain_score": 3,
     "triage_category": "green",
@@ -124,6 +134,22 @@ QoS `1`, `retain=False`.
   }
 }
 ```
+
+Raspi tidak mengirim `bed_id`. Backend memilih bed kosong di zona sesuai kategori:
+`red` → Resusitasi, lalu Darurat, lalu Non-Darurat; `yellow` → Darurat, lalu Non-Darurat, lalu Resusitasi;
+`green` → Non-Darurat saja. Bila tidak ada bed, pasien masuk daftar tunggu (`WAITING`).
+`bed_id` dari outbox versi lama masih diterima tetapi diabaikan.
+
+Setelah data tersimpan, backend membalas ke
+`triago/biomed/devices/<device_id>/assignment` (QoS `1`, `retain=False`):
+
+```json
+{"schema_version": 1, "event_id": "9c34353a-c2f1-4a67-b55a-3f0074e633d8",
+ "status": "success", "assigned_bed": "10", "zone": "green"}
+```
+
+`status` bernilai `warning` dengan `assigned_bed`/`zone` `null` bila pasien masuk
+daftar tunggu. Balasan yang gagal terkirim tidak mengulang penyimpanan data.
 
 Backend memvalidasi tipe JSON, angka finite, kategori, UUID event, dan kecocokan
 device ID dengan topic. Pesan retained, rusak, dan di atas 64 KiB ditolak.
