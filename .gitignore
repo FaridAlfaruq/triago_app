@@ -22,3 +22,6 @@ venv/
 !.env.example
 /runtime/
 .venv/
+
+# Local contributor guide
+/[Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
