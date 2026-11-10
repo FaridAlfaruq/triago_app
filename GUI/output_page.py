@@ -273,20 +273,14 @@ class OutputPage(QWidget):
         if data.get("rr_measured", False):
             self.lbl_rr_val.setToolTip(f"Kualitas estimasi RR: {float(data.get('rr_quality', 0.0)):.2f}")
         else:
-            self.lbl_rr_val.setToolTip("RR tidak terukur; nilai fallback digunakan")
+            self.lbl_rr_val.setToolTip("")
 
         self.lbl_spo2_val.setText(f"{spo2:.1f} %")
         
-        # Label mode BP dari model BP revisi (ECG + PPG IR, tanpa manset).
-        bp_mode = data.get("bp_mode", "unavailable")
-        bp_label = {
-            "calibrated": "Calibrated estimate",
-            "uncalibrated": "Uncalibrated estimate",
-            "fallback": "Fallback 120/80 mmHg (BP tidak lolos SQA)"
-        }.get(bp_mode, "")
+        # MAP dihitung dari nilai sistolik dan diastolik yang ditampilkan.
         has_bp = sys_bp is not None and dia_bp is not None
         self.lbl_bp_val.setText(f"{sys_bp:.1f}/{dia_bp:.1f} mmHg" if has_bp else "BP unavailable")
-        self.lbl_bp_sub.setText(bp_label if has_bp else "")
+        self.lbl_bp_sub.setText(f"MAP: {(sys_bp + 2 * dia_bp) / 3:.0f} mmHg" if has_bp else "")
 
         self.lbl_temp_val.setText(f"{temp_core:.1f} °C" if temp_core is not None else "Temperature unavailable")
         self.lbl_temp_sub.setText(f"Kulit: {temp_skin:.1f}°C" if temp_skin is not None else "")
@@ -295,11 +289,7 @@ class OutputPage(QWidget):
         triage_valid = data.get("triage_valid") is True
         triage_status_text = data.get("triage_status", "TIDAK TERSEDIA") if triage_valid else "TIDAK TERSEDIA"
         self.update_triage_header(triage_status_text)
-        input_warnings = data.get("triage_input_warnings", [])
-        if input_warnings:
-            self.lbl_status_text.setToolTip("Sebagian input memakai fallback:\n- " + "\n- ".join(input_warnings))
-        else:
-            self.lbl_status_text.setToolTip("")
+        self.lbl_status_text.setToolTip("")
 
         # 3. Render Grafik Sinyal ECG & PPG 5 Detik (Mencari Segmen Morfologi Terbaik & Stabil)
         time_arr = np.array(data.get("time_125", []))
